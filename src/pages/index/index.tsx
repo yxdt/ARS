@@ -1,7 +1,7 @@
-import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text, Image, Button } from "@tarojs/components";
-import { AtNavBar, AtButton, AtIcon } from "taro-ui";
-import "./index.scss";
+import Taro, { Component, Config } from '@tarojs/taro';
+import { View, Text, Image, Button } from '@tarojs/components';
+import { AtNavBar, AtIcon } from 'taro-ui';
+import './index.scss';
 
 export default class Index extends Component {
   componentWillMount() {}
@@ -22,15 +22,15 @@ export default class Index extends Component {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    navigationBarTitleText: "首页",
+    navigationBarTitleText: '首页',
   };
 
   handleClick() {
-    console.log("you clicked me.");
+    console.log('you clicked me.');
   }
   openCamera() {
     Taro.navigateTo({
-      url: "/pages/camera/camera",
+      url: '/pages/camera/camera',
     });
   }
   render() {
@@ -44,10 +44,10 @@ export default class Index extends Component {
           title="LGECH A.R.S."
           leftText=""
           leftIconType={{
-            prefixClass: "fa",
-            value: "truck",
-            size: "30",
-            color: "#fff",
+            prefixClass: 'fa',
+            value: 'truck',
+            size: '30',
+            color: '#fff',
           }}
           rightFirstIconType="bullet-list"
           rightSecondIconType=""
@@ -55,33 +55,19 @@ export default class Index extends Component {
         <Image
           mode="scaleToFill"
           style="width:100%; height: 100%; position:fixed; background-size: 100%, 100%; z-index: -1"
-          src="../../assets/img/back.png"
-        ></Image>
+          src="../../assets/img/back.png"></Image>
         <View className="home-title-span">
           <Text className="home-title">
-            欢迎使用 <Text className="home-title-hilite">A.R.S.</Text>\n
-            司机专属版
+            欢迎使用 <Text className="home-title-hilite">A.R.S.</Text>\n 司机专属版
           </Text>
         </View>
         <View className="home-button-span">
           <Button onClick={this.openCamera} className="home-button">
-            <AtIcon
-              prefixClass="fa"
-              value="camera"
-              size="20"
-              color="#ffffff"
-              customStyle="margin-right:10px;"
-            ></AtIcon>
+            <AtIcon prefixClass="fa" value="camera" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
             拍照上传交货单
           </Button>
           <Button className="home-button">
-            <AtIcon
-              prefixClass="fa"
-              value="pencil"
-              size="20"
-              color="#ffffff"
-              customStyle="margin-right:10px;"
-            ></AtIcon>
+            <AtIcon prefixClass="fa" value="pencil" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
             手工录入交货单
           </Button>
         </View>

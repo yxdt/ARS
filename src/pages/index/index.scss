@@ -1,0 +1,42 @@
+$color-bg: #a50034;
+.at-nav-bar {
+  background-color: #a50034;
+  .at-nav-bar__title {
+    color: #ffffff;
+  }
+}
+.home-title-span {
+  margin-top: 6rem;
+  margin-left: 1rem;
+  .home-title {
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: bold;
+    font-family: "Teko" sans-serif;
+    .home-title-hilite {
+      color: $color-bg;
+      font-size: 3.2rem;
+      font-weight: bolder;
+      text-shadow: 2px 2px 2px #ffffff;
+    }
+  }
+}
+.home-button-span {
+  margin-top: 3.5rem;
+  .home-button {
+    background-color: $color-bg;
+    color: #ffffff;
+    margin: 2rem;
+    height: 4rem;
+    line-height: 4rem;
+    font-size: 0.8rem;
+  }
+}
+
+.home-prompt-span {
+  margin-top: 2rem;
+  margin-left: 2rem;
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-style: italic;
+}

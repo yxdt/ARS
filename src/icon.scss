@@ -1,0 +1,33 @@
+@font-face {
+  font-family: "FontAwesome";
+  src: url("./assets/fonts/fontawesome-webfont.eot?v=4.7.0");
+  src: url("./assets/fonts/fontawesome-webfont.woff2?v=4.7.0") format("woff2"),
+    url("./assets/fonts/fontawesome-webfont.woff?v=4.7.0") format("woff"),
+    url("./assets/fonts/fontawesome-webfont.ttf?v=4.7.0") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.fa {
+  display: inline-block;
+  font: normal normal normal 14px/1 fontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.fa-clock:before {
+  content: "\f00d";
+}
+.fa-truck:before {
+  content: "\f0d1";
+}
+.fa-camera:before {
+  content: "\f030";
+}
+.fa-pencil:before {
+  content: "\f040";
+}
+.fa-picture-o:before {
+  content: "\f03e";
+}

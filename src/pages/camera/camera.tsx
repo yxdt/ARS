@@ -1,24 +1,30 @@
-import Taro, { Component, Config } from '@tarojs/taro';
-import { View, Text, Image, Button, Camera } from '@tarojs/components';
-import { AtNavBar, AtIcon } from 'taro-ui';
-import './camera.scss';
+import Taro, { Component, Config } from "@tarojs/taro";
+import { View, Text, Image, Button, Camera } from "@tarojs/components";
+import { AtNavBar, AtIcon } from "taro-ui";
+import "./camera.scss";
 
 export interface CameraStates {
   src: string;
   preview: boolean;
 }
 
-export default class Index extends Component<null, CameraStates> {
+export interface CameraProps {
+  isScan: boolean;
+}
+
+export default class Index extends Component<CameraProps, CameraStates> {
   constructor() {
     super(...arguments);
     this.state = {
-      src: '',
+      src: "",
       preview: false,
     };
     this.takePic.bind(this);
     this.scanCode.bind(this);
   }
-  componentWillMount() {}
+  componentWillMount() {
+    console.log(this.$router.params);
+  }
 
   componentDidMount() {}
 
@@ -36,16 +42,16 @@ export default class Index extends Component<null, CameraStates> {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    navigationBarTitleText: '首页',
+    navigationBarTitleText: "首页",
   };
 
   handleClick() {
-    console.log('you clicked me.');
+    console.log("you clicked me.");
   }
   takePic() {
     const ctx = Taro.createCameraContext();
     ctx.takePhoto({
-      quality: 'high',
+      quality: "high",
       success: (res) => {
         console.log(res);
         this.setState({
@@ -58,11 +64,13 @@ export default class Index extends Component<null, CameraStates> {
   scanCode() {
     const ctx = Taro.scanCode({
       success: (res) => {
-        console.log('scan code success:', res);
+        console.log("scan code success:", res);
       },
     });
   }
   render() {
+    console.log("props, router:", this.props, this.$router.params);
+    const isScan = this.$router.params.isScan;
     return (
       <View className="index">
         <AtNavBar
@@ -73,17 +81,22 @@ export default class Index extends Component<null, CameraStates> {
           title="LGECH A.R.S."
           leftText=""
           leftIconType={{
-            prefixClass: 'fa',
-            value: 'truck',
-            size: '30',
-            color: '#fff',
+            prefixClass: "fa",
+            value: "truck",
+            size: "30",
+            color: "#fff",
           }}
           rightFirstIconType="bullet-list"
           rightSecondIconType=""
         />
         {this.state.preview ? null : (
           <View className="camera-span expand">
-            <Camera frameSize="large" devicePosition="back" flash="auto" style="width:100%; height: 100%;"></Camera>
+            <Camera
+              frameSize="large"
+              devicePosition="back"
+              flash="auto"
+              style="width:100%; height: 100%;"
+            ></Camera>
           </View>
         )}
         {this.state.preview ? (
@@ -94,15 +107,30 @@ export default class Index extends Component<null, CameraStates> {
         ) : null}
         {this.state.preview ? null : (
           <View className="camera-button-span">
-            <Button className="camera-button" onClick={this.takePic}>
-              <AtIcon prefixClass="fa" value="camera" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
-              点击拍照
-            </Button>
-            <Button className="camera-button" onClick={this.scanCode}>
-              扫描货运单条码
-            </Button>
+            {!isScan ? (
+              <Button className="camera-button" onClick={this.takePic}>
+                <AtIcon
+                  prefixClass="fa"
+                  value="camera"
+                  size="20"
+                  color="#ffffff"
+                  customStyle="margin-right:10px;"
+                ></AtIcon>
+                点击拍照
+              </Button>
+            ) : (
+              <Button className="camera-button" onClick={this.scanCode}>
+                扫描货运单条码
+              </Button>
+            )}
             <Button className="camera-button">
-              <AtIcon prefixClass="fa" value="picture-o" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
+              <AtIcon
+                prefixClass="fa"
+                value="picture-o"
+                size="20"
+                color="#ffffff"
+                customStyle="margin-right:10px;"
+              ></AtIcon>
               选取图片
             </Button>
           </View>

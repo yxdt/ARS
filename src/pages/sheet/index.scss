@@ -5,12 +5,89 @@ $color-bg: #a50034;
     color: #ffffff;
   }
 }
+.back-image {
+  margin: -100;
+  padding: 0;
+}
+.form-title {
+  color: #666666;
+  font-size: 1.2rem;
+  margin-top: 4rem;
+  margin-left: 1rem;
+  display: block;
+  font-weight: bold;
+}
+.form-caption {
+  color: #666666;
+  font-size: 1rem;
+  line-height: 1.8rem;
+  display: block;
+}
+hr {
+  color: #999999;
+  background-color: #999999;
+  height: 2px;
+}
+.form-hilite {
+  color: $color-bg;
+  font-size: 1rem;
+  font-weight: bolder;
+  background-color: #ffa3b2;
+  display: inline-block;
+  margin: "0 auto";
+  padding: 10px;
+}
+.sheet-info-span {
+  margin: 1rem;
+  padding-top: 5rem;
+  background-color: #f5f5f5;
+  border-radius: 0.8rem;
+  margin-bottom: 3rem;
+  margin-top: 1rem;
+  font-family: "Teko" sans-serif;
+  padding-top: 1rem;
+  padding-left: 1.2rem;
+  padding-right: 1.2rem;
+  padding-bottom: 2.2rem;
 
-.sheet-span {
+  .form-userinfo {
+    background-color: #f5f5f5;
+    padding-bottom: 2rem;
+    .input-text {
+      border-radius: 10px;
+      border-color: #dddddd;
+      border-width: 2px;
+      border-style: solid;
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+      padding-left: 1rem;
+      margin-bottom: 1rem;
+      margin-left: 0;
+    }
+    .picker {
+      border-radius: 10px;
+      border-color: #dddddd;
+      border-width: 2px;
+      border-style: solid;
+      margin-bottom: 1rem;
+      margin-left: 0;
+    }
+  }
+}
+
+.home-button {
+  margin-top: 1rem;
+  background-color: $color-bg;
+  color: #ffffff;
+  height: 4rem;
+  line-height: 4rem;
+  font-size: 0.8rem;
+}
+
+.home-prompt-span {
   margin-top: 2rem;
   margin-left: 2rem;
   color: #ffffff;
-  background-color: #cccccc;
   font-size: 0.8rem;
   font-style: italic;
 }

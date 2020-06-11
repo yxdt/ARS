@@ -3,6 +3,8 @@ import { View, Text, Image, Button } from "@tarojs/components";
 import { AtNavBar, AtIcon } from "taro-ui";
 import "./index.scss";
 
+import NavBar from "../../components/navbar";
+
 export default class Index extends Component {
   componentWillMount() {}
 
@@ -44,25 +46,10 @@ export default class Index extends Component {
   render() {
     return (
       <View className="index">
-        <AtNavBar
-          onClickRgIconSt={this.handleClick}
-          onClickRgIconNd={this.handleClick}
-          onClickLeftIcon={this.handleClick}
-          color="#ffffff"
-          title="LGECH A.R.S."
-          leftText=""
-          leftIconType={{
-            prefixClass: "fa",
-            value: "truck",
-            size: "30",
-            color: "#fff",
-          }}
-          rightFirstIconType="bullet-list"
-          rightSecondIconType=""
-        />
+        <NavBar handleClick={this.handleClick} />
         <Image
           mode="scaleToFill"
-          style="width:100%; height: 100%; position:fixed; background-size: 100%, 100%; z-index: -1"
+          style="width:100%; height: 100%; left:0;top:0; position:fixed; background-size: 100%, 100%; z-index: -1"
           src="../../assets/img/back.png"
         ></Image>
         <View className="home-title-span">

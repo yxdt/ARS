@@ -1,7 +1,8 @@
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Image, Button, Camera } from "@tarojs/components";
-import { AtNavBar, AtIcon } from "taro-ui";
+import { AtIcon } from "taro-ui";
 import "./camera.scss";
+import NavBar from "../../components/navbar";
 
 export interface CameraStates {
   src: string;
@@ -73,22 +74,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
     const isScan = this.$router.params.isScan;
     return (
       <View className="index">
-        <AtNavBar
-          onClickRgIconSt={this.handleClick}
-          onClickRgIconNd={this.handleClick}
-          onClickLeftIcon={this.handleClick}
-          color="#ffffff"
-          title="LGECH A.R.S."
-          leftText=""
-          leftIconType={{
-            prefixClass: "fa",
-            value: "truck",
-            size: "30",
-            color: "#fff",
-          }}
-          rightFirstIconType="bullet-list"
-          rightSecondIconType=""
-        />
+        <NavBar />
         {this.state.preview ? null : (
           <View className="camera-span expand">
             <Camera

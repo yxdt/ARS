@@ -5,6 +5,12 @@ $color-bg: #a50034;
     color: #ffffff;
   }
 }
+.item-content__info-title {
+  font-size: 0.8rem !important;
+}
+.item-content__info-note {
+  color: #666 !important;
+}
 .back-image {
   margin: -100;
   padding: 0;

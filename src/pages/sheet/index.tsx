@@ -1,23 +1,15 @@
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Picker } from "@tarojs/components";
-import {
-  AtNavBar,
-  AtForm,
-  AtInput,
-  AtList,
-  AtListItem,
-  AtButton,
-} from "taro-ui";
+import { AtForm, AtInput, AtList, AtListItem, AtButton } from "taro-ui";
 import "./index.scss";
-
-export default class Index extends Component {
+import NavBar from "../../components/navbar";
+export interface SheetState {
+  checked: boolean;
+}
+export default class Index extends Component<null, SheetState> {
   constructor() {
     super(...arguments);
     this.state = {
-      userName: "",
-      cellphone: "",
-      platenumber: "",
-      trucktype: "",
       checked: false,
     };
   }
@@ -63,23 +55,7 @@ export default class Index extends Component {
   render() {
     return (
       <View className="index">
-        <AtNavBar
-          onClickRgIconSt={this.handleClick}
-          onClickRgIconNd={this.handleClick}
-          onClickLeftIcon={this.handleClick}
-          color="#ffffff"
-          title="LGECH A.R.S."
-          fixed={true}
-          leftText=""
-          leftIconType={{
-            prefixClass: "fa",
-            value: "truck",
-            size: "30",
-            color: "#fff",
-          }}
-          rightFirstIconType="bullet-list"
-          rightSecondIconType=""
-        />
+        <NavBar handleClick={this.handleClick} />
         <Text className="form-title">货运单详细信息</Text>
         <View className="sheet-info-span">
           <Text className="form-caption">
@@ -108,6 +84,7 @@ export default class Index extends Component {
               }}
               title="M09BJZ011288-1-1bj-1（样机）"
               note="GT-S25NPD.CASWPLGD"
+              extraText="1"
               iconInfo={{
                 prefixClass: "fa",
                 value: this.state.checked ? "check-square-o" : "square-o",

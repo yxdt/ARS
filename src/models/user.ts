@@ -9,8 +9,9 @@ export default class User {
   distNum: string;
   comment: string;
   password: string;
-  province: string;
-  city: string;
+  country: string; //wx
+  province: string; //wx
+  city: string; //wx
   address: string;
   gender: string;
   dob: Date;

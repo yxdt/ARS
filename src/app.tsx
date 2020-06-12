@@ -30,7 +30,8 @@ class App extends Component {
     pages: [
       "pages/index/index",
       "pages/camera/camera",
-      "pages/driver/index",
+      "pages/driver/userinfo",
+      "pages/driver/Register",
       "pages/sheet/index",
     ],
     window: {

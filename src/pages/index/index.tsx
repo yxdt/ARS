@@ -4,7 +4,7 @@ import { AtNavBar, AtIcon } from "taro-ui";
 import "./index.scss";
 
 import NavBar from "../../components/navbar";
-
+import ArsTabBar from "../../components/tabbar";
 export default class Index extends Component {
   componentWillMount() {}
 
@@ -40,7 +40,7 @@ export default class Index extends Component {
   }
   openManual() {
     Taro.navigateTo({
-      url: "/pages/driver/index",
+      url: "/pages/driver/Register",
     });
   }
   render() {
@@ -83,6 +83,7 @@ export default class Index extends Component {
         <View className="home-prompt-span">
           <Text>请点击上面的按钮进行交货单确认操作</Text>
         </View>
+        <ArsTabBar current={0} />
       </View>
     );
   }

@@ -1,21 +1,21 @@
-import Taro, { useState } from "@tarojs/taro";
-import { View, Text, Image, Picker, Button } from "@tarojs/components";
-import { AtAvatar } from "taro-ui";
-import "./index.scss";
-import NavBar from "../../components/navbar";
-import ArsTabBar from "../../components/tabbar";
+import Taro, { useState } from '@tarojs/taro';
+import { View, Text, Image, Picker, Button } from '@tarojs/components';
+import { AtAvatar } from 'taro-ui';
+import './index.scss';
+import NavBar from '../../components/navbar';
+import ArsTabBar from '../../components/tabbar';
 
 export default function UserInfo() {
-  const [curAvatar, setAvatar] = useState("/assets/img/user.png");
-  const [userName, setUserName] = useState("");
-  const [userType, setUserType] = useState("注册司机");
-  const [cellphone, setCellphone] = useState("13823803380");
-  const [plateNum, setPlateNum] = useState("京A-876543");
+  const [curAvatar, setAvatar] = useState('/assets/img/user.png');
+  const [userName, setUserName] = useState('');
+  const [userType, setUserType] = useState('注册司机');
+  const [cellphone, setCellphone] = useState('13823803380');
+  const [plateNum, setPlateNum] = useState('京A-876543');
   const [truckType, setTruckType] = useState(1);
   const [init, setInit] = useState(true);
-  const userAuth: boolean = Taro.getStorageSync("userAuth");
+  const userAuth: boolean = Taro.getStorageSync('userAuth');
 
-  console.log("UserInfo:", this);
+  console.log('UserInfo:', this);
 
   function setUserInfo(userInfo) {
     setAvatar(userInfo.avatarUrl);
@@ -24,14 +24,14 @@ export default function UserInfo() {
 
   function onGotUserInfo(res) {
     //const {isWx, isBd, isTt} = this.state;
-    console.log("user info got return:", res);
+    console.log('user info got return:', res);
     const isWx = true;
-    Taro.setStorage({ key: "userAuth", data: true });
+    Taro.setStorage({ key: 'userAuth', data: true });
     if (isWx) {
       Taro.getUserInfo().then((ret) => {
         if (isWx) {
-          Taro.setStorage({ key: "userName", data: ret.userInfo.nickName });
-          Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
+          Taro.setStorage({ key: 'userName', data: ret.userInfo.nickName });
+          Taro.setStorage({ key: 'avatar', data: ret.userInfo.avatarUrl });
         }
         setUserInfo(ret.userInfo);
       });
@@ -50,7 +50,7 @@ export default function UserInfo() {
     <View className="index">
       <NavBar
         handleClick={() => {
-          console.log("click", this.state);
+          console.log('click', this.state);
         }}
       />
       <View className="user-info-span">
@@ -58,7 +58,7 @@ export default function UserInfo() {
           <AtAvatar image={curAvatar} size="normal" />
         </View>
         <View className="user-info">
-          {!userAuth ? (
+          {userAuth ? (
             <View className="user-detail">
               <View className="user-detail-1">
                 {userName}（{userType}）
@@ -68,11 +68,7 @@ export default function UserInfo() {
               </View>
             </View>
           ) : (
-            <Button
-              openType="getUserInfo"
-              onGetUserInfo={onGotUserInfo}
-              className="login-button"
-            >
+            <Button openType="getUserInfo" onGetUserInfo={onGotUserInfo} className="login-button">
               登录/注册
             </Button>
           )}

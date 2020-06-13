@@ -3,6 +3,8 @@ import { View, Text, Image, Button, Camera } from "@tarojs/components";
 import { AtIcon } from "taro-ui";
 import "./camera.scss";
 import NavBar from "../../components/navbar";
+import { takePicture, scanBarcode } from "../../controllers/camera";
+import ArsTabBar from "../../components/tabbar";
 
 export interface CameraStates {
   src: string;
@@ -50,23 +52,17 @@ export default class Index extends Component<CameraProps, CameraStates> {
     console.log("you clicked me.");
   }
   takePic() {
-    const ctx = Taro.createCameraContext();
-    ctx.takePhoto({
-      quality: "high",
-      success: (res) => {
-        console.log(res);
-        this.setState({
-          src: res.tempImagePath,
-          preview: true,
-        });
-      },
+    takePicture((res) => {
+      console.log("takePicture.res:", res);
+      this.setState({
+        src: res.tempImagePath,
+        preview: true,
+      });
     });
   }
   scanCode() {
-    const ctx = Taro.scanCode({
-      success: (res) => {
-        console.log("scan code success:", res);
-      },
+    scanBarcode((res) => {
+      console.log("scan code success:", res);
     });
   }
   render() {
@@ -106,6 +102,12 @@ export default class Index extends Component<CameraProps, CameraStates> {
               </Button>
             ) : (
               <Button className="camera-button" onClick={this.scanCode}>
+                <AtIcon
+                  prefixClass="fa"
+                  value="refresh fa-spin"
+                  size="30"
+                  color="#ffffff"
+                ></AtIcon>
                 扫描货运单条码
               </Button>
             )}
@@ -121,6 +123,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
             </Button>
           </View>
         )}
+        <ArsTabBar current={1} />
       </View>
     );
   }

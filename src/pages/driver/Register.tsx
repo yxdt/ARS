@@ -22,6 +22,7 @@ export interface DriverStates {
 }
 
 export default function Register(props) {
+  console.log("");
   const [userName, setUserName] = useState("1");
   const [cellphone, setCellphone] = useState("2");
   const [plateNum, setPlateNum] = useState("3");
@@ -59,17 +60,12 @@ export default function Register(props) {
 
   return (
     <View className="index">
-      <NavBar
-        handleClick={() => {
-          console.log("click", this.state);
-        }}
-      />
       <Image
         mode="scaleToFill"
         style="top:0;left:0; width:100%; height: 100%; position:fixed; background-size: 100%, 100%; z-index: -1"
         src="../../assets/img/back.png"
       ></Image>
-      <View className="user-info-span">
+      <View className="user-reg-span">
         <Text className="form-title">成为注册司机</Text>
         <Text className="form-caption">请输入您的信息</Text>
         <Text className="form-comment">
@@ -112,7 +108,7 @@ export default function Register(props) {
             onChange={handleChange.bind(this, "truckType")}
           >
             <AtList>
-              <AtListItem title="货车类型" />
+              <AtListItem title="货车类型" extraText={TruckTypes[truckType]} />
             </AtList>
           </Picker>
           <AtButton className="home-button" formType="submit">

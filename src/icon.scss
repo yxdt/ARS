@@ -55,3 +55,19 @@
 .fa-file-text-o:before {
   content: "\f0f6";
 }
+.fa-address-card-o:before {
+  content: "\f2bc";
+}
+.fa-wpforms:before {
+  content: "\f298";
+}
+.fa-pencil-square-o:before {
+  content: "\f044";
+}
+.fa-refresh:before {
+  content: "\f021";
+}
+.fa-spin {
+  -webkit-animation: fa-spin 2s infinite linear;
+  animation: fa-spin 2s infinite linear;
+}

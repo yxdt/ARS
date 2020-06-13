@@ -45,9 +45,9 @@ export default function ArsTabBar(props) {
       iconSize={20}
       current={current}
       fixed={true}
-      backgroundColor="#7b7b7b"
-      color="#a50034"
-      selectedColor="#ffffff"
+      backgroundColor="#ffffff"
+      color="#6b6b6b"
+      selectedColor="#f50034"
       fontSize={11}
     />
   );

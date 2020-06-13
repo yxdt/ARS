@@ -1,21 +1,23 @@
-import Taro, { useState } from '@tarojs/taro';
-import { View, Text, Image, Picker, Button } from '@tarojs/components';
-import { AtAvatar } from 'taro-ui';
-import './index.scss';
-import NavBar from '../../components/navbar';
-import ArsTabBar from '../../components/tabbar';
+import Taro, { useState } from "@tarojs/taro";
+import { View, Text, Image, Picker, Button } from "@tarojs/components";
+import { AtAvatar, AtGrid, AtList, AtListItem, AtFloatLayout } from "taro-ui";
+
+import "./index.scss";
+import NavBar from "../../components/navbar";
+import ArsTabBar from "../../components/tabbar";
 
 export default function UserInfo() {
-  const [curAvatar, setAvatar] = useState('/assets/img/user.png');
-  const [userName, setUserName] = useState('');
-  const [userType, setUserType] = useState('注册司机');
-  const [cellphone, setCellphone] = useState('13823803380');
-  const [plateNum, setPlateNum] = useState('京A-876543');
+  const [curAvatar, setAvatar] = useState("/assets/img/user.png");
+  const [userName, setUserName] = useState("");
+  const [userType, setUserType] = useState("注册司机");
+  const [cellphone, setCellphone] = useState("13823803380");
+  const [plateNum, setPlateNum] = useState("京A-876543");
   const [truckType, setTruckType] = useState(1);
+  const [openDetail, setOpenDetail] = useState(false);
   const [init, setInit] = useState(true);
-  const userAuth: boolean = Taro.getStorageSync('userAuth');
+  const userAuth: boolean = Taro.getStorageSync("userAuth");
 
-  console.log('UserInfo:', this);
+  console.log("UserInfo:", this);
 
   function setUserInfo(userInfo) {
     setAvatar(userInfo.avatarUrl);
@@ -24,14 +26,14 @@ export default function UserInfo() {
 
   function onGotUserInfo(res) {
     //const {isWx, isBd, isTt} = this.state;
-    console.log('user info got return:', res);
+    console.log("user info got return:", res);
     const isWx = true;
-    Taro.setStorage({ key: 'userAuth', data: true });
+    Taro.setStorage({ key: "userAuth", data: true });
     if (isWx) {
       Taro.getUserInfo().then((ret) => {
         if (isWx) {
-          Taro.setStorage({ key: 'userName', data: ret.userInfo.nickName });
-          Taro.setStorage({ key: 'avatar', data: ret.userInfo.avatarUrl });
+          Taro.setStorage({ key: "userName", data: ret.userInfo.nickName });
+          Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
         }
         setUserInfo(ret.userInfo);
       });
@@ -45,12 +47,15 @@ export default function UserInfo() {
       setUserInfo(this.$router.params);
     }
   }
-
+  function onOpenDetail() {
+    console.log("onOpenDetail:", openDetail);
+    setOpenDetail(!openDetail);
+  }
   return (
     <View className="index">
       <NavBar
         handleClick={() => {
-          console.log('click', this.state);
+          console.log("click", this.state);
         }}
       />
       <View className="user-info-span">
@@ -68,12 +73,106 @@ export default function UserInfo() {
               </View>
             </View>
           ) : (
-            <Button openType="getUserInfo" onGetUserInfo={onGotUserInfo} className="login-button">
+            <Button
+              openType="getUserInfo"
+              onGetUserInfo={onGotUserInfo}
+              className="login-button"
+            >
               登录/注册
             </Button>
           )}
         </View>
       </View>
+      <View style={{ fontSize: "0.8rem", color: "#ff0000" }}>
+        <AtGrid
+          onClick={(item, index) => {
+            console.log("atgrid:", item, index);
+            switch (index) {
+              case 0:
+                Taro.navigateTo({
+                  url: "/pages/driver/Register",
+                });
+              default:
+                console.log("wait...");
+            }
+          }}
+          data={[
+            {
+              iconInfo: {
+                prefixClass: "fa",
+                value: "address-card-o",
+                size: 40,
+                color: "#ce007c",
+              },
+              value: "注册信息",
+            },
+            {
+              iconInfo: {
+                prefixClass: "fa",
+                value: "wpforms",
+                size: 40,
+                color: "#62a60a",
+              },
+              value: "回执列表",
+            },
+            {
+              iconInfo: {
+                prefixClass: "fa",
+                value: "pencil-square-o",
+                size: 40,
+                color: "#d15805",
+              },
+              value: "运单查询",
+            },
+          ]}
+        ></AtGrid>
+      </View>
+      <View className="list-span">
+        <Text className="list-title">系统消息</Text>
+        <AtList className="message-list">
+          <AtListItem className="list-items" title="运单已交付"></AtListItem>
+          <AtListItem
+            className="list-items"
+            title="货品已入库"
+            extraText="详细信息"
+            onClick={onOpenDetail}
+          ></AtListItem>
+          <AtListItem
+            className="list-items"
+            title="回执已上传成功"
+            extraText="标记已读"
+          ></AtListItem>
+          <AtListItem className="list-items" title="运单已交付"></AtListItem>
+          <AtListItem
+            className="list-items"
+            title="货品已入库"
+            extraText="详细信息"
+          ></AtListItem>
+          <AtListItem
+            className="list-items"
+            title="回执已上传成功"
+            extraText="标记已读"
+          ></AtListItem>
+          <AtListItem className="list-items" title="运单已交付"></AtListItem>
+          <AtListItem
+            className="list-items"
+            title="货品已入库"
+            extraText="详细信息"
+          ></AtListItem>
+          <AtListItem
+            className="list-items"
+            title="回执已上传成功"
+            extraText="标记已读"
+          ></AtListItem>
+        </AtList>
+      </View>
+      <AtFloatLayout
+        isOpened={openDetail}
+        title="消息标题"
+        onClose={onOpenDetail}
+      >
+        消息详细信息消息详细信息，消息详细信息消息详细信息消息详细信息，消息详细信息。
+      </AtFloatLayout>
       <ArsTabBar current={2} />
     </View>
   );

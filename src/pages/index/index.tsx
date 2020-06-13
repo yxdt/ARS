@@ -67,7 +67,7 @@ export default class Index extends Component {
               color="#ffffff"
               customStyle="margin-right:10px;"
             ></AtIcon>
-            拍照上传交货单
+            扫码输入交货单
           </Button>
           <Button className="home-button" onClick={this.openManual}>
             <AtIcon

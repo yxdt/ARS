@@ -5,13 +5,16 @@ import "./index.scss";
 import NavBar from "../../components/navbar";
 export interface SheetState {
   checked: boolean;
+  loading: boolean;
 }
 export default class Index extends Component<null, SheetState> {
   constructor() {
     super(...arguments);
     this.state = {
       checked: false,
+      loading: true,
     };
+    console.log("sheet", this.$router.params);
   }
 
   componentWillMount() {}

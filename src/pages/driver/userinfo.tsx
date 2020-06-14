@@ -57,6 +57,7 @@ export default function UserInfo() {
         handleClick={() => {
           console.log("click", this.state);
         }}
+        title="个人信息"
       />
       <View className="user-info-span">
         <View className="user-avatar">

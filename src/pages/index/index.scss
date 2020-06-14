@@ -3,8 +3,14 @@ $color-bg: #a50034;
   background-color: #a50034;
   .at-nav-bar__title {
     color: #ffffff;
+    font-size: 0.8rem;
   }
 }
+.at-input__title {
+  font-size: 0.8rem;
+  text-align: right;
+}
+
 .home-title-span {
   margin-top: 6rem;
   margin-left: 1rem;
@@ -29,6 +35,12 @@ $color-bg: #a50034;
     margin: 2rem;
     height: 4rem;
     line-height: 4rem;
+    font-size: 0.8rem;
+  }
+  .home-input {
+    margin: 2rem;
+    height: 2rem;
+    line-height: 2rem;
     font-size: 0.8rem;
   }
 }

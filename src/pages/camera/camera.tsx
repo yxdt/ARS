@@ -1,10 +1,10 @@
-import Taro, { Component, Config } from '@tarojs/taro';
-import { View, Text, Image, Button, Camera } from '@tarojs/components';
-import { AtIcon } from 'taro-ui';
-import './camera.scss';
-import NavBar from '../../components/navbar';
-import { takePicture, scanBarcode } from '../../controllers/camera';
-import ArsTabBar from '../../components/tabbar';
+import Taro, { Component, Config } from "@tarojs/taro";
+import { View, Text, Image, Button, Camera } from "@tarojs/components";
+import { AtIcon } from "taro-ui";
+import "./camera.scss";
+import NavBar from "../../components/navbar";
+import { takePicture, scanBarcode } from "../../controllers/camera";
+import ArsTabBar from "../../components/tabbar";
 
 export interface CameraStates {
   src: string;
@@ -19,7 +19,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
   constructor() {
     super(...arguments);
     this.state = {
-      src: '',
+      src: "",
       preview: false,
     };
     this.takePic.bind(this);
@@ -45,15 +45,15 @@ export default class Index extends Component<CameraProps, CameraStates> {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    navigationBarTitleText: '首页',
+    navigationBarTitleText: "回执上传",
   };
 
   handleClick() {
-    console.log('you clicked me.');
+    console.log("you clicked me.");
   }
   takePic() {
     takePicture((res) => {
-      console.log('takePicture.res:', res);
+      console.log("takePicture.res:", res);
       this.setState({
         src: res.tempImagePath,
         preview: true,
@@ -62,14 +62,18 @@ export default class Index extends Component<CameraProps, CameraStates> {
   }
 
   render() {
-    console.log('props, router:', this.props, this.$router.params);
+    console.log("props, router:", this.props, this.$router.params);
     const isScan = this.$router.params.isScan;
     return (
       <View className="index">
-        <NavBar />
         {this.state.preview ? null : (
           <View className="camera-span expand">
-            <Camera frameSize="large" devicePosition="back" flash="auto" style="width:100%; height: 100%;"></Camera>
+            <Camera
+              frameSize="large"
+              devicePosition="back"
+              flash="auto"
+              style="width:100%; height: 100%;"
+            ></Camera>
           </View>
         )}
         {this.state.preview ? (
@@ -82,17 +86,34 @@ export default class Index extends Component<CameraProps, CameraStates> {
           <View className="camera-button-span">
             {!isScan ? (
               <Button className="camera-button" onClick={this.takePic}>
-                <AtIcon prefixClass="fa" value="camera" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
+                <AtIcon
+                  prefixClass="fa"
+                  value="camera"
+                  size="20"
+                  color="#ffffff"
+                  customStyle="margin-right:10px;"
+                ></AtIcon>
                 点击拍照
               </Button>
             ) : (
               <Button className="camera-button" onClick={scanBarcode}>
-                <AtIcon prefixClass="fa" value="refresh fa-spin" size="30" color="#ffffff"></AtIcon>
+                <AtIcon
+                  prefixClass="fa"
+                  value="refresh fa-spin"
+                  size="30"
+                  color="#ffffff"
+                ></AtIcon>
                 扫描货运单条码
               </Button>
             )}
             <Button className="camera-button">
-              <AtIcon prefixClass="fa" value="picture-o" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
+              <AtIcon
+                prefixClass="fa"
+                value="picture-o"
+                size="20"
+                color="#ffffff"
+                customStyle="margin-right:10px;"
+              ></AtIcon>
               选取图片
             </Button>
           </View>

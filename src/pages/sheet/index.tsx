@@ -1,11 +1,17 @@
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Picker } from "@tarojs/components";
-import { AtForm, AtInput, AtList, AtListItem, AtButton } from "taro-ui";
+import { AtForm, AtInput, AtList, AtListItem, AtButton, AtIcon } from "taro-ui";
 import "./index.scss";
 import NavBar from "../../components/navbar";
+import Loading from "../../components/loading";
+import { getWaybill } from "../../controllers/rest";
+
 export interface SheetState {
   checked: boolean;
   loading: boolean;
+  waybill: object;
+  itemCount: number;
+  itemflags: Array<boolean>;
 }
 export default class Index extends Component<null, SheetState> {
   constructor() {
@@ -13,13 +19,35 @@ export default class Index extends Component<null, SheetState> {
     this.state = {
       checked: false,
       loading: true,
+      waybill: {},
+      itemCount: 0,
+      itemflags: [],
     };
     console.log("sheet", this.$router.params);
   }
 
   componentWillMount() {}
 
-  componentDidMount() {}
+  componentDidMount() {
+    console.log("componentDidMount.props:", this.props, this.$router.params);
+    const wbno = this.$router.params.wbno;
+    getWaybill(wbno).then((ret: object) => {
+      console.log("getWaybill.ret:", ret);
+      if (ret) {
+        let iflags = new Array();
+        const iCnt = ret.shipItems.length;
+        for (let i = 0; i < iCnt; i++) {
+          iflags[i] = ret.shipItems[i].status === "arrived";
+        }
+        this.setState({
+          loading: false,
+          waybill: ret,
+          itemflags: iflags,
+          itemCount: iCnt,
+        });
+      }
+    });
+  }
 
   componentWillUnmount() {}
 
@@ -38,9 +66,6 @@ export default class Index extends Component<null, SheetState> {
     navigationBarTitleText: "货运单",
   };
 
-  handleClick() {
-    console.log("you clicked me.");
-  }
   openCamera() {
     Taro.navigateTo({
       url: "/pages/camera/camera?isScan=true",
@@ -56,18 +81,26 @@ export default class Index extends Component<null, SheetState> {
     console.log("something has been changed:", val);
   }
   render() {
+    const { loading, waybill, checked, itemCount } = this.state;
+    console.log("loading:", loading);
+    if (loading) {
+      return <Loading />;
+    }
     return (
       <View className="index">
-        <NavBar handleClick={this.handleClick} />
         <Text className="form-title">货运单详细信息</Text>
         <View className="sheet-info-span">
           <Text className="form-caption">
-            运单状态： <Text className="form-hilite">尚未到达</Text>
+            运单状态：{" "}
+            <Text className="form-hilite">{waybill.statusCaption}</Text>
           </Text>
-          <Text className="form-caption">运单编号：11234568</Text>
-          <Text className="form-caption">发行时间：2020/06/12 17:18:20</Text>
-          <Text className="form-caption">往来单位：国美电器内蒙古有限公司</Text>
-          <Text className="form-caption">联系电话：0471-9387793</Text>
+          <Text className="form-caption">运单编号：{waybill.sheetNum}</Text>
+          <Text className="form-caption">
+            发行时间：
+            {new Date(waybill.startDatetime).toLocaleString("zh-CN")}
+          </Text>
+          <Text className="form-caption">往来单位：{waybill.shiptoName}</Text>
+          <Text className="form-caption">联系电话：{waybill.shiptoTel}</Text>
           <Text
             style={{
               color: "#f5f5f5",
@@ -77,29 +110,71 @@ export default class Index extends Component<null, SheetState> {
           >
             ---
           </Text>
-          <Text className="form-caption">物流中心：01（北京物流中心）</Text>
-          <Text className="form-caption">接货单位：0020 呼和浩特国美电器</Text>
-          <Text className="form-caption">车辆编号：京A 332238（张强）</Text>
-          <AtList>
-            <AtListItem
-              onClick={() => {
-                this.setState({ checked: !this.state.checked });
-              }}
-              title="M09BJZ011288-1-1bj-1（样机）"
-              note="GT-S25NPD.CASWPLGD"
-              extraText="1"
-              iconInfo={{
-                prefixClass: "fa",
-                value: this.state.checked ? "check-square-o" : "square-o",
-                size: "25",
-                color: "#666",
-              }}
-            ></AtListItem>
-          </AtList>
+          <Text className="form-caption">
+            物流中心：{waybill.rdcCode}（{waybill.rdcName}）
+          </Text>
+          <Text className="form-caption">
+            接货单位：{waybill.shiptoCode} （{waybill.shiptoName}）
+          </Text>
+          <Text className="form-caption">
+            车辆编号：{waybill.plateNum}（{waybill.driverName}）
+          </Text>
+          <View className="form-detail-span">
+            <View className="form-detail-header">
+              <Text className="form-detail-title">货运清单</Text>
+              <Text className="form-detail-title-right">全选</Text>
+              <AtIcon
+                prefixClass="fa"
+                value={checked ? "check-square-o" : "square-o"}
+                size="20"
+                color="#666666"
+                customStyle="margin-left:10px;margin-top:1.5rem;"
+                onClick={() => {
+                  const iFlags = new Array();
+                  for (let i = 0; i < itemCount; i++) {
+                    iFlags[i] = !checked;
+                  }
+                  this.setState({
+                    itemflags: iFlags,
+                    checked: !checked,
+                  });
+                }}
+              ></AtIcon>
+            </View>
+            <AtList>
+              {waybill.shipItems.map((item, index) => (
+                <AtListItem
+                  key={"ship-item-" + item.id}
+                  onClick={() => {
+                    const iFlag = this.state.itemflags;
+                    iFlag[index] = !iFlag[index];
+                    this.setState({ itemflags: iFlag });
+                  }}
+                  title={item.orderNum}
+                  note={item.modelNum}
+                  extraText={item.qty}
+                  iconInfo={{
+                    prefixClass: "fa",
+                    value: this.state.itemflags[index]
+                      ? "check-square-o"
+                      : "square-o",
+                    size: "25",
+                    color: "#666",
+                  }}
+                ></AtListItem>
+              ))}
+            </AtList>
+          </View>
           <AtButton className="home-button" formType="submit">
             确认到达
           </AtButton>
-          <AtButton className="home-button" formType="reset">
+          <AtButton
+            className="home-button"
+            formType="reset"
+            onClick={() => {
+              Taro.navigateBack();
+            }}
+          >
             取消
           </AtButton>
         </View>

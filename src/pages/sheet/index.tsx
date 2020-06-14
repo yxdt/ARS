@@ -1,10 +1,9 @@
-import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text, Picker } from "@tarojs/components";
-import { AtForm, AtInput, AtList, AtListItem, AtButton, AtIcon } from "taro-ui";
-import "./index.scss";
-import NavBar from "../../components/navbar";
-import Loading from "../../components/loading";
-import { getWaybill } from "../../controllers/rest";
+import Taro, { Component, Config } from '@tarojs/taro';
+import { View, Text, Picker } from '@tarojs/components';
+import { AtForm, AtInput, AtList, AtListItem, AtButton, AtIcon } from 'taro-ui';
+import './index.scss';
+import Loading from '../../components/loading';
+import { getWaybill } from '../../controllers/rest';
 
 export interface SheetState {
   checked: boolean;
@@ -23,21 +22,21 @@ export default class Index extends Component<null, SheetState> {
       itemCount: 0,
       itemflags: [],
     };
-    console.log("sheet", this.$router.params);
+    console.log('sheet', this.$router.params);
   }
 
   componentWillMount() {}
 
   componentDidMount() {
-    console.log("componentDidMount.props:", this.props, this.$router.params);
+    console.log('componentDidMount.props:', this.props, this.$router.params);
     const wbno = this.$router.params.wbno;
     getWaybill(wbno).then((ret: object) => {
-      console.log("getWaybill.ret:", ret);
+      console.log('getWaybill.ret:', ret);
       if (ret) {
         let iflags = new Array();
         const iCnt = ret.shipItems.length;
         for (let i = 0; i < iCnt; i++) {
-          iflags[i] = ret.shipItems[i].status === "arrived";
+          iflags[i] = ret.shipItems[i].status === 'arrived';
         }
         this.setState({
           loading: false,
@@ -63,26 +62,26 @@ export default class Index extends Component<null, SheetState> {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    navigationBarTitleText: "货运单",
+    navigationBarTitleText: '货运单',
   };
 
   openCamera() {
     Taro.navigateTo({
-      url: "/pages/camera/camera?isScan=true",
+      url: '/pages/camera/camera?isScan=true',
     });
   }
   openManual() {
     Taro.navigateTo({
-      url: "/pages/driver/index",
+      url: '/pages/driver/index',
     });
   }
 
   handleChange(val) {
-    console.log("something has been changed:", val);
+    console.log('something has been changed:', val);
   }
   render() {
     const { loading, waybill, checked, itemCount } = this.state;
-    console.log("loading:", loading);
+    console.log('loading:', loading);
     if (loading) {
       return <Loading />;
     }
@@ -91,23 +90,21 @@ export default class Index extends Component<null, SheetState> {
         <Text className="form-title">货运单详细信息</Text>
         <View className="sheet-info-span">
           <Text className="form-caption">
-            运单状态：{" "}
-            <Text className="form-hilite">{waybill.statusCaption}</Text>
+            运单状态： <Text className="form-hilite">{waybill.statusCaption}</Text>
           </Text>
           <Text className="form-caption">运单编号：{waybill.sheetNum}</Text>
           <Text className="form-caption">
             发行时间：
-            {new Date(waybill.startDatetime).toLocaleString("zh-CN")}
+            {new Date(waybill.startDatetime).toLocaleString('zh-CN')}
           </Text>
           <Text className="form-caption">往来单位：{waybill.shiptoName}</Text>
           <Text className="form-caption">联系电话：{waybill.shiptoTel}</Text>
           <Text
             style={{
-              color: "#f5f5f5",
-              height: "33px",
-              margin: "0 auto",
-            }}
-          >
+              color: '#f5f5f5',
+              height: '33px',
+              margin: '0 auto',
+            }}>
             ---
           </Text>
           <Text className="form-caption">
@@ -125,7 +122,7 @@ export default class Index extends Component<null, SheetState> {
               <Text className="form-detail-title-right">全选</Text>
               <AtIcon
                 prefixClass="fa"
-                value={checked ? "check-square-o" : "square-o"}
+                value={checked ? 'check-square-o' : 'square-o'}
                 size="20"
                 color="#666666"
                 customStyle="margin-left:10px;margin-top:1.5rem;"
@@ -138,13 +135,12 @@ export default class Index extends Component<null, SheetState> {
                     itemflags: iFlags,
                     checked: !checked,
                   });
-                }}
-              ></AtIcon>
+                }}></AtIcon>
             </View>
             <AtList>
               {waybill.shipItems.map((item, index) => (
                 <AtListItem
-                  key={"ship-item-" + item.id}
+                  key={'ship-item-' + item.id}
                   onClick={() => {
                     const iFlag = this.state.itemflags;
                     iFlag[index] = !iFlag[index];
@@ -152,16 +148,13 @@ export default class Index extends Component<null, SheetState> {
                   }}
                   title={item.orderNum}
                   note={item.modelNum}
-                  extraText={item.qty}
+                  extraText={'' + item.qty}
                   iconInfo={{
-                    prefixClass: "fa",
-                    value: this.state.itemflags[index]
-                      ? "check-square-o"
-                      : "square-o",
-                    size: "25",
-                    color: "#666",
-                  }}
-                ></AtListItem>
+                    prefixClass: 'fa',
+                    value: this.state.itemflags[index] ? 'check-square-o' : 'square-o',
+                    size: 25,
+                    color: '#666',
+                  }}></AtListItem>
               ))}
             </AtList>
           </View>
@@ -173,8 +166,7 @@ export default class Index extends Component<null, SheetState> {
             formType="reset"
             onClick={() => {
               Taro.navigateBack();
-            }}
-          >
+            }}>
             取消
           </AtButton>
         </View>

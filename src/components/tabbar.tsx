@@ -9,19 +9,16 @@ export default function ArsTabBar(props) {
         {
           title: "到达确认",
           iconPrefixClass: "fa",
-
-          iconType: current === 0 ? "barcode" : "camera",
+          iconType: current === 0 ? "camera" : "qrcode",
         },
         {
           title: "回执上传",
           iconPrefixClass: "fa",
-
           iconType: current === 1 ? "file-text" : "file-text-o",
         },
         {
           title: "个人信息",
           iconPrefixClass: "fa",
-
           iconType: current === 2 ? "user" : "user-o",
         },
       ]}

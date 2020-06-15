@@ -10,6 +10,8 @@ import { Fragment } from "react";
 export default function Index() {
   const [manual, setManual] = useState(false);
   const [waybillNum, setWaybillNum] = useState("");
+  const [rdcNum, setRdcNum] = useState("");
+  const [cellphone, setCellphone] = useState("");
 
   function handleClick() {
     console.log("you clicked me.");
@@ -22,18 +24,14 @@ export default function Index() {
       setManual(true);
     } else {
       Taro.navigateTo({
-        url: "/pages/sheet/index?wbno=" + waybillNum,
+        url: "/pages/sheet/index?wbno=" + waybillNum + "&rdc=" + rdcNum,
       });
     }
   }
 
   return (
     <View className="index">
-      <NavBar
-        handleClick={this.handleClick}
-        title="首页"
-        style="font-size:0.8rem"
-      />
+      <NavBar handleClick={this.handleClick} style="font-size:0.8rem" />
       <Image
         mode="scaleToFill"
         style="width:100%; height: 100%; left:0;top:0; position:fixed; background-size: 100%, 100%; z-index: -1"
@@ -41,29 +39,59 @@ export default function Index() {
       ></Image>
       <View className="home-title-span">
         <Text className="home-title">
-          欢迎使用 <Text className="home-title-hilite">A.R.S.</Text>\n
-          司机专属版
+          欢迎使用 <Text className="home-title-hilite">TIMS</Text>\n
+          <Text className="home-title-sub">配送信息管理系统</Text>
         </Text>
       </View>
       <View className="home-button-span">
         {manual ? (
-          <AtInput
-            className="home-input"
-            name="waybillNum"
-            title="运单编号"
-            type="text"
-            value={waybillNum}
-            onChange={(val: string) => {
-              console.log(val);
-              setWaybillNum(val);
-            }}
-            placeholder="请输入运单编号"
-          />
+          <View>
+            <AtInput
+              className="home-input"
+              name="waybillNum"
+              title="*运单号"
+              type="text"
+              value={waybillNum}
+              onChange={(val: string) => {
+                console.log(val);
+                setWaybillNum(val);
+              }}
+              placeholder="请输入运单编号，必填"
+            />
+            <View style={{ flexDirection: "row", display: "flex" }}>
+              <AtInput
+                className="home-input-semi-left"
+                name="rdcNum"
+                title="*接货号"
+                type="text"
+                value={rdcNum}
+                customStyle={{ flex: 3 }}
+                onChange={(val: string) => {
+                  console.log(val);
+                  setRdcNum(val);
+                }}
+                placeholder="4位序号，必填"
+              />
+              <AtInput
+                customStyle={{ flex: 6 }}
+                className="home-input-semi-right"
+                name="cellphone"
+                title="手机"
+                type="text"
+                value={cellphone}
+                onChange={(val: string) => {
+                  console.log(val);
+                  setCellphone(val);
+                }}
+                placeholder="您的手机号码"
+              />
+            </View>
+          </View>
         ) : (
           <Button onClick={scanBarcode} className="home-button">
             <AtIcon
               prefixClass="fa"
-              value="barcode"
+              value="qrcode"
               size="20"
               color="#ffffff"
               customStyle="margin-right:10px;"

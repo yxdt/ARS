@@ -8,15 +8,19 @@ $color-bg: #a50034;
 }
 .at-input__title {
   font-size: 0.8rem;
-  text-align: right;
+  text-align: center;
+  width: 100px;
+}
+.at-input input {
+  font-size: 0.8rem;
 }
 
 .home-title-span {
   margin-top: 6rem;
-  margin-left: 1rem;
+  margin-left: 2rem;
   .home-title {
     color: #ffffff;
-    font-size: 2.2rem;
+    font-size: 1.8rem;
     font-weight: bold;
     font-family: "Teko" sans-serif;
     .home-title-hilite {
@@ -24,6 +28,10 @@ $color-bg: #a50034;
       font-size: 3.2rem;
       font-weight: bolder;
       text-shadow: 2px 2px 2px #ffffff;
+    }
+    .home-title-sub {
+      color: #ffffff;
+      font-size: 2rem;
     }
   }
 }
@@ -38,9 +46,23 @@ $color-bg: #a50034;
     font-size: 0.8rem;
   }
   .home-input {
-    margin: 2rem;
-    height: 2rem;
-    line-height: 2rem;
+    margin-top: 1rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    font-size: 0.8rem;
+    color: #a50034;
+    font-weight: bold;
+  }
+  .home-input-semi-left {
+    margin-top: 1rem;
+    margin-left: 2rem;
+    font-size: 0.8rem;
+    color: #a50034;
+    font-weight: bold;
+  }
+  .home-input-semi-right {
+    margin-top: 1rem;
+    margin-right: 2rem;
     font-size: 0.8rem;
   }
 }

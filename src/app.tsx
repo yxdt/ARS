@@ -37,7 +37,7 @@ class App extends Component {
     window: {
       backgroundTextStyle: "light",
       navigationBarBackgroundColor: "#a50034",
-      navigationBarTitleText: "A.R.S 到货接收",
+      navigationBarTitleText: "TIMS",
       navigationBarTextStyle: "white",
     },
   };

@@ -13,16 +13,15 @@ export default function NavBar(props) {
       onClickRgIconNd={this.props.handleClick}
       onClickLeftIcon={this.props.handleClick}
       color="#ffffff"
-      title={props.title}
+      title={props.title || "中心人员登录"}
       leftText=""
       fixed={true}
-      leftIconType={{
+      rightFirstIconType={{
         prefixClass: "fa",
-        value: "truck",
+        value: "id-badge",
         size: "30",
         color: "#fff",
       }}
-      rightFirstIconType="bullet-list"
       rightSecondIconType=""
     />
   );

@@ -1,9 +1,9 @@
-import Taro from "@tarojs/taro";
+import Taro from '@tarojs/taro';
 
-function getDriverLocation(wbno: string, resolve) {
-  console.log("wbno:", wbno);
+function getDriverLocation(wbno: string, resolve: Function) {
+  console.log('wbno:', wbno);
   Taro.getLocation({
-    type: "wgs84",
+    type: 'wgs84',
     success: (res) => {
       //成功获取司机位置信息可以做一些服务器端操作，比如存储位置信息。
       //res:

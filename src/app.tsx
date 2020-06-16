@@ -40,6 +40,11 @@ class App extends Component {
       navigationBarTitleText: "TIMS",
       navigationBarTextStyle: "white",
     },
+    permission: {
+      "scope.userLocation": {
+        desc: "您的位置信息将用于确认运单正确送达",
+      },
+    },
   };
 
   // 在 App 类中的 render() 函数没有实际作用

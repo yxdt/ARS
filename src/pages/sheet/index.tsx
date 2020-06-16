@@ -1,26 +1,51 @@
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Picker } from "@tarojs/components";
-import { AtForm, AtInput, AtList, AtListItem, AtButton, AtIcon } from "taro-ui";
+import {
+  AtButton,
+  AtModal,
+  AtModalHeader,
+  AtModalContent,
+  AtModalAction,
+} from "taro-ui";
 import "./index.scss";
 import Loading from "../../components/loading";
-import { getWaybill } from "../../controllers/rest";
+import { getWaybill, confirmWaybill } from "../../controllers/rest";
+import { getDriverLocation } from "../../controllers/users";
+import ShipItems from "../../components/shipitems";
+import { Waybill, Result } from "../../types/ars";
 
 export interface SheetState {
-  checked: boolean;
   loading: boolean;
-  waybill: object;
+  waybill: Waybill;
   itemCount: number;
-  itemflags: Array<boolean>;
+  arrived: boolean; //司机确认到达
+  confirmArrive: boolean;
+  confirmed: boolean; //中心已确认到达
 }
 export default class Index extends Component<null, SheetState> {
   constructor() {
     super(...arguments);
     this.state = {
-      checked: false,
       loading: true,
-      waybill: {},
+      waybill: {
+        shiptoCode: "",
+        rdcCode: "",
+        startDatetime: new Date(),
+        plateNum: "",
+        totalPages: 1,
+        status: "",
+        statusCaption: "",
+        sheetNum: "",
+        shiptoName: "",
+        shiptoTel: "",
+        rdcName: "",
+        driverName: "",
+        shipItems: [],
+      },
       itemCount: 0,
-      itemflags: [],
+      arrived: false,
+      confirmArrive: false,
+      confirmed: false,
     };
     console.log("sheet", this.$router.params);
   }
@@ -31,20 +56,17 @@ export default class Index extends Component<null, SheetState> {
     console.log("componentDidMount.props:", this.props, this.$router.params);
     const wbno = this.$router.params.wbno;
     const rdcno = this.$router.params.rdc;
-    getWaybill(wbno).then((ret: object) => {
+    getWaybill(wbno).then((ret: Waybill) => {
       console.log("getWaybill.ret:", ret);
       if (ret) {
-        let iflags = new Array();
         const iCnt = ret.shipItems.length;
-        for (let i = 0; i < iCnt; i++) {
-          iflags[i] = ret.shipItems[i].status === "arrived";
-        }
         ret.rdcCode = rdcno; //todo: update here for dbl-check
         this.setState({
           loading: false,
           waybill: ret,
-          itemflags: iflags,
           itemCount: iCnt,
+          arrived: ret.status === "arrived",
+          confirmed: ret.status === "confirmed",
         });
       }
     });
@@ -82,19 +104,82 @@ export default class Index extends Component<null, SheetState> {
     console.log("something has been changed:", val);
   }
   render() {
-    const { loading, waybill, checked, itemCount } = this.state;
+    const { loading, waybill, confirmArrive, arrived, confirmed } = this.state;
     console.log("loading:", loading);
     if (loading) {
       return <Loading />;
     }
+    const confirmString =
+      "当前日期时间为" +
+      new Date().toLocaleString("zh-CN") +
+      ", 确认本运单已送达？请注意，一旦确认将无法修改。";
     return (
       <View className="index">
         <Text className="form-title">货运单详细信息</Text>
         <View className="sheet-info-span">
-          <Text className="form-caption">
-            运单状态：{" "}
-            <Text className="form-hilite">{waybill.statusCaption}</Text>
-          </Text>
+          <View className="form-caption-split">
+            运单状态：
+            <Text
+              className={arrived || confirmed ? "arrived" : "notarrive"}
+              style="flex:1"
+            >
+              {waybill.statusCaption}
+            </Text>
+            {arrived || confirmed ? null : (
+              <AtButton
+                className="right-button"
+                onClick={() => {
+                  this.setState({ confirmArrive: true });
+                  getDriverLocation((res) => {
+                    console.log("driver loc:", res);
+                  });
+                }}
+              >
+                点击确认到达
+              </AtButton>
+            )}
+            {arrived && !confirmed ? (
+              <AtButton
+                className="right-button-1"
+                onClick={() => {
+                  Taro.redirectTo({ url: "/pages/camera/camera" });
+                }}
+              >
+                点击上传回执
+              </AtButton>
+            ) : null}
+            <AtModal
+              isOpened={confirmArrive}
+              title="确认运单到达"
+              content={confirmString}
+              cancelText="取消"
+              confirmText="确认"
+              onClose={() => {
+                console.log("closed");
+              }}
+              onCancel={() => {
+                this.setState({ confirmArrive: false });
+              }}
+              onConfirm={() => {
+                console.log("confirmed!");
+                this.setState({ loading: true });
+                confirmWaybill(waybill.sheetNum).then((ret: Result) => {
+                  if (ret.result === "success") {
+                    this.setState({
+                      arrived: true,
+                      loading: false,
+                      waybill: {
+                        ...waybill,
+                        status: "arrived",
+                        statusCaption: "已送达",
+                      },
+                    });
+                  }
+                });
+                this.setState({ confirmArrive: false });
+              }}
+            />
+          </View>
           <Text className="form-caption">运单编号：{waybill.sheetNum}</Text>
           <Text className="form-caption">
             发行时间：
@@ -102,15 +187,7 @@ export default class Index extends Component<null, SheetState> {
           </Text>
           <Text className="form-caption">往来单位：{waybill.shiptoName}</Text>
           <Text className="form-caption">联系电话：{waybill.shiptoTel}</Text>
-          <Text
-            style={{
-              color: "#f5f5f5",
-              height: "33px",
-              margin: "0 auto",
-            }}
-          >
-            ---
-          </Text>
+          <Text className="form-divider">-</Text>
           <Text className="form-caption">
             物流中心：{waybill.rdcCode}（{waybill.rdcName}）
           </Text>
@@ -123,52 +200,18 @@ export default class Index extends Component<null, SheetState> {
           <View className="form-detail-span">
             <View className="form-detail-header">
               <Text className="form-detail-title">货运清单</Text>
-              <Text className="form-detail-title-right">全选</Text>
-              <AtIcon
-                prefixClass="fa"
-                value={checked ? "check-square-o" : "square-o"}
-                size="20"
-                color="#666666"
-                customStyle="margin-left:10px;margin-top:1.5rem;"
-                onClick={() => {
-                  const iFlags = new Array();
-                  for (let i = 0; i < itemCount; i++) {
-                    iFlags[i] = !checked;
-                  }
-                  this.setState({
-                    itemflags: iFlags,
-                    checked: !checked,
-                  });
-                }}
-              ></AtIcon>
             </View>
-            <AtList>
-              {waybill.shipItems.map((item, index) => (
-                <AtListItem
-                  key={"ship-item-" + item.id}
-                  onClick={() => {
-                    const iFlag = this.state.itemflags;
-                    iFlag[index] = !iFlag[index];
-                    this.setState({ itemflags: iFlag });
-                  }}
-                  title={item.orderNum}
-                  note={item.modelNum}
-                  extraText={"" + item.qty}
-                  iconInfo={{
-                    prefixClass: "fa",
-                    value: this.state.itemflags[index]
-                      ? "check-square-o"
-                      : "square-o",
-                    size: 25,
-                    color: "#666",
-                  }}
-                ></AtListItem>
-              ))}
-            </AtList>
+            <ShipItems
+              current={0}
+              pageCount={waybill.totalPages}
+              shipItems={waybill.shipItems}
+            />
           </View>
-          <AtButton className="home-button" formType="submit">
-            确认到达
-          </AtButton>
+          {arrived || confirmed ? null : (
+            <AtButton className="home-button" formType="submit">
+              点击确认到达
+            </AtButton>
+          )}
           <AtButton
             className="home-button"
             formType="reset"
@@ -176,7 +219,7 @@ export default class Index extends Component<null, SheetState> {
               Taro.navigateBack();
             }}
           >
-            取消
+            返回
           </AtButton>
         </View>
       </View>

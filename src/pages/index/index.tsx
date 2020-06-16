@@ -7,14 +7,22 @@ import NavBar from "../../components/navbar";
 import ArsTabBar from "../../components/tabbar";
 import { scanBarcode } from "../../controllers/camera";
 import { Fragment } from "react";
-export default function Index() {
+export default function Index(props) {
   const [manual, setManual] = useState(false);
   const [waybillNum, setWaybillNum] = useState("");
   const [rdcNum, setRdcNum] = useState("");
   const [cellphone, setCellphone] = useState("");
+  const [isScan, setIsScan] = useState(false);
 
+  //console.log("$router.params:", props, this.$router);
+
+  if (this.$router.params.wbno) {
+    setIsScan(true);
+    setWaybillNum(this.$router.params.wbno);
+    setManual(true);
+  }
   function handleClick() {
-    console.log("you clicked me.");
+    //console.log("you clicked me.");
     Taro.navigateTo({
       url: "/pages/sheet/index",
     });

@@ -1,13 +1,13 @@
-import Taro from '@tarojs/taro';
+import Taro from "@tarojs/taro";
 
 function scanBarcode() {
   Taro.scanCode({
     success: (res) => {
       //resolve(res);
-      console.log('scan barcode success:', res);
+      console.log("scan barcode success:", res);
       if (res.result) {
         Taro.navigateTo({
-          url: '/pages/sheet/index?wbno=' + res.result,
+          url: "/pages/index/index?wbno=" + res.result,
         });
       }
     },
@@ -17,13 +17,13 @@ function scanBarcode() {
 function takePicture(resolve) {
   const ctx = Taro.createCameraContext();
   ctx.takePhoto({
-    quality: 'high',
+    quality: "high",
     success: resolve,
   });
 }
 
 function uploadReceipt() {
-  console.log('not impleted yet');
+  console.log("not impleted yet");
 }
 
 export { scanBarcode, takePicture, uploadReceipt };

@@ -20,7 +20,7 @@ async function confirmWaybill(wbNum: string) {
   }
 }
 
-async function getWaybill(wbNum: string) {
+async function getWaybill(wbNum: string, rdcCode: string, cellphone: string) {
   if (DEBUGGING) {
     return new Promise((res, rej) => {
       setTimeout(() => {

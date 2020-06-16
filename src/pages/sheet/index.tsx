@@ -130,7 +130,7 @@ export default class Index extends Component<null, SheetState> {
                 className="right-button"
                 onClick={() => {
                   this.setState({ confirmArrive: true });
-                  getDriverLocation((res) => {
+                  getDriverLocation(waybill.sheetNum, (res) => {
                     console.log("driver loc:", res);
                   });
                 }}

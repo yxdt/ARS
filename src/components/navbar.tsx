@@ -16,12 +16,16 @@ export default function NavBar(props) {
       title={props.title || "中心人员登录"}
       leftText=""
       fixed={true}
-      rightFirstIconType={{
-        prefixClass: "fa",
-        value: "id-badge",
-        size: "30",
-        color: "#fff",
-      }}
+      rightFirstIconType={
+        props.hideRightIcon
+          ? ""
+          : {
+              prefixClass: "fa",
+              value: "id-badge",
+              size: "30",
+              color: "#fff",
+            }
+      }
       rightSecondIconType=""
     />
   );

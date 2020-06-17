@@ -32,7 +32,13 @@ export default function Index(props) {
       setManual(true);
     } else {
       Taro.navigateTo({
-        url: "/pages/sheet/index?wbno=" + waybillNum + "&rdc=" + rdcNum,
+        url:
+          "/pages/sheet/index?wbno=" +
+          waybillNum +
+          "&rdc=" +
+          rdcNum +
+          "&cell=" +
+          cellphone,
       });
     }
   }

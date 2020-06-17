@@ -16,7 +16,16 @@ export interface Waybill {
   driverName: string;
   shipItems: ShipItem[];
 }
-
+export interface WaybillResult {
+  result: string;
+  waybill: Waybill;
+}
 export interface Result {
   result: string;
+}
+export interface InfoCardProps {
+  title: string;
+  message: string;
+  extMessage: string;
+  backFunc: Function;
 }

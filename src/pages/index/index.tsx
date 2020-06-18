@@ -1,17 +1,16 @@
-import Taro, { useState } from "@tarojs/taro";
-import { View, Text, Image, Button } from "@tarojs/components";
-import { AtInput, AtIcon } from "taro-ui";
-import "./index.scss";
+import Taro, { useState } from '@tarojs/taro';
+import { View, Text, Image, Button } from '@tarojs/components';
+import { AtInput, AtIcon } from 'taro-ui';
+import './index.scss';
 
-import NavBar from "../../components/navbar";
-import ArsTabBar from "../../components/tabbar";
-import { scanBarcode } from "../../controllers/camera";
-import { Fragment } from "react";
-export default function Index(props) {
-  const [manual, setManual] = useState(true);
-  const [waybillNum, setWaybillNum] = useState("");
-  const [rdcNum, setRdcNum] = useState("");
-  const [cellphone, setCellphone] = useState("");
+import NavBar from '../../components/navbar';
+import ArsTabBar from '../../components/tabbar';
+import { scanBarcode } from '../../controllers/camera';
+export default function Index() {
+  //const [manual, setManual] = useState(true);
+  const [waybillNum, setWaybillNum] = useState('');
+  const [rdcNum, setRdcNum] = useState('');
+  const [cellphone, setCellphone] = useState('');
   const [isScan, setIsScan] = useState(false);
 
   //console.log("$router.params:", props, this.$router);
@@ -19,28 +18,17 @@ export default function Index(props) {
   if (this.$router.params.wbno) {
     setIsScan(true);
     setWaybillNum(this.$router.params.wbno);
-    setManual(true);
+    //setManual(true);
   }
-  function handleClick() {
-    //console.log("you clicked me.");
+
+  function openSheet() {
+    //if (!manual) {
+    //  setManual(true);
+    //} else {
     Taro.navigateTo({
-      url: "/pages/sheet/index",
+      url: '/pages/sheet/index?wbno=' + waybillNum + '&rdc=' + rdcNum + '&cell=' + cellphone,
     });
-  }
-  function openManual() {
-    if (!manual) {
-      setManual(true);
-    } else {
-      Taro.navigateTo({
-        url:
-          "/pages/sheet/index?wbno=" +
-          waybillNum +
-          "&rdc=" +
-          rdcNum +
-          "&cell=" +
-          cellphone,
-      });
-    }
+    //}
   }
 
   return (
@@ -54,7 +42,7 @@ export default function Index(props) {
       </View>
       <View className="home-button-span">
         <View>
-          <View style={{ flexDirection: "row", display: "flex" }}>
+          <View style={{ flexDirection: 'row', display: 'flex' }}>
             <AtInput
               className="home-input"
               name="waybillNum"
@@ -62,21 +50,16 @@ export default function Index(props) {
               type="text"
               value={waybillNum}
               onChange={(val: string) => {
-                console.log(val);
+                //console.log(val);
                 setWaybillNum(val);
               }}
               placeholder="扫码或手工输入运单编号"
             />
             <Button onClick={scanBarcode} className="cam-button">
-              <AtIcon
-                prefixClass="fa"
-                value="qrcode"
-                size="26"
-                color="#ffffff"
-              ></AtIcon>
+              <AtIcon prefixClass="fa" value="qrcode" size="26" color="#ffffff"></AtIcon>
             </Button>
           </View>
-          <View style={{ flexDirection: "row", display: "flex" }}>
+          <View style={{ flexDirection: 'row', display: 'flex' }}>
             <View style={{ flex: 3 }}>
               <AtInput
                 className="home-input-semi-left"
@@ -84,9 +67,9 @@ export default function Index(props) {
                 title="*接货号"
                 type="text"
                 value={rdcNum}
-                customStyle={{ flex: 3, display: "flex" }}
+                customStyle={{ flex: 3, display: 'flex' }}
                 onChange={(val: string) => {
-                  console.log(val);
+                  //console.log(val);
                   setRdcNum(val);
                 }}
                 placeholder="4位序号"
@@ -94,14 +77,14 @@ export default function Index(props) {
             </View>
             <View style={{ flex: 4 }}>
               <AtInput
-                customStyle={{ marginLeft: "0.2rem" }}
+                customStyle={{ marginLeft: '0.2rem' }}
                 className="home-input-semi-right"
                 name="cellphone"
                 title="手机"
                 type="text"
                 value={cellphone}
                 onChange={(val: string) => {
-                  console.log(val);
+                  //console.log(val);
                   setCellphone(val);
                 }}
                 placeholder="您的手机号码"
@@ -109,15 +92,9 @@ export default function Index(props) {
             </View>
           </View>
         </View>
-        <Button className="home-button" onClick={openManual}>
+        <Button className="home-button" onClick={openSheet}>
           <div>
-            <AtIcon
-              prefixClass="fa"
-              value="search"
-              size="20"
-              color="#ffffff"
-              customStyle="margin-right:10px;"
-            ></AtIcon>
+            <AtIcon prefixClass="fa" value="search" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
             获取运单信息
           </div>
         </Button>

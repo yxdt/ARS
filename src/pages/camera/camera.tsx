@@ -2,7 +2,11 @@ import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Image, Button, Camera } from "@tarojs/components";
 import { AtIcon, AtButton, AtFab } from "taro-ui";
 import "./camera.scss";
-import { takePicture, scanBarcode } from "../../controllers/camera";
+import {
+  takePicture,
+  scanBarcode,
+  uploadPicture,
+} from "../../controllers/camera";
 import ArsTabBar from "../../components/tabbar";
 import { NavBar } from "../../components/navbar";
 import { InfoCard } from "../../components/infocard";
@@ -64,6 +68,10 @@ export default class Index extends Component<CameraProps, CameraStates> {
       });
     });
   }
+  uploadPic() {
+    console.log("camera.uploadPic:", this.state.curwbno, this.state.src);
+    uploadPicture(this.state.curwbno, this.state.src);
+  }
 
   render() {
     console.log("props, router:", this.props, this.$router.params);
@@ -115,7 +123,9 @@ export default class Index extends Component<CameraProps, CameraStates> {
                 });
               }}
             ></Image>
-            <Button className="preview-confirm-button">确认上传</Button>
+            <Button className="preview-confirm-button" onClick={this.uploadPic}>
+              确认上传
+            </Button>
           </View>
         ) : null}
         {this.state.preview ? null : (

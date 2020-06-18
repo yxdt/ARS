@@ -5,15 +5,13 @@ export default function NavBar(props) {
   return (
     <AtNavBar
       customStyle={{
-        backgroundColor: "#a50034",
-        color: "#ffffff",
-        fontSize: "0.2rem",
+        backgroundColor: "#ababab",
       }}
       onClickRgIconSt={this.props.handleClick}
       onClickRgIconNd={this.props.handleClick}
       onClickLeftIcon={this.props.handleClick}
-      color="#ffffff"
       title={props.title || "中心人员登录"}
+      color="#ffffff"
       leftText=""
       fixed={true}
       rightFirstIconType={
@@ -22,8 +20,8 @@ export default function NavBar(props) {
           : {
               prefixClass: "fa",
               value: "id-badge",
-              size: "30",
-              color: "#fff",
+              size: "24",
+              color: "#ffffff",
             }
       }
       rightSecondIconType=""

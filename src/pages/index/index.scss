@@ -1,6 +1,5 @@
 $color-bg: #a50034;
 .at-nav-bar {
-  background-color: #a50034;
   .at-nav-bar__title {
     color: #ffffff;
     font-size: 0.8rem;
@@ -11,15 +10,19 @@ $color-bg: #a50034;
   text-align: center;
   width: 100px;
 }
+.at-input {
+  border: solid 1px #a50034;
+  border-radius: 6px;
+}
 .at-input input {
-  font-size: 0.8rem;
+  font-size: 1rem;
 }
 
 .home-title-span {
-  margin-top: 6rem;
+  margin-top: 5rem;
   margin-left: 2rem;
   .home-title {
-    color: #ffffff;
+    color: #6b6b6b;
     font-size: 1.8rem;
     font-weight: bold;
     font-family: "Teko" sans-serif;
@@ -30,47 +33,58 @@ $color-bg: #a50034;
       text-shadow: 2px 2px 2px #ffffff;
     }
     .home-title-sub {
-      color: #ffffff;
+      color: #6b6b6b;
       font-size: 2rem;
     }
   }
 }
 .home-button-span {
   margin-top: 3.5rem;
+  background-color: #cbcbcb;
+  padding-bottom: 3.5rem;
   .home-button {
     background-color: $color-bg;
     color: #ffffff;
     margin: 2rem;
     height: 4rem;
     line-height: 4rem;
-    font-size: 0.8rem;
+  }
+  .cam-button {
+    background-color: $color-bg;
+    color: #ffffff;
+    margin-top: 1rem;
+    margin-left: -1.8rem;
+    margin-right: 2rem;
+    text-align: center;
+    line-height: 3rem;
+    min-width: 100px;
+    flex: 1;
   }
   .home-input {
     margin-top: 1rem;
     margin-left: 2rem;
     margin-right: 2rem;
-    font-size: 0.8rem;
+
     color: #a50034;
     font-weight: bold;
   }
   .home-input-semi-left {
     margin-top: 1rem;
     margin-left: 2rem;
-    font-size: 0.8rem;
+
     color: #a50034;
     font-weight: bold;
   }
   .home-input-semi-right {
     margin-top: 1rem;
     margin-right: 2rem;
-    font-size: 0.8rem;
   }
 }
 
 .home-prompt-span {
-  margin-top: 2rem;
+  margin-top: -1rem;
   margin-left: 2rem;
-  color: #ffffff;
-  font-size: 0.8rem;
+  color: #a50034;
+  font-size: 0.6rem;
   font-style: italic;
 }

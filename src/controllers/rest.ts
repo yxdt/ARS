@@ -2,7 +2,7 @@ import Taro, { offLocalServiceResolveFail } from "@tarojs/taro";
 
 const DEBUGGING = true;
 
-const devUrl = "http://localhost:8700";
+const devUrl = "http://192.168.0.100:8765";
 const prodUrl = "https://www.hanyukj.cn";
 const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 

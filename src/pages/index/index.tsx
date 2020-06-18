@@ -8,7 +8,7 @@ import ArsTabBar from "../../components/tabbar";
 import { scanBarcode } from "../../controllers/camera";
 import { Fragment } from "react";
 export default function Index(props) {
-  const [manual, setManual] = useState(false);
+  const [manual, setManual] = useState(true);
   const [waybillNum, setWaybillNum] = useState("");
   const [rdcNum, setRdcNum] = useState("");
   const [cellphone, setCellphone] = useState("");
@@ -46,11 +46,6 @@ export default function Index(props) {
   return (
     <View className="index">
       <NavBar handleClick={this.handleClick} style="font-size:0.8rem" />
-      <Image
-        mode="scaleToFill"
-        style="width:100%; height: 100%; left:0;top:0; position:fixed; background-size: 100%, 100%; z-index: -1"
-        src="../../assets/img/back.png"
-      ></Image>
       <View className="home-title-span">
         <Text className="home-title">
           欢迎使用 <Text className="home-title-hilite">TIMS</Text>\n
@@ -58,8 +53,8 @@ export default function Index(props) {
         </Text>
       </View>
       <View className="home-button-span">
-        {manual ? (
-          <View>
+        <View>
+          <View style={{ flexDirection: "row", display: "flex" }}>
             <AtInput
               className="home-input"
               name="waybillNum"
@@ -70,24 +65,36 @@ export default function Index(props) {
                 console.log(val);
                 setWaybillNum(val);
               }}
-              placeholder="请输入运单编号，必填"
+              placeholder="扫码或手工输入运单编号"
             />
-            <View style={{ flexDirection: "row", display: "flex" }}>
+            <Button onClick={scanBarcode} className="cam-button">
+              <AtIcon
+                prefixClass="fa"
+                value="qrcode"
+                size="26"
+                color="#ffffff"
+              ></AtIcon>
+            </Button>
+          </View>
+          <View style={{ flexDirection: "row", display: "flex" }}>
+            <View style={{ flex: 3 }}>
               <AtInput
                 className="home-input-semi-left"
                 name="rdcNum"
                 title="*接货号"
                 type="text"
                 value={rdcNum}
-                customStyle={{ flex: 3 }}
+                customStyle={{ flex: 3, display: "flex" }}
                 onChange={(val: string) => {
                   console.log(val);
                   setRdcNum(val);
                 }}
-                placeholder="4位序号，必填"
+                placeholder="4位序号"
               />
+            </View>
+            <View style={{ flex: 4 }}>
               <AtInput
-                customStyle={{ flex: 6 }}
+                customStyle={{ marginLeft: "0.2rem" }}
                 className="home-input-semi-right"
                 name="cellphone"
                 title="手机"
@@ -101,38 +108,24 @@ export default function Index(props) {
               />
             </View>
           </View>
-        ) : (
-          <Button onClick={scanBarcode} className="home-button">
+        </View>
+        <Button className="home-button" onClick={openManual}>
+          <div>
             <AtIcon
               prefixClass="fa"
-              value="qrcode"
+              value="search"
               size="20"
               color="#ffffff"
               customStyle="margin-right:10px;"
             ></AtIcon>
-            扫码输入交货单
-          </Button>
-        )}
-        <Button className="home-button" onClick={openManual}>
-          {manual ? (
-            <div>确认</div>
-          ) : (
-            <div>
-              <AtIcon
-                prefixClass="fa"
-                value="pencil"
-                size="20"
-                color="#ffffff"
-                customStyle="margin-right:10px;"
-              ></AtIcon>
-              手工录入交货单
-            </div>
-          )}
+            获取运单信息
+          </div>
         </Button>
+        <View className="home-prompt-span">
+          <Text>您可以扫码输入运单号，输入接货号后查询运单</Text>
+        </View>
       </View>
-      <View className="home-prompt-span">
-        <Text>请点击上面的按钮进行交货单确认操作</Text>
-      </View>
+
       <ArsTabBar current={0} />
     </View>
   );

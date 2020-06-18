@@ -1,5 +1,5 @@
 import Taro from "@tarojs/taro";
-
+import { SERVER_URL } from "./rest";
 function scanBarcode() {
   Taro.scanCode({
     success: (res) => {
@@ -22,8 +22,19 @@ function takePicture(resolve) {
   });
 }
 
-function uploadReceipt() {
-  console.log("not impleted yet");
+function uploadPicture(wbno: string, filePath: string) {
+  console.log("uploadPicture:", wbno, filePath);
+  Taro.uploadFile({
+    url: SERVER_URL + "/photos/upload",
+    filePath,
+    name: "photo",
+    formData: {
+      wbno: wbno,
+    },
+    success: function(res) {
+      console.log("upload success:", res);
+    },
+  });
 }
 
-export { scanBarcode, takePicture, uploadReceipt };
+export { scanBarcode, takePicture, uploadPicture };

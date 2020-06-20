@@ -7,6 +7,7 @@ import {
   getWaybill,
   confirmWaybill,
   getWbPhotos,
+  SERVER_URL,
 } from "../../controllers/rest";
 import { getDriverLocation } from "../../controllers/users";
 import ShipItems from "../../components/shipitems";
@@ -67,7 +68,7 @@ export default class Index extends Component<null, SheetState> {
         ret.waybill.rdcCode = rdcno; //todo: update here for dbl-check
         getWbPhotos(wbno).then((pret: PhotosResult) => {
           ret.waybill.photos = pret.photos.map(
-            (item) => "http://192.168.0.100:8765/" + item
+            (item) => SERVER_URL + "/" + item
           );
           this.setState({
             loading: false,

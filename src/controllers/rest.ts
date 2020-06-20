@@ -168,6 +168,15 @@ async function getWaybill(wbNum: string, rdcCode: string, cellphone: string) {
   }
 }
 
+async function getWbPhotos(wbNum: string) {
+  if (DEBUGGING) {
+    const photos = await taroRequest("/photos/bywb/" + wbNum, "GET", wbNum);
+
+    console.log("getWbPhotos:", photos);
+    return photos.data;
+  }
+}
+
 async function taroRequest(url, method, data) {
   if (DEBUGGING) {
     console.log("taroRequest.SERVER_URL:", SERVER_URL, url);
@@ -181,4 +190,4 @@ async function taroRequest(url, method, data) {
   return ret;
 }
 
-export { SERVER_URL, getWaybill, confirmWaybill };
+export { SERVER_URL, getWaybill, confirmWaybill, getWbPhotos };

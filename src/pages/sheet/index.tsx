@@ -1,18 +1,16 @@
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Picker } from "@tarojs/components";
-import {
-  AtButton,
-  AtModal,
-  AtModalHeader,
-  AtModalContent,
-  AtModalAction,
-} from "taro-ui";
+import { AtButton, AtModal, AtGrid } from "taro-ui";
 import "./index.scss";
 import Loading from "../../components/loading";
-import { getWaybill, confirmWaybill } from "../../controllers/rest";
+import {
+  getWaybill,
+  confirmWaybill,
+  getWbPhotos,
+} from "../../controllers/rest";
 import { getDriverLocation } from "../../controllers/users";
 import ShipItems from "../../components/shipitems";
-import { WaybillResult, Waybill, Result } from "../../types/ars";
+import { WaybillResult, Waybill, Result, PhotosResult } from "../../types/ars";
 
 export interface SheetState {
   loading: boolean;
@@ -22,12 +20,14 @@ export interface SheetState {
   confirmArrive: boolean; //司机到达确认的确认
   confirmed: boolean; //中心已确认到达
   valid: boolean; //是否是有效的运单号
+  //photos: Array<string>; //uploaded photos
 }
 export default class Index extends Component<null, SheetState> {
   constructor() {
     super(...arguments);
     this.state = {
       loading: true,
+
       waybill: {
         shiptoCode: "",
         rdcCode: "",
@@ -42,6 +42,7 @@ export default class Index extends Component<null, SheetState> {
         rdcName: "",
         driverName: "",
         shipItems: [],
+        photos: [],
       },
       itemCount: 0,
       arrived: false,
@@ -64,13 +65,18 @@ export default class Index extends Component<null, SheetState> {
       if (ret.result === "success") {
         const iCnt = ret.waybill.shipItems.length;
         ret.waybill.rdcCode = rdcno; //todo: update here for dbl-check
-        this.setState({
-          loading: false,
-          waybill: ret.waybill,
-          itemCount: iCnt,
-          arrived: ret.waybill.status === "arrived",
-          confirmed: ret.waybill.status === "confirmed",
-          valid: true,
+        getWbPhotos(wbno).then((pret: PhotosResult) => {
+          ret.waybill.photos = pret.photos.map(
+            (item) => "http://localhost:8765/" + item
+          );
+          this.setState({
+            loading: false,
+            waybill: ret.waybill,
+            itemCount: iCnt,
+            arrived: ret.waybill.status === "arrived",
+            confirmed: ret.waybill.status === "confirmed",
+            valid: true,
+          });
         });
       } else {
         this.setState({
@@ -132,6 +138,11 @@ export default class Index extends Component<null, SheetState> {
       "当前日期时间为" +
       new Date().toLocaleString("zh-CN") +
       ", 确认本运单已送达？请注意，一旦确认将无法修改。";
+
+    const gridData = waybill.photos.map((item, index) => ({
+      image: item,
+      value: "图片" + index,
+    }));
     return (
       <View className="index">
         <Text className="form-title">
@@ -219,6 +230,7 @@ export default class Index extends Component<null, SheetState> {
             <Text className="form-caption">
               车辆编号：{waybill.plateNum}（{waybill.driverName}）
             </Text>
+            <AtGrid data={gridData} />
             <View className="form-detail-span">
               <View className="form-detail-header">
                 <Text className="form-detail-title">货运清单</Text>

@@ -1,6 +1,9 @@
 export interface ShipItem {
   status: string;
 }
+export interface PhotoUrl {
+  url: string;
+}
 export interface Waybill {
   rdcCode: string;
   startDatetime: Date;
@@ -15,6 +18,7 @@ export interface Waybill {
   rdcName: string;
   driverName: string;
   shipItems: ShipItem[];
+  photos: string[];
 }
 export interface WaybillResult {
   result: string;
@@ -28,4 +32,8 @@ export interface InfoCardProps {
   message: string;
   extMessage: string;
   backFunc: Function;
+}
+
+export interface PhotosResult {
+  photos: Array<string>;
 }

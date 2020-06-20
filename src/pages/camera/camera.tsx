@@ -1,6 +1,6 @@
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Image, Button, Camera } from "@tarojs/components";
-import { AtIcon, AtButton, AtFab } from "taro-ui";
+import { AtIcon, AtButton, AtFab, AtMessage } from "taro-ui";
 import "./camera.scss";
 import {
   takePicture,
@@ -14,6 +14,7 @@ export interface CameraStates {
   src: string;
   preview: boolean;
   curwbno: string;
+  uploading: boolean;
 }
 
 export interface CameraProps {
@@ -28,6 +29,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
       src: "",
       preview: false,
       curwbno,
+      uploading: false,
     };
     this.takePic.bind(this);
     //this.scanCode.bind(this);
@@ -69,8 +71,49 @@ export default class Index extends Component<CameraProps, CameraStates> {
     });
   }
   uploadPic() {
-    console.log("camera.uploadPic:", this.state.curwbno, this.state.src);
-    uploadPicture(this.state.curwbno, this.state.src);
+    //console.log("camera.uploadPic:", this.state.curwbno, this.state.src);
+    this.setState({ uploading: true });
+    uploadPicture(
+      this.state.curwbno,
+      this.state.src,
+      (res) => {
+        //console.log("upload-result:", res);
+        //{data: "{"result":"success","id":"5eec3ea936aabb13a43fa9d1"}",
+        // statusCode: 200,
+        // header: {…},
+        // cookies: Array(0), errMsg: "uploadFile:ok"}
+        this.setState({ uploading: false });
+        let isSuccess = false;
+        //成功上传
+        if (res.statusCode === 200) {
+          const result = JSON.parse(res.data);
+
+          //成功记录
+          if (result.result === "success") {
+            isSuccess = true;
+            Taro.atMessage({
+              message: "照片上传成功",
+              type: "success",
+            });
+            this.setState({ preview: false });
+          }
+        }
+        if (!isSuccess) {
+          this.setState({ uploading: false });
+          Taro.atMessage({
+            message: "照片上传失败，请重试！",
+            type: "error",
+          });
+        }
+      },
+      (err) => {
+        this.setState({ uploading: false });
+        Taro.atMessage({
+          message: "回执上传失败，请重试：" + err.errMsg,
+          type: "error",
+        });
+      }
+    );
   }
 
   render() {
@@ -93,7 +136,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
     return (
       <View className="index">
         <NavBar title={"当前运单：" + curwbno} hideRightIcon />
-
+        <AtMessage />
         {this.state.preview ? null : (
           <View className="camera-span expand">
             <Camera
@@ -123,9 +166,24 @@ export default class Index extends Component<CameraProps, CameraStates> {
                 });
               }}
             ></Image>
-            <Button className="preview-confirm-button" onClick={this.uploadPic}>
-              确认上传
-            </Button>
+            <View style="display:flex; flex-direction:row">
+              <Button
+                className="preview-confirm-button"
+                onClick={this.uploadPic}
+                disabled={this.state.uploading}
+              >
+                {this.state.uploading ? "上传中..." : "确认上传"}
+              </Button>
+              <Button
+                className="preview-confirm-button"
+                onClick={() => {
+                  this.setState({ preview: false });
+                }}
+                disabled={this.state.uploading}
+              >
+                返回
+              </Button>
+            </View>
           </View>
         ) : null}
         {this.state.preview ? null : (

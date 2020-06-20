@@ -22,7 +22,12 @@ function takePicture(resolve) {
   });
 }
 
-function uploadPicture(wbno: string, filePath: string) {
+function uploadPicture(
+  wbno: string,
+  filePath: string,
+  cbResult: any,
+  cbFail: any
+) {
   console.log("uploadPicture:", wbno, filePath);
   Taro.uploadFile({
     url: SERVER_URL + "/photos/upload",
@@ -31,10 +36,10 @@ function uploadPicture(wbno: string, filePath: string) {
     formData: {
       wbno: wbno,
     },
-    success: function(res) {
-      console.log("upload success:", res);
-    },
-  });
+    timeout: 5000, //for testing purpose
+    success: cbResult,
+    fail: cbFail,
+  }).catch(cbFail);
 }
 
 export { scanBarcode, takePicture, uploadPicture };

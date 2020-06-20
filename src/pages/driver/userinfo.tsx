@@ -19,6 +19,35 @@ export default function UserInfo() {
 
   console.log("UserInfo:", this);
 
+  function getUserInfo() {
+    let curUserInfo = {};
+    let userInfoStr = "scope.userInfo";
+    const userOpenId = Taro.getStorageSync("userOpenId") || "";
+    Taro.getSetting().then((res) => {
+      if (res.authSetting[userInfoStr]) {
+        console.log("userSettings:", res);
+      }
+    });
+    Taro.getUserInfo().then((ret) => {
+      curUserInfo = ret.userInfo;
+    });
+    Taro.login({
+      success: (res) => {
+        let code = res.code;
+        Taro.request({
+          url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
+          data: {},
+          header: { "content-type": "json" },
+          success: (resp) => {
+            let openId = JSON.parse(resp.data).openid;
+            console.log("openID:", openId);
+            console.log("resp:", resp);
+          },
+        });
+      },
+    });
+  }
+
   function setUserInfo(userInfo) {
     setAvatar(userInfo.avatarUrl);
     setUserName(userInfo.nickName);
@@ -93,8 +122,21 @@ export default function UserInfo() {
                 Taro.navigateTo({
                   url: "/pages/driver/Register",
                 });
+                break;
+              case 1:
+                getUserInfo();
+                break;
+              case 2:
+                Taro.requestSubscribeMessage({
+                  tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
+                  success: (res) => {
+                    console.log("subscribe message success:", res);
+                  },
+                });
+                break;
               default:
                 console.log("wait...");
+                break;
             }
           }}
           data={[

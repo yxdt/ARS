@@ -142,8 +142,9 @@ export default class Index extends Component<null, SheetState> {
 
     const gridData = waybill.photos.map((item, index) => ({
       image: item,
-      value: "图片" + index,
+      value: "图片_" + index,
     }));
+    console.log("sheet.gridData:", gridData);
     return (
       <View className="index">
         <Text className="form-title">
@@ -231,7 +232,22 @@ export default class Index extends Component<null, SheetState> {
             <Text className="form-caption">
               车辆编号：{waybill.plateNum}（{waybill.driverName}）
             </Text>
-            <AtGrid data={gridData} />
+            <AtGrid
+              onClick={(item, index) => {
+                //do preview
+                //console.log("atgrid.item:", item, gridData[index]);
+                Taro.previewImage({
+                  urls: [gridData[index].image],
+                  success: () => {
+                    console.log("success");
+                  },
+                  fail: () => {
+                    console.log("fail");
+                  },
+                });
+              }}
+              data={gridData}
+            />
             <View className="form-detail-span">
               <View className="form-detail-header">
                 <Text className="form-detail-title">货运清单</Text>

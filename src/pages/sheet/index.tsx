@@ -67,7 +67,7 @@ export default class Index extends Component<null, SheetState> {
         ret.waybill.rdcCode = rdcno; //todo: update here for dbl-check
         getWbPhotos(wbno).then((pret: PhotosResult) => {
           ret.waybill.photos = pret.photos.map(
-            (item) => "http://localhost:8765/" + item
+            (item) => "http://192.168.0.100:8765/" + item
           );
           this.setState({
             loading: false,

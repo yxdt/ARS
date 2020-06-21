@@ -171,7 +171,6 @@ async function getWaybill(wbNum: string, rdcCode: string, cellphone: string) {
 async function getWbPhotos(wbNum: string) {
   if (DEBUGGING) {
     const photos = await taroRequest("/photos/bywb/" + wbNum, "GET", wbNum);
-
     console.log("getWbPhotos:", photos);
     return photos.data;
   }

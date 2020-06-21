@@ -29,6 +29,7 @@ export default function UserInfo() {
       }
     });
     Taro.getUserInfo().then((ret) => {
+      console.log("userInfo:", ret);
       curUserInfo = ret.userInfo;
     });
     Taro.login({
@@ -120,7 +121,7 @@ export default function UserInfo() {
             switch (index) {
               case 0:
                 Taro.navigateTo({
-                  url: "/pages/driver/Register",
+                  url: "/pages/user/Register",
                 });
                 break;
               case 1:

@@ -1,9 +1,9 @@
-import Taro from '@tarojs/taro';
+import Taro from "@tarojs/taro";
 
 function getDriverLocation(wbno: string, resolve: Function) {
-  console.log('wbno:', wbno);
+  console.log("wbno:", wbno);
   Taro.getLocation({
-    type: 'wgs84',
+    type: "wgs84",
     success: (res) => {
       //成功获取司机位置信息可以做一些服务器端操作，比如存储位置信息。
       //res:
@@ -20,5 +20,29 @@ function getDriverLocation(wbno: string, resolve: Function) {
     },
   });
 }
+function getWxOpenId(cbOpenId: Function) {
+  Taro.login({
+    success: (res) => {
+      let code = res.code;
+      Taro.request({
+        url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
+        data: {},
+        header: { "content-type": "json" },
+        success: (resp) => {
+          let openId = JSON.parse(resp.data).openid;
+          console.log("openID:", openId);
+          console.log("resp:", resp);
+          cbOpenId(openId);
+        },
+      });
+    },
+  });
+}
 
-export { getDriverLocation };
+async function getUserInfo() {
+  const ui = await Taro.getUserInfo();
+  //console.log("userInfo:", ui);
+  return ui.userInfo;
+}
+
+export { getDriverLocation, getWxOpenId, getUserInfo };

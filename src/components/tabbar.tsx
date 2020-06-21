@@ -32,7 +32,7 @@ export default function ArsTabBar(props) {
           const userName = Taro.getStorageSync("userName");
           const avatar = Taro.getStorageSync("avatar");
           url =
-            "/pages/driver/userinfo?nickName=" +
+            "/pages/user/userinfo?nickName=" +
             userName +
             "&avatarUrl=" +
             avatar;

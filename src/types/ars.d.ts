@@ -1,3 +1,18 @@
+//司机不要求注册，中心人员需要后台手工确认绑定openid或手机
+export interface RegUser {
+  userName: string;
+  openId: string; //wx unique id
+  cellphone: string;
+  password: string; //hashed
+  userType: string; //司机 or 中心人员
+  area: string;
+  avatar: string;
+  country: string; //wx
+  province: string; //wx
+  city: string; //wx
+  gender: string; //wx 1: 男
+}
+
 export interface ShipItem {
   status: string;
 }

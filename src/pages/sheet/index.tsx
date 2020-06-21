@@ -1,17 +1,12 @@
-import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text, Picker } from "@tarojs/components";
-import { AtButton, AtModal, AtGrid } from "taro-ui";
-import "./index.scss";
-import Loading from "../../components/loading";
-import {
-  getWaybill,
-  confirmWaybill,
-  getWbPhotos,
-  SERVER_URL,
-} from "../../controllers/rest";
-import { getDriverLocation } from "../../controllers/users";
-import ShipItems from "../../components/shipitems";
-import { WaybillResult, Waybill, Result, PhotosResult } from "../../types/ars";
+import Taro, { Component, Config } from '@tarojs/taro';
+import { View, Text, Picker } from '@tarojs/components';
+import { AtButton, AtModal, AtGrid, AtMessage } from 'taro-ui';
+import './index.scss';
+import Loading from '../../components/loading';
+import { getWaybill, confirmWaybill, getWbPhotos, SERVER_URL } from '../../controllers/rest';
+import { getDriverLocation } from '../../controllers/users';
+import ShipItems from '../../components/shipitems';
+import { WaybillResult, Waybill, Result, PhotosResult } from '../../types/ars';
 
 export interface SheetState {
   loading: boolean;
@@ -30,18 +25,18 @@ export default class Index extends Component<null, SheetState> {
       loading: true,
 
       waybill: {
-        shiptoCode: "",
-        rdcCode: "",
+        shiptoCode: '',
+        rdcCode: '',
         startDatetime: new Date(),
-        plateNum: "",
+        plateNum: '',
         totalPages: 1,
-        status: "",
-        statusCaption: "",
-        sheetNum: "",
-        shiptoName: "",
-        shiptoTel: "",
-        rdcName: "",
-        driverName: "",
+        status: '',
+        statusCaption: '',
+        sheetNum: '',
+        shiptoName: '',
+        shiptoTel: '',
+        rdcName: '',
+        driverName: '',
         shipItems: [],
         photos: [],
       },
@@ -51,35 +46,53 @@ export default class Index extends Component<null, SheetState> {
       confirmed: false,
       valid: false,
     };
-    console.log("sheet", this.$router.params);
+    console.log('sheet', this.$router.params);
   }
 
   componentWillMount() {}
 
   componentDidMount() {
-    console.log("componentDidMount.props:", this.props, this.$router.params);
+    console.log('componentDidMount.props:', this.props, this.$router.params);
     const wbno = this.$router.params.wbno;
     const rdcno = this.$router.params.rdc;
     const cell = this.$router.params.cell;
-    getWaybill(wbno, rdcno, cell).then((ret: WaybillResult) => {
-      console.log("getWaybill.ret:", ret);
-      if (ret.result === "success") {
-        const iCnt = ret.waybill.shipItems.length;
-        ret.waybill.rdcCode = rdcno; //todo: update here for dbl-check
-        getWbPhotos(wbno).then((pret: PhotosResult) => {
-          ret.waybill.photos = pret.photos.map(
-            (item) => SERVER_URL + "/" + item
-          );
+    getWaybill(wbno, rdcno, cell)
+      .then((ret: WaybillResult) => {
+        console.log('getWaybill.ret:', ret);
+        if (ret.result === 'success') {
+          const iCnt = ret.waybill.shipItems.length;
+          ret.waybill.rdcCode = rdcno; //todo: update here for dbl-check
+          getWbPhotos(wbno)
+            .then((pret: PhotosResult) => {
+              ret.waybill.photos = pret.photos.map((item) => SERVER_URL + '/' + item);
+              this.setState({
+                loading: false,
+                waybill: ret.waybill,
+                itemCount: iCnt,
+                arrived: ret.waybill.status === 'arrived',
+                confirmed: ret.waybill.status === 'confirmed',
+                valid: true,
+              });
+            })
+            .catch((err) => {
+              Taro.atMessage({
+                message: '运单信息获取失败，请重试！' + err.errMsg,
+                type: 'error',
+              });
+
+              throw err;
+            });
+        } else {
           this.setState({
             loading: false,
-            waybill: ret.waybill,
-            itemCount: iCnt,
-            arrived: ret.waybill.status === "arrived",
-            confirmed: ret.waybill.status === "confirmed",
-            valid: true,
+            valid: false,
+            itemCount: 0,
+            arrived: false,
+            confirmArrive: false,
           });
-        });
-      } else {
+        }
+      })
+      .catch((err) => {
         this.setState({
           loading: false,
           valid: false,
@@ -87,8 +100,12 @@ export default class Index extends Component<null, SheetState> {
           arrived: false,
           confirmArrive: false,
         });
-      }
-    });
+
+        Taro.atMessage({
+          message: '运单信息获取失败，请重试！' + err.errMsg,
+          type: 'error',
+        });
+      });
   }
 
   componentWillUnmount() {}
@@ -105,59 +122,50 @@ export default class Index extends Component<null, SheetState> {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    navigationBarTitleText: "货运单",
+    navigationBarTitleText: '货运单',
   };
 
   openCamera() {
     Taro.navigateTo({
-      url: "/pages/camera/camera?isScan=true",
+      url: '/pages/camera/camera?isScan=true',
     });
   }
   openManual() {
     Taro.navigateTo({
-      url: "/pages/driver/index",
+      url: '/pages/driver/index',
     });
   }
 
   handleChange(val) {
-    console.log("something has been changed:", val);
+    console.log('something has been changed:', val);
   }
   render() {
-    const {
-      loading,
-      waybill,
-      confirmArrive,
-      arrived,
-      confirmed,
-      valid,
-    } = this.state;
-    console.log("loading:", loading);
+    const { loading, waybill, confirmArrive, arrived, confirmed, valid } = this.state;
+    console.log('loading:', loading);
     if (loading) {
-      return <Loading />;
+      return (
+        <View>
+          <AtMessage />
+          <Loading />
+        </View>
+      );
     }
-    const confirmString =
-      "当前日期时间为" +
-      new Date().toLocaleString("zh-CN") +
-      ", 确认本运单已送达？请注意，一旦确认将无法修改。";
+    const confirmString = '当前日期时间为' + new Date().toLocaleString('zh-CN') + ', 确认本运单已送达？请注意，一旦确认将无法修改。';
 
     const gridData = waybill.photos.map((item, index) => ({
       image: item,
-      value: "图片_" + index,
+      value: '图片_' + index,
     }));
-    console.log("sheet.gridData:", gridData);
+    console.log('sheet.gridData:', gridData);
     return (
       <View className="index">
-        <Text className="form-title">
-          {valid ? "货运单详细信息" : "未找到运单"}
-        </Text>
+        <AtMessage />
+        <Text className="form-title">{valid ? '货运单详细信息' : '未找到运单'}</Text>
         {valid ? (
           <View className="sheet-info-span">
             <View className="form-caption-split">
               运单状态：
-              <Text
-                className={arrived || confirmed ? "arrived" : "notarrive"}
-                style="flex:1"
-              >
+              <Text className={arrived || confirmed ? 'arrived' : 'notarrive'} style="flex:1">
                 {waybill.statusCaption}
               </Text>
               {arrived || confirmed ? null : (
@@ -166,10 +174,9 @@ export default class Index extends Component<null, SheetState> {
                   onClick={() => {
                     this.setState({ confirmArrive: true });
                     getDriverLocation(waybill.sheetNum, (res) => {
-                      console.log("driver loc:", res);
+                      console.log('driver loc:', res);
                     });
-                  }}
-                >
+                  }}>
                   点击确认到达
                 </AtButton>
               )}
@@ -177,9 +184,8 @@ export default class Index extends Component<null, SheetState> {
                 <AtButton
                   className="right-button-1"
                   onClick={() => {
-                    Taro.redirectTo({ url: "/pages/camera/camera" });
-                  }}
-                >
+                    Taro.redirectTo({ url: '/pages/camera/camera' });
+                  }}>
                   点击上传回执
                 </AtButton>
               ) : null}
@@ -190,23 +196,23 @@ export default class Index extends Component<null, SheetState> {
                 cancelText="取消"
                 confirmText="确认"
                 onClose={() => {
-                  console.log("closed");
+                  console.log('closed');
                 }}
                 onCancel={() => {
                   this.setState({ confirmArrive: false });
                 }}
                 onConfirm={() => {
-                  console.log("confirmed!");
+                  console.log('confirmed!');
                   this.setState({ loading: true });
                   confirmWaybill(waybill.sheetNum).then((ret: Result) => {
-                    if (ret.result === "success") {
+                    if (ret.result === 'success') {
                       this.setState({
                         arrived: true,
                         loading: false,
                         waybill: {
                           ...waybill,
-                          status: "arrived",
-                          statusCaption: "已送达",
+                          status: 'arrived',
+                          statusCaption: '已送达',
                         },
                       });
                     }
@@ -218,7 +224,7 @@ export default class Index extends Component<null, SheetState> {
             <Text className="form-caption">运单编号：{waybill.sheetNum}</Text>
             <Text className="form-caption">
               发行时间：
-              {new Date(waybill.startDatetime).toLocaleString("zh-CN")}
+              {new Date(waybill.startDatetime).toLocaleString('zh-CN')}
             </Text>
             <Text className="form-caption">往来单位：{waybill.shiptoName}</Text>
             <Text className="form-caption">联系电话：{waybill.shiptoTel}</Text>
@@ -239,10 +245,10 @@ export default class Index extends Component<null, SheetState> {
                 Taro.previewImage({
                   urls: [gridData[index].image],
                   success: () => {
-                    console.log("success");
+                    console.log('success');
                   },
                   fail: () => {
-                    console.log("fail");
+                    console.log('fail');
                   },
                 });
               }}
@@ -252,11 +258,7 @@ export default class Index extends Component<null, SheetState> {
               <View className="form-detail-header">
                 <Text className="form-detail-title">货运清单</Text>
               </View>
-              <ShipItems
-                current={0}
-                pageCount={waybill.totalPages}
-                shipItems={waybill.shipItems}
-              />
+              <ShipItems current={0} pageCount={waybill.totalPages} shipItems={waybill.shipItems} />
             </View>
             {arrived || confirmed ? null : (
               <AtButton className="home-button" formType="submit">
@@ -268,27 +270,21 @@ export default class Index extends Component<null, SheetState> {
               formType="reset"
               onClick={() => {
                 Taro.navigateBack();
-              }}
-            >
+              }}>
               返回
             </AtButton>
           </View>
         ) : (
           <View style="height:400px; margin-top:5rem; margin-left:2rem; margin-right:2rem;">
-            <Text style="display:block; text-align:center; font-size:1.2rem; margin-top:3rem">
-              您的-运单号-或-接货中心码-不正确
-            </Text>
-            <Text style="display:block; text-align:center; font-size:1.2rem; margin-top:3rem; margin-bottom:3rem;">
-              请返回重新输入
-            </Text>
+            <Text style="display:block; text-align:center; font-size:1.2rem; margin-top:3rem">您的-运单号-或-接货中心码-不正确</Text>
+            <Text style="display:block; text-align:center; font-size:1.2rem; margin-top:3rem; margin-bottom:3rem;">请返回重新输入</Text>
 
             <AtButton
               className="home-button"
               formType="reset"
               onClick={() => {
                 Taro.navigateBack();
-              }}
-            >
+              }}>
               返回
             </AtButton>
           </View>

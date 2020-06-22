@@ -13,6 +13,18 @@ export interface RegUser {
   gender: string; //wx 1: 男
 }
 
+export interface WxUserInfo {
+  nickName: string;
+  avatarUrl: string;
+  gender: number;
+
+  city: string;
+  province: string;
+  country: string;
+
+  language: string;
+}
+
 export interface ShipItem {
   status: string;
 }

@@ -3,6 +3,7 @@ import { View, Text, Image, Picker } from "@tarojs/components";
 import { AtForm, AtInput, AtButton, AtList, AtListItem } from "taro-ui";
 import "./index.scss";
 import { getUserInfo, getWxOpenId } from "../../controllers/users";
+import { WxUserInfo } from "src/types/ars";
 
 // export const TruckTypes: string[] = [
 //   "微型面包车",
@@ -14,15 +15,16 @@ import { getUserInfo, getWxOpenId } from "../../controllers/users";
 
 export default function Register() {
   console.log("");
-  let userInfo = [];
+  let userInfo = {};
 
   const [userName, setUserName] = useState("1");
   const [cellphone, setCellphone] = useState("2");
   const [plateNum, setPlateNum] = useState("3");
   const [avatar, setAvatar] = useState("");
 
-  getUserInfo().then((res) => {
+  getUserInfo().then((res: WxUserInfo) => {
     userInfo = res;
+    console.log("userInfo:", res);
     setUserName(res.nickName);
     setAvatar(res.avatarUrl);
   });

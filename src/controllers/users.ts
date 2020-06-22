@@ -41,7 +41,7 @@ function getWxOpenId(cbOpenId: Function) {
 
 async function getUserInfo() {
   const ui = await Taro.getUserInfo();
-  //console.log("userInfo:", ui);
+  console.log("Taro.getUserInfo:", ui);
   return ui.userInfo;
 }
 

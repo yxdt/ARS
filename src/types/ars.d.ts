@@ -5,8 +5,8 @@ export interface RegUser {
   cellphone: string;
   password: string; //hashed
   userType: string; //司机 or 中心人员
-  area: string;
-  avatar: string;
+  area: string; //负责地区
+  avatarUrl: string; //头像
   country: string; //wx
   province: string; //wx
   city: string; //wx

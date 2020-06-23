@@ -1,6 +1,15 @@
 import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text, Picker } from "@tarojs/components";
-import { AtButton, AtModal, AtGrid, AtMessage } from "taro-ui";
+import { View, Text, Picker, CoverView, Button } from "@tarojs/components";
+import {
+  AtButton,
+  AtModal,
+  AtGrid,
+  AtInput,
+  AtMessage,
+  AtModalContent,
+  AtModalHeader,
+  AtModalAction,
+} from "taro-ui";
 import "./index.scss";
 import Loading from "../../components/loading";
 import {
@@ -13,6 +22,7 @@ import { getDriverLocation } from "../../controllers/users";
 import ShipItems from "../../components/shipitems";
 import { WaybillResult, Waybill, Result, PhotosResult } from "../../types/ars";
 import InfoCard from "../../components/infocard";
+import ArriveConfirm from "../../components/arriveConfirm";
 
 export interface SheetState {
   loading: boolean;
@@ -49,7 +59,7 @@ export default class Index extends Component<null, SheetState> {
       },
       itemCount: 0,
       arrived: false,
-      confirmArrive: false,
+      confirmArrive: true,
       confirmed: false,
       valid: false,
     };
@@ -194,10 +204,9 @@ export default class Index extends Component<null, SheetState> {
         />
       );
     }
-    const confirmString =
-      "当前日期时间为" +
-      new Date().toLocaleString("zh-CN") +
-      ", 确认本运单已送达？请注意，一旦确认将无法修改。";
+    const confirmString = "当前时间：" + new Date().toLocaleString("zh-CN");
+    const confirmString2 = "请输入接货码、手机号确认送达";
+    const confirmString3 = "请注意，一旦确认将无法修改。";
     console.log("waybill:", waybill);
     const gridData = waybill.photos.map((item, index) => ({
       image: item.url,
@@ -207,6 +216,7 @@ export default class Index extends Component<null, SheetState> {
     return (
       <View className="index">
         <AtMessage />
+
         <Text className="form-title">
           {valid ? "货运单详细信息" : "未找到运单"}
         </Text>
@@ -220,19 +230,6 @@ export default class Index extends Component<null, SheetState> {
               >
                 {waybill.statusCaption}
               </Text>
-              {arrived || confirmed ? null : (
-                <AtButton
-                  className="right-button"
-                  onClick={() => {
-                    this.setState({ confirmArrive: true });
-                    getDriverLocation(waybill.sheetNum, (res) => {
-                      console.log("driver loc:", res);
-                    });
-                  }}
-                >
-                  点击确认到达
-                </AtButton>
-              )}
               {arrived && !confirmed ? (
                 <AtButton
                   className="right-button-1"
@@ -243,37 +240,47 @@ export default class Index extends Component<null, SheetState> {
                   点击上传回执
                 </AtButton>
               ) : null}
-              <AtModal
-                isOpened={confirmArrive}
-                title="确认运单到达"
-                content={confirmString}
-                cancelText="取消"
-                confirmText="确认"
-                onClose={() => {
-                  console.log("closed");
-                }}
-                onCancel={() => {
-                  this.setState({ confirmArrive: false });
-                }}
-                onConfirm={() => {
-                  console.log("confirmed!");
-                  this.setState({ loading: true });
-                  confirmWaybill(waybill.sheetNum).then((ret: Result) => {
-                    if (ret.result === "success") {
-                      this.setState({
-                        arrived: true,
-                        loading: false,
-                        waybill: {
-                          ...waybill,
-                          status: "arrived",
-                          statusCaption: "已送达",
-                        },
-                      });
-                    }
-                  });
-                  this.setState({ confirmArrive: false });
-                }}
-              />
+              <AtModal isOpened={confirmArrive}>
+                <AtModalHeader>确认到达</AtModalHeader>
+                <AtModalContent>
+                  <CoverView className="toast-main">
+                    <View className="confirm-info">{confirmString}</View>
+                    <View className="confirm-info">{confirmString2}</View>
+                    <View className="confirm-info">{confirmString3}</View>
+
+                    <CoverView className="toast-input">
+                      <AtInput
+                        type="number"
+                        className="home-input"
+                        title="*接货码"
+                        name="arsCode"
+                        placeholder="四位接货码"
+                        z-index={1000}
+                        onChange={(val) => {
+                          console.log("changed:", val);
+                        }}
+                      ></AtInput>
+                    </CoverView>
+                    <CoverView className="toast-input">
+                      <AtInput
+                        type="number"
+                        name="cellphone"
+                        className="home-input"
+                        title="手机号"
+                        placeholder="您的手机号"
+                        z-index={1000}
+                        onChange={(val) => {
+                          console.log("changed:", val);
+                        }}
+                      ></AtInput>
+                    </CoverView>
+                  </CoverView>
+                </AtModalContent>
+                <AtModalAction>
+                  <Button className="home-input-semi-left">取消</Button>
+                  <Button className="home-input-semi-right">确认</Button>
+                </AtModalAction>
+              </AtModal>
             </View>
             <Text className="form-caption">运单编号：{waybill.sheetNum}</Text>
             <Text className="form-caption">

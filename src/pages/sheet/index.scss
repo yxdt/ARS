@@ -11,6 +11,10 @@ $color-lg-lred: #ffa3b2;
 .at-tabs__item--active {
   color: $color-bg;
 }
+.at-modal__header {
+  background-color: $color-bg;
+  color: #ffffff;
+}
 .item-content__info-title {
   font-size: 0.8rem !important;
 }
@@ -20,6 +24,30 @@ $color-lg-lred: #ffa3b2;
 .back-image {
   margin: -100;
   padding: 0;
+}
+.home-input {
+  margin-top: 1rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
+
+  color: #a50034;
+  font-weight: bold;
+}
+.home-input-semi-left:active {
+  color: $color-bg;
+  font-weight: bold;
+}
+.home-input-semi-right {
+  color: $color-bg !important;
+  font-weight: bold;
+}
+.confirm-info {
+  margin-top: 1.2rem;
+  line-height: 1.2rem;
+  color: #666666;
+  word-wrap: break-word;
+  display: block;
+  text-align: center;
 }
 .form-title {
   color: #666666;

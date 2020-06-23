@@ -1,16 +1,16 @@
-import Taro, { useState } from '@tarojs/taro';
-import { View, Text, Image, Button } from '@tarojs/components';
-import { AtInput, AtIcon } from 'taro-ui';
-import './index.scss';
+import Taro, { useState } from "@tarojs/taro";
+import { View, Text, Image, Button } from "@tarojs/components";
+import { AtInput, AtIcon } from "taro-ui";
+import "./index.scss";
 
-import NavBar from '../../components/navbar';
-import ArsTabBar from '../../components/tabbar';
-import { scanBarcode } from '../../controllers/camera';
+import NavBar from "../../components/navbar";
+import ArsTabBar from "../../components/tabbar";
+import { scanBarcode } from "../../controllers/camera";
 export default function Index() {
   //const [manual, setManual] = useState(true);
-  const [waybillNum, setWaybillNum] = useState('');
-  const [rdcNum, setRdcNum] = useState('');
-  const [cellphone, setCellphone] = useState('');
+  const [waybillNum, setWaybillNum] = useState("");
+  const [rdcNum, setRdcNum] = useState("");
+  const [cellphone, setCellphone] = useState("");
   const [isScan, setIsScan] = useState(false);
 
   //console.log("$router.params:", props, this.$router);
@@ -26,7 +26,13 @@ export default function Index() {
     //  setManual(true);
     //} else {
     Taro.navigateTo({
-      url: '/pages/sheet/index?wbno=' + waybillNum + '&rdc=' + rdcNum + '&cell=' + cellphone,
+      url:
+        "/pages/sheet/index?wbno=" +
+        waybillNum +
+        "&rdc=" +
+        rdcNum +
+        "&cell=" +
+        cellphone,
     });
     //}
   }
@@ -42,7 +48,7 @@ export default function Index() {
       </View>
       <View className="home-button-span">
         <View>
-          <View style={{ flexDirection: 'row', display: 'flex' }}>
+          <View style={{ flexDirection: "row", display: "flex" }}>
             <AtInput
               className="home-input"
               name="waybillNum"
@@ -56,45 +62,24 @@ export default function Index() {
               placeholder="扫码或手工输入运单编号"
             />
             <Button onClick={scanBarcode} className="cam-button">
-              <AtIcon prefixClass="fa" value="qrcode" size="26" color="#ffffff"></AtIcon>
+              <AtIcon
+                prefixClass="fa"
+                value="qrcode"
+                size="26"
+                color="#ffffff"
+              ></AtIcon>
             </Button>
-          </View>
-          <View style={{ flexDirection: 'row', display: 'flex' }}>
-            <View style={{ flex: 3 }}>
-              <AtInput
-                className="home-input-semi-left"
-                name="rdcNum"
-                title="*接货号"
-                type="text"
-                value={rdcNum}
-                customStyle={{ flex: 3, display: 'flex' }}
-                onChange={(val: string) => {
-                  //console.log(val);
-                  setRdcNum(val);
-                }}
-                placeholder="4位序号"
-              />
-            </View>
-            <View style={{ flex: 4 }}>
-              <AtInput
-                customStyle={{ marginLeft: '0.2rem' }}
-                className="home-input-semi-right"
-                name="cellphone"
-                title="手机"
-                type="text"
-                value={cellphone}
-                onChange={(val: string) => {
-                  //console.log(val);
-                  setCellphone(val);
-                }}
-                placeholder="您的手机号码"
-              />
-            </View>
           </View>
         </View>
         <Button className="home-button" onClick={openSheet}>
           <div>
-            <AtIcon prefixClass="fa" value="search" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
+            <AtIcon
+              prefixClass="fa"
+              value="search"
+              size="20"
+              color="#ffffff"
+              customStyle="margin-right:10px;"
+            ></AtIcon>
             获取运单信息
           </div>
         </Button>

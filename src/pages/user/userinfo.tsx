@@ -5,6 +5,7 @@ import { AtAvatar, AtGrid, AtList, AtListItem, AtFloatLayout } from "taro-ui";
 import "./index.scss";
 import NavBar from "../../components/navbar";
 import ArsTabBar from "../../components/tabbar";
+import { WxUserInfo } from "src/types/ars";
 
 export default function UserInfo() {
   const [curAvatar, setAvatar] = useState("/assets/img/user.png");
@@ -28,28 +29,35 @@ export default function UserInfo() {
         console.log("userSettings:", res);
       }
     });
+
     Taro.getUserInfo().then((ret) => {
-      console.log("userInfo:", ret);
-      curUserInfo = ret.userInfo;
-    });
-    Taro.login({
-      success: (res) => {
-        let code = res.code;
-        Taro.request({
-          url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
-          data: {},
-          header: { "content-type": "json" },
-          success: (resp) => {
-            let openId = JSON.parse(resp.data).openid;
-            console.log("openID:", openId);
-            console.log("resp:", resp);
-          },
-        });
-      },
+      //if (isWx) {
+      Taro.setStorage({ key: "userName", data: ret.userInfo.nickName });
+      Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
+      //}T
+      setUserInfo(ret.userInfo);
+
+      //get open id
+      Taro.login({
+        success: (res) => {
+          let code = res.code;
+          Taro.request({
+            url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
+            data: {},
+            header: { "content-type": "json" },
+            success: (resp) => {
+              let openId = JSON.parse(resp.data).openid;
+              Taro.setStorage;
+              console.log("openID:", openId);
+              console.log("resp:", resp);
+            },
+          });
+        },
+      });
     });
   }
 
-  function setUserInfo(userInfo) {
+  function setUserInfo(userInfo: WxUserInfo) {
     setAvatar(userInfo.avatarUrl);
     setUserName(userInfo.nickName);
   }
@@ -60,13 +68,7 @@ export default function UserInfo() {
     const isWx = true;
     Taro.setStorage({ key: "userAuth", data: true });
     if (isWx) {
-      Taro.getUserInfo().then((ret) => {
-        if (isWx) {
-          Taro.setStorage({ key: "userName", data: ret.userInfo.nickName });
-          Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
-        }
-        setUserInfo(ret.userInfo);
-      });
+      getUserInfo();
     }
   }
   if (init) {

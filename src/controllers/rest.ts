@@ -1,4 +1,5 @@
 import Taro, { offLocalServiceResolveFail } from "@tarojs/taro";
+import { RegUser } from "src/types/ars";
 
 const DEBUGGING = true;
 
@@ -38,7 +39,7 @@ async function confirmWaybill(wbNum: string) {
   }
 }
 
-async function getWaybill(wbNum: string, rdcCode: string, cellphone: string) {
+async function getWaybill(wbNum: string) {
   if (DEBUGGING) {
     return new Promise((res, rej) => {
       setTimeout(() => {
@@ -46,7 +47,11 @@ async function getWaybill(wbNum: string, rdcCode: string, cellphone: string) {
         const status =
           wbNum === "1" ? "arrived" : wbNum === "2" ? "confirmed" : "loaded";
         const statusCaption =
-          wbNum === "1" ? "已送达" : wbNum === "2" ? "中心已确认" : "尚未送达";
+          wbNum === "1"
+            ? "已确认送达"
+            : wbNum === "2"
+            ? "中心已确认"
+            : "尚未送达";
         if (wbNum === "000") {
           res({ result: "not found" });
           //清除本地运单号
@@ -64,12 +69,12 @@ async function getWaybill(wbNum: string, rdcCode: string, cellphone: string) {
               sheetNum: wbNum,
               status,
               statusCaption,
-              startDatetime: new Date(),
+              arriveTime: new Date(new Date().valueOf() - 22 * 60 * 60 * 1000),
               loadNum: "load-num-123",
               driverId: 100,
               driverName: "张强",
-              plateNum: "京A-12345",
-              rdcCode: "01",
+              plateNum: "京A-123456",
+              rdcCode: "0101",
               rdcName: "北京国美",
               shiptoCode: "02",
               shiptoName: "呼和浩特国美",
@@ -176,6 +181,17 @@ async function getWbPhotos(wbNum: string) {
   }
 }
 
+async function saveUserInfo(userInfo: RegUser) {
+  const url = "/users/save";
+  const ret = await Taro.request({
+    url: SERVER_URL + url,
+    method: "POST",
+    data: userInfo,
+    header: { "content-type": "application/x-www-form-urlencoded" },
+  });
+  return ret;
+}
+
 async function taroRequest(url, method, data) {
   if (DEBUGGING) {
     console.log("taroRequest.SERVER_URL:", SERVER_URL, url);
@@ -189,4 +205,4 @@ async function taroRequest(url, method, data) {
   return ret;
 }
 
-export { SERVER_URL, getWaybill, confirmWaybill, getWbPhotos };
+export { SERVER_URL, getWaybill, confirmWaybill, getWbPhotos, saveUserInfo };

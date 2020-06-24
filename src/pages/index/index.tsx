@@ -6,6 +6,8 @@ import "./index.scss";
 import NavBar from "../../components/navbar";
 import ArsTabBar from "../../components/tabbar";
 import { scanBarcode } from "../../controllers/camera";
+import { getDriverLocation } from "../../controllers/users";
+
 export default function Index() {
   //const [manual, setManual] = useState(true);
   const [waybillNum, setWaybillNum] = useState("");
@@ -25,11 +27,14 @@ export default function Index() {
     //if (!manual) {
     //  setManual(true);
     //} else {
+    getDriverLocation(waybillNum, (res) => {
+      console.log("driver loc:", res);
+    });
     Taro.navigateTo({
       url:
         "/pages/sheet/index?wbno=" +
         waybillNum +
-        "&rdc=" +
+        //"&rdc=" +
         rdcNum +
         "&cell=" +
         cellphone,
@@ -52,14 +57,14 @@ export default function Index() {
             <AtInput
               className="home-input"
               name="waybillNum"
-              title="*运单号"
+              title="*装车号"
               type="text"
               value={waybillNum}
               onChange={(val: string) => {
                 //console.log(val);
                 setWaybillNum(val);
               }}
-              placeholder="扫码或手工输入运单编号"
+              placeholder="扫码或手工输入装车号及序列号"
             />
             <Button onClick={scanBarcode} className="cam-button">
               <AtIcon
@@ -80,11 +85,11 @@ export default function Index() {
               color="#ffffff"
               customStyle="margin-right:10px;"
             ></AtIcon>
-            获取运单信息
+            获取交货单信息
           </div>
         </Button>
         <View className="home-prompt-span">
-          <Text>您可以扫码输入运单号，输入接货号后查询运单</Text>
+          <Text>您可以扫描往来表上的二维码，或输入装车序列号及验证码。</Text>
         </View>
       </View>
 

@@ -1,4 +1,6 @@
 import Taro from "@tarojs/taro";
+import { WxUserInfo, RegUser } from "src/types/ars";
+import { saveUserInfo } from "./rest";
 
 function getDriverLocation(wbno: string, resolve: Function) {
   console.log("wbno:", wbno);
@@ -43,6 +45,30 @@ async function getUserInfo() {
   const ui = await Taro.getUserInfo();
   console.log("Taro.getUserInfo:", ui);
   return ui.userInfo;
+}
+
+async function uploadWxUserInfo(
+  openId: string,
+  cell: string,
+  userType: string,
+  area: string,
+  userInfo: WxUserInfo
+) {
+  const regUserInfo: RegUser = {
+    userName: userInfo.nickName,
+    openId,
+    cellphone: cell,
+    password: "",
+    userType: userType,
+    area: area,
+    avatarUrl: userInfo.avatarUrl,
+    country: userInfo.country,
+    province: userInfo.province,
+    city: userInfo.city,
+    gender: userInfo.gender === 1 ? "男" : "女",
+  };
+  const ret = await saveUserInfo(regUserInfo);
+  return ret;
 }
 
 export { getDriverLocation, getWxOpenId, getUserInfo };

@@ -1,6 +1,6 @@
 //司机不要求注册，中心人员需要后台手工确认绑定openid或手机
 export interface RegUser {
-  userName: string;
+  userName: string; //default is wx.nickName
   openId: string; //wx unique id
   cellphone: string;
   password: string; //hashed
@@ -10,7 +10,7 @@ export interface RegUser {
   country: string; //wx
   province: string; //wx
   city: string; //wx
-  gender: string; //wx 1: 男
+  gender: string; //wx 1: 男 other: 女
 }
 
 export interface WxUserInfo {
@@ -33,7 +33,6 @@ export interface PhotoUrl {
 }
 export interface Waybill {
   rdcCode: string;
-  startDatetime: Date;
   shiptoCode: string;
   plateNum: string;
   totalPages: number;
@@ -46,6 +45,7 @@ export interface Waybill {
   driverName: string;
   shipItems: ShipItem[];
   photos: string[];
+  arriveTime: Date;
 }
 export interface WaybillResult {
   result: string;

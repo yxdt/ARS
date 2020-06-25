@@ -153,6 +153,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
               mode="aspectFit"
               src={this.state.src}
               className="preview-img"
+              style="width:100%; height: 100%; left:0;top:0; position:fixed; background-size: 100%, 100%; z-index: -1"
               onClick={() => {
                 //do preview
                 Taro.previewImage({

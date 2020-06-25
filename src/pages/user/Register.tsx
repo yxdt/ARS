@@ -17,9 +17,9 @@ export default function Register() {
   console.log("");
   let userInfo = {};
 
-  const [userName, setUserName] = useState("1");
-  const [cellphone, setCellphone] = useState("2");
-  const [plateNum, setPlateNum] = useState("3");
+  const [userName, setUserName] = useState("测试员");
+  const [cellphone, setCellphone] = useState("13901390139");
+  const [plateNum, setPlateNum] = useState("北京配送中心");
   const [avatar, setAvatar] = useState("");
 
   getUserInfo().then((res: WxUserInfo) => {
@@ -65,17 +65,10 @@ export default function Register() {
 
   return (
     <View className="index">
-      <Image
-        mode="scaleToFill"
-        style="top:0;left:0; width:100%; height: 100%; position:fixed; background-size: 100%, 100%; z-index: -1"
-        src="../../assets/img/back.png"
-      ></Image>
       <View className="user-reg-span">
-        <Text className="form-title">成为注册用户</Text>
-        <Text className="form-caption">请输入您的信息</Text>
+        <Text className="form-title">您的相关信息</Text>
         <Text className="form-comment">
-          本系统只对LG配送中心员工开放，
-          请输入您的个人信息提交管理员审核。审核通过后，您就可以访问相关功能。
+          本功能只对LG配送中心员工开放，用户登录后可以查看相关信息。
         </Text>
         <AtForm className="form-userinfo" onSubmit={onFormSubmit.bind(this)}>
           <AtInput
@@ -99,7 +92,7 @@ export default function Register() {
           <AtInput
             className="input-text"
             name="platenumber"
-            title="地址"
+            title="配送中心"
             type="text"
             placeholder="请输入您的车牌号"
             value={plateNum}
@@ -108,8 +101,14 @@ export default function Register() {
           <AtButton className="home-button" formType="submit">
             提交
           </AtButton>
-          <AtButton className="home-button" formType="reset">
-            重置
+          <AtButton
+            className="home-button"
+            formType="reset"
+            onClick={() => {
+              Taro.navigateBack();
+            }}
+          >
+            返回
           </AtButton>
         </AtForm>
       </View>

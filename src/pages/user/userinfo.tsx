@@ -5,12 +5,13 @@ import { AtAvatar, AtGrid, AtList, AtListItem, AtFloatLayout } from "taro-ui";
 import "./index.scss";
 import NavBar from "../../components/navbar";
 import ArsTabBar from "../../components/tabbar";
-import { WxUserInfo } from "src/types/ars";
+import { WxUserInfo } from "../../types/ars";
+import { SERVER_URL } from "../../controllers/rest";
 
 export default function UserInfo() {
   const [curAvatar, setAvatar] = useState("/assets/img/user.png");
   const [userName, setUserName] = useState("");
-  const [userType, setUserType] = useState("注册司机");
+  const [userType, setUserType] = useState("中心人员");
   const [cellphone, setCellphone] = useState("13823803380");
   const [plateNum, setPlateNum] = useState("京A-876543");
   const [truckType, setTruckType] = useState(1);
@@ -31,6 +32,7 @@ export default function UserInfo() {
     });
 
     Taro.getUserInfo().then((ret) => {
+      console.log("getUserInfo.ret:", ret);
       //if (isWx) {
       Taro.setStorage({ key: "userName", data: ret.userInfo.nickName });
       Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
@@ -47,9 +49,25 @@ export default function UserInfo() {
             header: { "content-type": "json" },
             success: (resp) => {
               let openId = JSON.parse(resp.data).openid;
-              Taro.setStorage;
+              const snKey = JSON.parse(resp.data).session_key;
+
+              console.log("response:", resp);
+              console.log("response.data:", ret.encryptedData);
               console.log("openID:", openId);
               console.log("resp:", resp);
+
+              Taro.request({
+                url: SERVER_URL + "/users/userInfo",
+                method: "POST",
+                data: {
+                  session_key: snKey,
+                  iv: ret.iv,
+                  data: ret.encryptedData,
+                },
+                header: { "content-type": "application/x-www-form-urlencoded" },
+              }).then((ret) => {
+                console.log("client_post_response:", ret);
+              });
             },
           });
         },
@@ -89,7 +107,8 @@ export default function UserInfo() {
         handleClick={() => {
           console.log("click", this.state);
         }}
-        title="个人信息"
+        title="个人信息-点击退出"
+        ricon="sign-out"
       />
       <View className="user-info-span">
         <View className="user-avatar">
@@ -101,9 +120,7 @@ export default function UserInfo() {
               <View className="user-detail-1">
                 {userName}（{userType}）
               </View>
-              <View className="user-detail-2">
-                {plateNum}（手机：{cellphone}）
-              </View>
+              <View className="user-detail-2">手机：{cellphone}</View>
             </View>
           ) : (
             <Button
@@ -111,7 +128,7 @@ export default function UserInfo() {
               onGetUserInfo={onGotUserInfo}
               className="login-button"
             >
-              登录/注册
+              微信授权
             </Button>
           )}
         </View>
@@ -127,15 +144,19 @@ export default function UserInfo() {
                 });
                 break;
               case 1:
-                getUserInfo();
+                //getUserInfo();
+                Taro.redirectTo({
+                  url: "/pages/camera/verify",
+                });
                 break;
               case 2:
-                Taro.requestSubscribeMessage({
-                  tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
-                  success: (res) => {
-                    console.log("subscribe message success:", res);
-                  },
-                });
+                Taro.redirectTo({ url: "/pages/sheet/query" });
+                // Taro.requestSubscribeMessage({
+                //   tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
+                //   success: (res) => {
+                //     console.log("subscribe message success:", res);
+                //   },
+                // });
                 break;
               default:
                 console.log("wait...");
@@ -146,20 +167,21 @@ export default function UserInfo() {
             {
               iconInfo: {
                 prefixClass: "fa",
-                value: "address-card-o",
+                value: "comments",
                 size: 40,
-                color: "#ce007c",
+                color: "#62a60a",
               },
-              value: "注册信息",
+              value: "系统信息",
             },
             {
               iconInfo: {
                 prefixClass: "fa",
                 value: "wpforms",
                 size: 40,
-                color: "#62a60a",
+
+                color: "#ce007c",
               },
-              value: "回执列表",
+              value: "回执审核",
             },
             {
               iconInfo: {

@@ -1,8 +1,8 @@
-import Taro, { Component, Config } from '@tarojs/taro';
-import Index from './pages/index';
-import 'taro-ui/dist/style/index.scss';
-import './app.scss';
-import './icon.scss';
+import Taro, { Component, Config } from "@tarojs/taro";
+import Index from "./pages/index";
+import "taro-ui/dist/style/index.scss";
+import "./app.scss";
+import "./icon.scss";
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -27,16 +27,25 @@ class App extends Component {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    pages: ['pages/index/index', 'pages/camera/camera', 'pages/user/userinfo', 'pages/user/Register', 'pages/sheet/index', 'pages/user/Login'],
+    pages: [
+      "pages/index/index",
+      "pages/camera/camera",
+      "pages/camera/verify",
+      "pages/user/userinfo",
+      "pages/user/Register",
+      "pages/user/Login",
+      "pages/sheet/index",
+      "pages/sheet/query",
+    ],
     window: {
-      backgroundTextStyle: 'light',
-      navigationBarBackgroundColor: '#a50034',
-      navigationBarTitleText: 'TIMS',
-      navigationBarTextStyle: 'white',
+      backgroundTextStyle: "light",
+      navigationBarBackgroundColor: "#a50034",
+      navigationBarTitleText: "TIMS",
+      navigationBarTextStyle: "white",
     },
     permission: {
-      'scope.userLocation': {
-        desc: '您的位置信息将用于确认运单正确送达',
+      "scope.userLocation": {
+        desc: "您的位置信息将用于确认运单正确送达",
       },
     },
   };
@@ -48,4 +57,4 @@ class App extends Component {
   }
 }
 
-Taro.render(<App />, document.getElementById('app'));
+Taro.render(<App />, document.getElementById("app"));

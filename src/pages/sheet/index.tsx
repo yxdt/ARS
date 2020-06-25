@@ -22,7 +22,6 @@ import { getDriverLocation } from "../../controllers/users";
 import ShipItems from "../../components/shipitems";
 import { WaybillResult, Waybill, Result, PhotosResult } from "../../types/ars";
 import InfoCard from "../../components/infocard";
-import ArriveConfirm from "../../components/arriveConfirm";
 
 export interface SheetState {
   loading: boolean;

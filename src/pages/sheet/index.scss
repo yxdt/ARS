@@ -15,6 +15,9 @@ $color-lg-lred: #ffa3b2;
   background-color: $color-bg;
   color: #ffffff;
 }
+.at-input__title {
+  font-size: 0.8rem !important;
+}
 .item-content__info-title {
   font-size: 0.8rem !important;
 }
@@ -202,4 +205,15 @@ hr {
   color: #ffffff;
   font-size: 0.8rem;
   font-style: italic;
+}
+
+.query-input {
+  margin-left: 0 !important;
+
+  padding: 24rpx 24rpx;
+}
+
+.small-ph {
+  font-size: 0.8rem !important;
+  text-align: right;
 }

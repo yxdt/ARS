@@ -1,15 +1,15 @@
-import Taro, { useState, login } from '@tarojs/taro';
-import { View, Text, Button } from '@tarojs/components';
-import { AtInput } from 'taro-ui';
-import './index.scss';
+import Taro, { useState, login } from "@tarojs/taro";
+import { View, Text, Button } from "@tarojs/components";
+import { AtInput } from "taro-ui";
+import "./index.scss";
 
-import ArsTabBar from '../../components/tabbar';
+import ArsTabBar from "../../components/tabbar";
 
 export default function Login() {
   //const [manual, setManual] = useState(true);
-  const [cellphone, setCellphone] = useState('');
-  const [password, setPassword] = useState('');
-  const [openId, setOpenId] = useState('');
+  const [cellphone, setCellphone] = useState("");
+  const [password, setPassword] = useState("");
+  const [openId, setOpenId] = useState("");
   const [loging, setLoging] = useState(false);
   //console.log("$router.params:", props, this.$router);
 
@@ -19,7 +19,7 @@ export default function Login() {
   }
 
   function doLogin() {
-    console.log('user cellphone, password:', cellphone, password);
+    console.log("user cellphone, password:", cellphone, password);
   }
 
   return (
@@ -30,7 +30,7 @@ export default function Login() {
       </Text>
 
       <View>
-        <View style={{ flexDirection: 'row', display: 'flex' }}>
+        <View style={{ flexDirection: "row", display: "flex" }}>
           <AtInput
             className="home-input"
             name="cellphone"
@@ -43,7 +43,7 @@ export default function Login() {
             placeholder="请输入您的手机号"
           />
         </View>
-        <View style={{ flexDirection: 'row', display: 'flex' }}>
+        <View style={{ flexDirection: "row", display: "flex" }}>
           <AtInput
             className="home-input"
             name="password"
@@ -58,8 +58,12 @@ export default function Login() {
         </View>
       </View>
       <View style="display:flex; flex-direction:row">
-        <Button className="home-button preview-confirm-button" onClick={doLogin} disabled={loging}>
-          {loging ? '登录中...' : '登录'}
+        <Button
+          className="home-button preview-confirm-button"
+          onClick={doLogin}
+          disabled={loging}
+        >
+          {loging ? "登录中..." : "登录"}
         </Button>
         <Button
           className="home-button preview-confirm-button"
@@ -67,14 +71,14 @@ export default function Login() {
             setLoging(false);
             Taro.navigateBack();
           }}
-          disabled={loging}>
+          disabled={loging}
+        >
           返回
         </Button>
       </View>
-      <View className="home-prompt-span">
-        <Text>本功能只面向配送中心工作人员，请输入您的注册手机号及密码，登录到系统。</Text>
-      </View>
-
+      <Text className="caption">
+        本功能只面向配送中心工作人员，请输入您的注册手机号及密码进行登录。
+      </Text>
       <ArsTabBar current={2} />
     </View>
   );

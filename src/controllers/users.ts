@@ -2,11 +2,33 @@ import Taro from "@tarojs/taro";
 import { WxUserInfo, RegUser } from "src/types/ars";
 import { saveUserInfo } from "./rest";
 
+import QQMapWX from "../libs/qqmap-wx-jssdk";
+
 function getDriverLocation(wbno: string, resolve: Function) {
   console.log("wbno:", wbno);
+
   Taro.getLocation({
     type: "wgs84",
     success: (res) => {
+      const qqmapsdk = new QQMapWX({
+        key: "HV2BZ-HMTC6-IICS7-ESS5M-BFX2E-V6B5B",
+      });
+      const loc = { latitude: res.latitude, longitude: res.longitude };
+      console.log("cur position:", loc);
+      qqmapsdk.reverseGeocoder({
+        location: loc || "",
+        success: (resLoc) => {
+          console.log("resLoc:", resLoc);
+          resolve({
+            latitude: res.latitude,
+            longitude: res.longitude,
+            address: resLoc.result.address,
+          });
+        },
+        fail: (err) => {
+          console.log("error when find address:", err);
+        },
+      });
       //成功获取司机位置信息可以做一些服务器端操作，比如存储位置信息。
       //res:
       //{
@@ -18,7 +40,6 @@ function getDriverLocation(wbno: string, resolve: Function) {
       //   speed: -1
       //   verticalAccuracy: 65
       //}
-      resolve(res);
     },
   });
 }

@@ -19,8 +19,15 @@ import {
   SERVER_URL,
 } from "../../controllers/rest";
 import { getDriverLocation } from "../../controllers/users";
+
 import ShipItems from "../../components/shipitems";
-import { WaybillResult, Waybill, Result, PhotosResult } from "../../types/ars";
+import {
+  WaybillResult,
+  Waybill,
+  Result,
+  PhotosResult,
+  WaybillConfirmParams,
+} from "../../types/ars";
 import InfoCard from "../../components/infocard";
 
 export interface SheetState {
@@ -29,6 +36,7 @@ export interface SheetState {
   itemCount: number;
   arrived: boolean; //司机确认到达
   confirmArrive: boolean; //司机到达确认的确认
+  confirming: boolean; //司机到达确认中
   confirmed: boolean; //中心已确认到达
   valid: boolean; //是否是有效的运单号
   failed: boolean; //是否操作失败
@@ -63,11 +71,12 @@ export default class Index extends Component<null, SheetState> {
       itemCount: 0,
       arrived: false,
       confirmArrive: false,
+      confirming: false,
       confirmed: false,
       valid: false,
     };
     console.log("sheet:", this.$router.params);
-    this.confirmArrive.bind(this);
+    this.driverConfirmArrive.bind(this);
   }
 
   componentWillMount() {}
@@ -179,24 +188,44 @@ export default class Index extends Component<null, SheetState> {
     console.log("something has been changed:", val);
   }
 
-  confirmArrive() {
+  driverConfirmArrive() {
     console.log("confirm arrive");
+    console.log("sheetNum:", this.state.waybill.sheetNum);
     console.log("rdcNum:", this.state.rdcNum, this.state.waybill.rdcCode);
+
     if (this.state.rdcNum === this.state.waybill.rdcCode) {
       //you can confirm with the waybill
-      confirmWaybill(this.state.waybill.sheetNum).then((ret: Result) => {
-        if (ret.result === "success") {
-          this.setState({
-            arrived: true,
-            loading: false,
-            confirmArrive: false,
-            waybill: {
-              ...this.state.waybill,
-              status: "arrived",
-              statusCaption: "已确认送达",
-            },
-          });
-        }
+      this.setState({ confirming: true });
+      getDriverLocation(this.state.waybill.sheetNum, (res) => {
+        //do
+        const params: WaybillConfirmParams = {
+          openid: "",
+          sysTime: new Date().toLocaleString("zh-CN"),
+          ordNo: this.state.waybill.sheetNum,
+          shpToCd: this.state.rdcNum,
+          latitude: res.latitude,
+          longitude: res.longitude,
+          address: res.address,
+          phone: this.state.cellphone,
+        };
+        console.log("driver loc ,cellphone:", res, params);
+
+        confirmWaybill(params).then((ret: Result) => {
+          console.log("confirmWaybill.ret:", ret);
+          if (ret.result === "success") {
+            this.setState({
+              arrived: true,
+              loading: false,
+              confirmArrive: false,
+              confirming: false,
+              waybill: {
+                ...this.state.waybill,
+                status: "arrived",
+                statusCaption: "已确认送达",
+              },
+            });
+          }
+        });
       });
     } else {
       //wrong rdcNumber input
@@ -321,7 +350,7 @@ export default class Index extends Component<null, SheetState> {
                 <Button
                   className="home-input-semi-right"
                   onClick={() => {
-                    this.confirmArrive();
+                    this.driverConfirmArrive();
                   }}
                 >
                   确认

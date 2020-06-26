@@ -1,18 +1,17 @@
-import Taro, { useState } from '@tarojs/taro';
-import { View, Text, Image, Button } from '@tarojs/components';
-import { AtInput, AtIcon } from 'taro-ui';
-import './index.scss';
+import Taro, { useState } from "@tarojs/taro";
+import { View, Text, Image, Button } from "@tarojs/components";
+import { AtInput, AtIcon } from "taro-ui";
+import "./index.scss";
 
-import NavBar from '../../components/navbar';
-import ArsTabBar from '../../components/tabbar';
-import { scanBarcode } from '../../controllers/camera';
-import { getDriverLocation } from '../../controllers/users';
+import NavBar from "../../components/navbar";
+import ArsTabBar from "../../components/tabbar";
+import { scanBarcode } from "../../controllers/camera";
 
 export default function Index() {
   //const [manual, setManual] = useState(true);
-  const [waybillNum, setWaybillNum] = useState('');
-  const [rdcNum, setRdcNum] = useState('');
-  const [cellphone, setCellphone] = useState('');
+  const [waybillNum, setWaybillNum] = useState("");
+  const [rdcNum, setRdcNum] = useState("");
+  const [cellphone, setCellphone] = useState("");
   const [isScan, setIsScan] = useState(false);
 
   //console.log("$router.params:", props, this.$router);
@@ -27,23 +26,20 @@ export default function Index() {
     //if (!manual) {
     //  setManual(true);
     //} else {
-    getDriverLocation(waybillNum, (res) => {
-      console.log('driver loc:', res);
-    });
     Taro.navigateTo({
       url:
-        '/pages/sheet/index?wbno=' +
+        "/pages/sheet/index?wbno=" +
         waybillNum +
         //"&rdc=" +
         rdcNum +
-        '&cell=' +
+        "&cell=" +
         cellphone,
     });
     //}
   }
   function login() {
     Taro.navigateTo({
-      url: '/pages/user/Login',
+      url: "/pages/user/Login",
     });
   }
   return (
@@ -57,7 +53,7 @@ export default function Index() {
       </View>
       <View className="home-button-span">
         <View>
-          <View style={{ flexDirection: 'row', display: 'flex' }}>
+          <View style={{ flexDirection: "row", display: "flex" }}>
             <AtInput
               className="home-input"
               name="waybillNum"
@@ -71,13 +67,24 @@ export default function Index() {
               placeholder="扫码或手工输入装车号及序列号"
             />
             <Button onClick={scanBarcode} className="cam-button">
-              <AtIcon prefixClass="fa" value="qrcode" size="26" color="#ffffff"></AtIcon>
+              <AtIcon
+                prefixClass="fa"
+                value="qrcode"
+                size="26"
+                color="#ffffff"
+              ></AtIcon>
             </Button>
           </View>
         </View>
         <Button className="home-button" onClick={openSheet}>
           <div>
-            <AtIcon prefixClass="fa" value="search" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
+            <AtIcon
+              prefixClass="fa"
+              value="search"
+              size="20"
+              color="#ffffff"
+              customStyle="margin-right:10px;"
+            ></AtIcon>
             获取交货单信息
           </div>
         </Button>

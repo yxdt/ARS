@@ -1,10 +1,10 @@
 import Taro, { offLocalServiceResolveFail } from "@tarojs/taro";
-import { RegUser } from "src/types/ars";
+import { RegUser, WaybillConfirmParams, TimsResponse } from "src/types/ars";
 
 const DEBUGGING = true;
 
 const devUrl = "http://192.168.0.100:8765";
-const prodUrl = "https://www.hanyukj.cn";
+const prodUrl = "https://tims.lg.com.cn"; //"https://www.hanyukj.cn";
 const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 
 async function saveDriverLocation(wbNum: string, loc: string) {
@@ -23,18 +23,32 @@ async function saveDriverLocation(wbNum: string, loc: string) {
   }
 }
 
-async function confirmWaybill(wbNum: string) {
+async function confirmWaybill(wbInfo: WaybillConfirmParams) {
+  const url = SERVER_URL + "/driver/confirm";
+
   if (DEBUGGING) {
+    console.log("confirmWaybill.params:", wbInfo);
     return new Promise((res, rej) => {
       setTimeout(() => {
         console.log("waybill.confirmWaybill.timeout");
         res({
-          sheetNum: wbNum,
-          result: "success",
+          messageId: "0000aksdkfasdfas",
+          data: {},
+          code: "0000",
+          message: "Successful operation",
+          sentTime: new Date(),
+          responseTime: new Date(),
         });
       }, 1000);
     });
   } else {
+    const ret = await Taro.request({
+      url,
+      method: "POST",
+      data: wbInfo,
+      header: { "content-type": "application/x-www-form-urlencoded" },
+    });
+    console.log("confirmWaybill.ret:", ret);
     console.log("!!1not implemented yet!!!");
   }
 }

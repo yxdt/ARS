@@ -150,13 +150,13 @@ export default function UserInfo() {
                 });
                 break;
               case 2:
-                Taro.redirectTo({ url: "/pages/sheet/query" });
-                // Taro.requestSubscribeMessage({
-                //   tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
-                //   success: (res) => {
-                //     console.log("subscribe message success:", res);
-                //   },
-                // });
+                //Taro.redirectTo({ url: "/pages/sheet/query" });
+                Taro.requestSubscribeMessage({
+                  tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
+                  success: (res) => {
+                    console.log("subscribe message success:", res);
+                  },
+                });
                 break;
               default:
                 console.log("wait...");

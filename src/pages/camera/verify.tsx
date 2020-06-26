@@ -16,6 +16,7 @@ import { SERVER_URL } from "../../controllers/rest";
 export default function Verify() {
   const [selPic, setSelPic] = useState("");
   const [preview, setPreview] = useState(false);
+  const [days, setDays] = useState;
 
   function handleClick(val) {
     console.log("handleClick:", val);

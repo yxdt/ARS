@@ -47,6 +47,16 @@ export interface Waybill {
   photos: string[];
   arriveTime: Date;
 }
+export interface WaybillConfirmParams {
+  openid: string; //司机小程序用户openid
+  sysTime: string; //到达时间
+  ordNo: string; //运单号
+  shpToCd: string; //四位验证码
+  latitude: string;
+  longitude: string;
+  address: string;
+  phone: string;
+}
 export interface WaybillResult {
   result: string;
   waybill: Waybill;
@@ -63,4 +73,13 @@ export interface InfoCardProps {
 
 export interface PhotosResult {
   photos: Array<string>;
+}
+
+export interface TimsResponse {
+  messageId: string;
+  data: JSON;
+  code: string;
+  message: string;
+  sentTime: Date;
+  responseTime: Date;
 }

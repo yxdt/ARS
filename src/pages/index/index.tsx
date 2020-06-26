@@ -57,7 +57,7 @@ export default function Index() {
             <AtInput
               className="home-input"
               name="waybillNum"
-              title="*装车号"
+              title="装车号*"
               type="text"
               value={waybillNum}
               onChange={(val: string) => {

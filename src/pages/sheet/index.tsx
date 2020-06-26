@@ -35,6 +35,7 @@ export interface SheetState {
   waybill: Waybill;
   itemCount: number;
   arrived: boolean; //司机确认到达
+  confirmTime: Date;
   confirmArrive: boolean; //司机到达确认的确认
   confirming: boolean; //司机到达确认中
   confirmed: boolean; //中心已确认到达
@@ -71,6 +72,7 @@ export default class Index extends Component<null, SheetState> {
       itemCount: 0,
       arrived: false,
       confirmArrive: false,
+      confirmTime: new Date(),
       confirming: false,
       confirmed: false,
       valid: false,
@@ -108,6 +110,7 @@ export default class Index extends Component<null, SheetState> {
                 arrived: ret.waybill.status === "arrived",
                 confirmed: ret.waybill.status === "confirmed",
                 confirmArrive: ret.waybill.status === "loaded",
+                confirmTime: new Date(),
                 valid: true,
               });
             })
@@ -242,6 +245,7 @@ export default class Index extends Component<null, SheetState> {
       loading,
       waybill,
       confirmArrive,
+      confirmTime,
       arrived,
       confirmed,
       valid,
@@ -305,17 +309,18 @@ export default class Index extends Component<null, SheetState> {
               {waybill.statusCaption}
             </Text>
             <AtModal isOpened={confirmArrive}>
-              <AtModalHeader>确认到达</AtModalHeader>
+              <AtModalHeader>
+                时间：{confirmTime.toLocaleString("zh-CN")}
+              </AtModalHeader>
               <AtModalContent>
-                <CoverView className="toast-main">
-                  <View className="confirm-info">{confirmString}</View>
+                <View className="toast-main">
                   <View className="confirm-info">{confirmString2}</View>
                   <View className="confirm-info">{confirmString3}</View>
                   <AtInput
                     key={"confirm-arrive-ara-code"}
                     type="text"
-                    className="home-input"
-                    title="*验证码"
+                    className="modal-input"
+                    title="验证码*"
                     name="arsCode"
                     placeholder="四位验证码"
                     onChange={(val) => {
@@ -327,7 +332,7 @@ export default class Index extends Component<null, SheetState> {
                     key={"confirm-arrive-cell-phone"}
                     type="number"
                     name="cellphone"
-                    className="home-input"
+                    className="modal-input"
                     title="手机号"
                     placeholder="您的手机号"
                     onChange={(val) => {
@@ -335,7 +340,7 @@ export default class Index extends Component<null, SheetState> {
                       this.setState({ cellphone: val.toString() });
                     }}
                   ></AtInput>
-                </CoverView>
+                </View>
               </AtModalContent>
               <AtModalAction>
                 <Button
@@ -353,7 +358,7 @@ export default class Index extends Component<null, SheetState> {
                     this.driverConfirmArrive();
                   }}
                 >
-                  确认
+                  确认到达
                 </Button>
               </AtModalAction>
             </AtModal>

@@ -28,24 +28,32 @@ $color-lg-lred: #ffa3b2;
   margin: -100;
   padding: 0;
 }
+.modal-input {
+  color: #a50034;
+  font-weight: bold;
+  border-bottom: solid 1px #a50034;
+}
 .home-input {
   margin: 1rem;
   color: #a50034;
   font-weight: bold;
   border-bottom: solid 1px #a50034;
 }
-.home-input-semi-left:active {
+.home-input-semi-left {
   color: $color-bg;
   font-weight: bold;
+  margin: 0 auto;
+  line-height: 1.2rem;
 }
 .home-input-semi-right {
   color: $color-bg !important;
   font-weight: bold;
+  margin: 0 auto;
+  line-height: 1.2rem;
 }
 .confirm-info {
-  margin-top: 0.8rem;
   line-height: 1.2rem;
-  color: #666666;
+  color: #666666 !important;
   word-wrap: break-word;
   display: block;
   text-align: center;

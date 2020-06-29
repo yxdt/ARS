@@ -1,7 +1,6 @@
 import Taro from "@tarojs/taro";
 import { WxUserInfo, RegUser } from "src/types/ars";
-import { saveUserInfo } from "./rest";
-
+import { saveUserInfo, userLogin } from "./rest";
 import QQMapWX from "../libs/qqmap-wx-jssdk";
 
 function getDriverLocation(wbno: string, resolve: Function) {
@@ -53,7 +52,8 @@ function getWxOpenId(cbOpenId: Function) {
         header: { "content-type": "json" },
         success: (resp) => {
           let openId = JSON.parse(resp.data).openid;
-          console.log("openID:", openId);
+          Taro.setStorage({ key: "userOpenId", data: openId });
+          console.log("controllers.users.getWxOpenId.openID:", openId);
           console.log("resp:", resp);
           cbOpenId(openId);
         },
@@ -63,9 +63,13 @@ function getWxOpenId(cbOpenId: Function) {
 }
 
 async function getUserInfo() {
-  const ui = await Taro.getUserInfo();
-  console.log("Taro.getUserInfo:", ui);
-  return ui.userInfo;
+  try {
+    const ui = await Taro.getUserInfo();
+    console.log("Taro.getUserInfo:", ui);
+    return ui.userInfo;
+  } catch (err) {
+    console.log("err in controllers/users/getUserInfo:", err);
+  }
 }
 
 async function uploadWxUserInfo(
@@ -92,4 +96,9 @@ async function uploadWxUserInfo(
   return ret;
 }
 
-export { getDriverLocation, getWxOpenId, getUserInfo };
+async function doLogin(cellphone, password) {
+  console.log("controllers.user.doLogin:", cellphone, password);
+  return await userLogin(cellphone, password);
+}
+
+export { getDriverLocation, getWxOpenId, getUserInfo, doLogin };

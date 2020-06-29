@@ -38,7 +38,7 @@ export default function Query() {
             <Picker mode="date" onChange={this.onDateChange} value={startDate}>
               <AtList>
                 <AtListItem
-                  title="查询起始日期"
+                  title="起始出门时间"
                   extraText={startDate}
                   customStyle="font-size:1rem"
                 />
@@ -48,7 +48,7 @@ export default function Query() {
           <View>
             <Picker mode="date" onChange={this.onDateChange} value={endDate}>
               <AtList>
-                <AtListItem title="查询截至日期" extraText={endDate} />
+                <AtListItem title="截止出门时间" extraText={endDate} />
               </AtList>
             </Picker>
           </View>

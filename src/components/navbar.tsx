@@ -2,15 +2,29 @@ import Taro, { useState } from "@tarojs/taro";
 import { AtNavBar } from "taro-ui";
 
 export default function NavBar(props) {
+  let loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
   return (
     <AtNavBar
       customStyle={{
         backgroundColor: "#ababab",
       }}
-      onClickRgIconSt={this.props.handleClick}
+      onClickRgIconSt={() => {
+        console.log("onClickRgIconSt");
+        if (loggedIn) {
+          Taro.removeStorage({
+            key: "roleName",
+            success: () => {
+              Taro.redirectTo({ url: "/pages/index/index" });
+            },
+          });
+          Taro.removeStorage({ key: "userName" });
+        } else {
+          this.props.handleClick();
+        }
+      }}
       onClickRgIconNd={this.props.handleClick}
       onClickLeftIcon={this.props.handleClick}
-      title={props.title || "配送中心人员登录"}
+      title={props.title || (loggedIn ? "点击退出" : "配送中心人员登录")}
       color="#ffffff"
       leftText=""
       fixed={true}
@@ -19,7 +33,7 @@ export default function NavBar(props) {
           ? ""
           : {
               prefixClass: "fa",
-              value: props.ricon || "id-badge",
+              value: props.ricon || (loggedIn ? "sign-out" : "id-badge"),
               size: "24",
               color: "#ffffff",
             }

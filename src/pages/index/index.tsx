@@ -6,6 +6,7 @@ import "./index.scss";
 import NavBar from "../../components/navbar";
 import ArsTabBar from "../../components/tabbar";
 import { scanBarcode } from "../../controllers/camera";
+import { getWxOpenId } from "../../controllers/users";
 
 export default function Index() {
   //const [manual, setManual] = useState(true);
@@ -13,6 +14,7 @@ export default function Index() {
   const [rdcNum, setRdcNum] = useState("");
   const [cellphone, setCellphone] = useState("");
   const [isScan, setIsScan] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   //console.log("$router.params:", props, this.$router);
 
@@ -20,6 +22,25 @@ export default function Index() {
     setIsScan(true);
     setWaybillNum(this.$router.params.wbno);
     //setManual(true);
+  } else {
+    let curwbno = Taro.getStorageSync("waybill");
+    const wbnodate: Date = new Date(Taro.getStorageSync("waybilldate"));
+    const today = new Date();
+    if (today.valueOf() - wbnodate.valueOf() > 24 * 60 * 60 * 1000) {
+      //本地运单信息超过一天自动清除
+      curwbno = "";
+      Taro.removeStorage("waybill");
+      Taro.removeStorage("waybilldate");
+    }
+    setWaybillNum(curwbno);
+  }
+
+  function gotBarcode(bcVal: string) {
+    //bcVal = waybillNum + rdcNum
+    console.log("index.index.gotBarcode:", bcVal);
+    Taro.navigateTo({
+      url: "/pages/sheet/index?wbno=" + bcVal.result,
+    });
   }
 
   function openSheet() {
@@ -31,9 +52,9 @@ export default function Index() {
         "/pages/sheet/index?wbno=" +
         waybillNum +
         //"&rdc=" +
-        rdcNum +
-        "&cell=" +
-        cellphone,
+        rdcNum, //+
+      //"&cell=" +
+      //cellphone,
     });
     //}
   }
@@ -57,16 +78,22 @@ export default function Index() {
             <AtInput
               className="home-input"
               name="waybillNum"
-              title="装车号*"
+              title="装车号"
               type="text"
               value={waybillNum}
               onChange={(val: string) => {
                 //console.log(val);
                 setWaybillNum(val);
               }}
-              placeholder="扫码或手工输入装车号及序列号"
+              placeholder="扫码或手工输入装车号及验证码"
+              placeholderStyle="font-size:0.8rem;"
             />
-            <Button onClick={scanBarcode} className="cam-button">
+            <Button
+              onClick={() => {
+                scanBarcode(gotBarcode);
+              }}
+              className="cam-button"
+            >
               <AtIcon
                 prefixClass="fa"
                 value="qrcode"
@@ -92,7 +119,6 @@ export default function Index() {
           <Text>您可以扫描往来表上的二维码，或输入装车序列号及验证码。</Text>
         </View>
       </View>
-
       <ArsTabBar current={0} />
     </View>
   );

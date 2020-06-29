@@ -27,6 +27,7 @@ import {
   Result,
   PhotosResult,
   WaybillConfirmParams,
+  TimsResponse,
 } from "../../types/ars";
 import InfoCard from "../../components/infocard";
 
@@ -43,6 +44,7 @@ export interface SheetState {
   failed: boolean; //是否操作失败
   rdcNum: string; //司机输入接货码
   cellphone: string; //driver cellphone
+  isSuper: boolean; //是否是中心人员
   //photos: Array<string>; //uploaded photos
 }
 export default class Index extends Component<null, SheetState> {
@@ -53,6 +55,7 @@ export default class Index extends Component<null, SheetState> {
       failed: false,
       rdcNum: "",
       cellphone: "",
+      isSuper: false,
       waybill: {
         shiptoCode: "",
         rdcCode: "",
@@ -88,6 +91,7 @@ export default class Index extends Component<null, SheetState> {
     const wbno = this.$router.params.wbno;
     const rdcno = this.$router.params.rdc;
     const cell = this.$router.params.cell;
+    const isSuper = this.$router.params.super === "1";
     getWaybill(wbno, rdcno, cell)
       .then((ret: WaybillResult) => {
         console.log("getWaybill.ret:", ret);
@@ -112,6 +116,7 @@ export default class Index extends Component<null, SheetState> {
                 confirmArrive: ret.waybill.status === "loaded",
                 confirmTime: new Date(),
                 valid: true,
+                isSuper,
               });
             })
             .catch((err) => {
@@ -128,6 +133,7 @@ export default class Index extends Component<null, SheetState> {
                 itemCount: 0,
                 arrived: false,
                 confirmArrive: false,
+                isSuper,
               });
               throw err;
             });
@@ -138,6 +144,7 @@ export default class Index extends Component<null, SheetState> {
             itemCount: 0,
             arrived: false,
             confirmArrive: false,
+            isSuper,
           });
         }
       })
@@ -149,8 +156,9 @@ export default class Index extends Component<null, SheetState> {
           itemCount: 0,
           arrived: false,
           confirmArrive: false,
+          isSuper,
         });
-        console.log("Err", err);
+        console.log("Error:", err);
         Taro.atMessage({
           message: "运单信息获取失败，请重试！",
           type: "error",
@@ -195,6 +203,9 @@ export default class Index extends Component<null, SheetState> {
     console.log("confirm arrive");
     console.log("sheetNum:", this.state.waybill.sheetNum);
     console.log("rdcNum:", this.state.rdcNum, this.state.waybill.rdcCode);
+    //dirver position address openid
+    const openid = Taro.getStorageSync("userOpenId");
+    console.log("sheet.index.driverConfirmArrive.openid:", openid);
 
     if (this.state.rdcNum === this.state.waybill.rdcCode) {
       //you can confirm with the waybill
@@ -202,7 +213,7 @@ export default class Index extends Component<null, SheetState> {
       getDriverLocation(this.state.waybill.sheetNum, (res) => {
         //do
         const params: WaybillConfirmParams = {
-          openid: "",
+          openid,
           sysTime: new Date().toLocaleString("zh-CN"),
           ordNo: this.state.waybill.sheetNum,
           shpToCd: this.state.rdcNum,
@@ -213,22 +224,38 @@ export default class Index extends Component<null, SheetState> {
         };
         console.log("driver loc ,cellphone:", res, params);
 
-        confirmWaybill(params).then((ret: Result) => {
-          console.log("confirmWaybill.ret:", ret);
-          if (ret.result === "success") {
-            this.setState({
-              arrived: true,
-              loading: false,
-              confirmArrive: false,
-              confirming: false,
-              waybill: {
-                ...this.state.waybill,
-                status: "arrived",
-                statusCaption: "已确认送达",
-              },
+        confirmWaybill(params)
+          .then((ret: TimsResponse) => {
+            console.log("confirmWaybill.ret:", ret);
+            if (ret.code === "0000") {
+              this.setState({
+                arrived: true,
+                loading: false,
+                confirmArrive: false,
+                confirming: false,
+                waybill: {
+                  ...this.state.waybill,
+                  status: "arrived",
+                  statusCaption: "已确认送达",
+                },
+              });
+            } else {
+              //sth. wrong with the input
+              Taro.atMessage({
+                message: "操作失败：" + ret.message,
+                type: "error",
+                duration: 8000,
+              });
+            }
+          })
+          .catch((err) => {
+            //Confirming failed
+            Taro.atMessage({
+              message: "操作失败，请重试：" + err.errMsg,
+              type: "error",
+              duration: 5000,
             });
-          }
-        });
+          });
       });
     } else {
       //wrong rdcNumber input
@@ -363,7 +390,7 @@ export default class Index extends Component<null, SheetState> {
               </AtModalAction>
             </AtModal>
           </View>
-          <Text className="form-caption">装车序号：{waybill.sheetNum}</Text>
+          <Text className="form-caption"> 装 车 号：{waybill.sheetNum}</Text>
           {arrived ? (
             <Text className="form-caption">
               到达时间：

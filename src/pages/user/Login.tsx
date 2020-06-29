@@ -1,9 +1,10 @@
 import Taro, { useState, login } from "@tarojs/taro";
 import { View, Text, Button } from "@tarojs/components";
-import { AtInput } from "taro-ui";
+import { AtInput, AtMessage } from "taro-ui";
 import "./index.scss";
 
 import ArsTabBar from "../../components/tabbar";
+import { doLogin } from "../../controllers/users";
 
 export default function Login() {
   //const [manual, setManual] = useState(true);
@@ -18,12 +19,28 @@ export default function Login() {
     //setManual(true);
   }
 
-  function doLogin() {
-    console.log("user cellphone, password:", cellphone, password);
+  function login() {
+    setLoging(true);
+    doLogin(cellphone, password)
+      .then((ret) => {
+        console.log("login result:", ret);
+        if (ret) {
+          Taro.redirectTo({ url: "/pages/user/userinfo?usertype=super" });
+        }
+        Taro.atMessage({
+          message: ret ? "登录成功！" : "登录失败，请重试",
+          type: ret ? "success" : "error",
+          duration: 5000,
+        });
+      })
+      .finally(() => {
+        setLoging(false);
+      });
   }
 
   return (
     <View className="user-reg-span">
+      <AtMessage />
       <Text className="form-caption" style="margin-bottom:2rem">
         欢迎登录到 <Text className="home-title-hilite">TIMS</Text>\n
         <Text className="home-title-sub">配送信息管理系统</Text>
@@ -60,7 +77,7 @@ export default function Login() {
       <View style="display:flex; flex-direction:row">
         <Button
           className="home-button preview-confirm-button"
-          onClick={doLogin}
+          onClick={login}
           disabled={loging}
         >
           {loging ? "登录中..." : "登录"}

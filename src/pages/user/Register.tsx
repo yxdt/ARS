@@ -4,7 +4,7 @@ import { AtForm, AtInput, AtButton, AtList, AtListItem } from "taro-ui";
 import "./index.scss";
 import { getUserInfo, getWxOpenId } from "../../controllers/users";
 import { WxUserInfo } from "src/types/ars";
-
+import userpng from "../../assets/img/user.png";
 // export const TruckTypes: string[] = [
 //   "微型面包车",
 //   "面包车",
@@ -15,7 +15,15 @@ import { WxUserInfo } from "src/types/ars";
 
 export default function Register() {
   console.log("");
-  let userInfo = {};
+  let userInfo: WxUserInfo = {
+    nickName: "匿名用户",
+    avatarUrl: userpng,
+    gender: 1,
+    city: "Beijing",
+    province: "Beijing",
+    country: "China",
+    language: "zh-CN",
+  };
 
   const [userName, setUserName] = useState("测试员");
   const [cellphone, setCellphone] = useState("13901390139");
@@ -23,14 +31,18 @@ export default function Register() {
   const [avatar, setAvatar] = useState("");
 
   getUserInfo().then((res: WxUserInfo) => {
-    userInfo = res;
-    console.log("userInfo:", res);
-    setUserName(res.nickName);
-    setAvatar(res.avatarUrl);
+    console.log("Register.getUserInfo.res:", res);
+    //userInfo = res || {};
+    if (res) {
+      userInfo = res;
+    }
+    console.log("userInfo:", userInfo);
+    setUserName(userInfo.nickName || "匿名用户");
+    setAvatar(userInfo.avatarUrl || userpng);
   });
 
   getWxOpenId((openid) => {
-    console.log("openId:", openid);
+    console.log("Register.getWxOpenId.openId:", openid);
   });
 
   function handleChange(target: string, newVal) {

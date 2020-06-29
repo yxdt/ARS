@@ -24,7 +24,15 @@ export interface CameraProps {
 export default class Index extends Component<CameraProps, CameraStates> {
   constructor() {
     super(...arguments);
-    const curwbno = Taro.getStorageSync("waybill");
+    let curwbno = Taro.getStorageSync("waybill");
+    const wbnodate: Date = new Date(Taro.getStorageSync("waybilldate"));
+    const today = new Date();
+    if (today.valueOf() - wbnodate.valueOf() > 24 * 60 * 60 * 1000) {
+      curwbno = "";
+      Taro.removeStorage("waybill");
+      Taro.removeStorage("waybilldate");
+    }
+
     this.state = {
       src: "",
       preview: false,
@@ -121,6 +129,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
 
     const isScan = this.$router.params.isScan;
     const { curwbno } = this.state;
+    console.log("curwbno:", curwbno, this.state);
     if (curwbno.length <= 0) {
       return (
         <InfoCard

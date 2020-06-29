@@ -7,9 +7,9 @@ import NavBar from "../../components/navbar";
 import ArsTabBar from "../../components/tabbar";
 import { WxUserInfo } from "../../types/ars";
 import { SERVER_URL } from "../../controllers/rest";
-
+import userpng from "../../assets/img/user.png";
 export default function UserInfo() {
-  const [curAvatar, setAvatar] = useState("/assets/img/user.png");
+  const [curAvatar, setAvatar] = useState(userpng);
   const [userName, setUserName] = useState("");
   const [userType, setUserType] = useState("中心人员");
   const [cellphone, setCellphone] = useState("13823803380");
@@ -25,59 +25,76 @@ export default function UserInfo() {
     let curUserInfo = {};
     let userInfoStr = "scope.userInfo";
     const userOpenId = Taro.getStorageSync("userOpenId") || "";
-    Taro.getSetting().then((res) => {
-      if (res.authSetting[userInfoStr]) {
-        console.log("userSettings:", res);
-      }
-    });
-
-    Taro.getUserInfo().then((ret) => {
-      console.log("getUserInfo.ret:", ret);
-      //if (isWx) {
-      Taro.setStorage({ key: "userName", data: ret.userInfo.nickName });
-      Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
-      //}T
-      setUserInfo(ret.userInfo);
-
-      //get open id
-      Taro.login({
-        success: (res) => {
-          let code = res.code;
-          Taro.request({
-            url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
-            data: {},
-            header: { "content-type": "json" },
-            success: (resp) => {
-              let openId = JSON.parse(resp.data).openid;
-              const snKey = JSON.parse(resp.data).session_key;
-
-              console.log("response:", resp);
-              console.log("response.data:", ret.encryptedData);
-              console.log("openID:", openId);
-              console.log("resp:", resp);
-
-              Taro.request({
-                url: SERVER_URL + "/users/userInfo",
-                method: "POST",
-                data: {
-                  session_key: snKey,
-                  iv: ret.iv,
-                  data: ret.encryptedData,
-                },
-                header: { "content-type": "application/x-www-form-urlencoded" },
-              }).then((ret) => {
-                console.log("client_post_response:", ret);
-              });
-            },
-          });
-        },
+    Taro.getSetting()
+      .then((res) => {
+        if (res.authSetting[userInfoStr]) {
+          console.log("userSettings:", res);
+        }
+      })
+      .catch((err) => {
+        console.log("error in getSetting():", err.errMsg);
       });
-    });
+
+    Taro.getUserInfo()
+      .then((ret) => {
+        console.log("getUserInfo.ret:", ret);
+        //if (isWx) {
+        Taro.setStorage({ key: "userName", data: ret.userInfo.nickName });
+        Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
+        //}T
+        setUserInfo(ret.userInfo);
+
+        //get open id
+        Taro.login({
+          fail: (err) => {
+            console.log("error in login:", err);
+          },
+          success: (res) => {
+            let code = res.code;
+            Taro.request({
+              url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
+              data: {},
+              header: { "content-type": "json" },
+              fail: (err) => {
+                console.log("err in get openid:", err);
+              },
+              success: (resp) => {
+                let openId = JSON.parse(resp.data).openid;
+                const snKey = JSON.parse(resp.data).session_key;
+
+                console.log("response:", resp);
+                console.log("response.data:", ret.encryptedData);
+                console.log("openID:", openId);
+                console.log("resp:", resp);
+
+                Taro.request({
+                  url: SERVER_URL + "/users/userInfo",
+                  method: "POST",
+                  data: {
+                    session_key: snKey,
+                    iv: ret.iv,
+                    data: ret.encryptedData,
+                  },
+                  header: {
+                    "content-type": "application/x-www-form-urlencoded",
+                  },
+                }).then((ret) => {
+                  console.log("client_post_response:", ret);
+                });
+              },
+            });
+          },
+        });
+      })
+      .catch((err) => {
+        console.log("err in getUserInfo:", err);
+      });
   }
 
   function setUserInfo(userInfo: WxUserInfo) {
-    setAvatar(userInfo.avatarUrl);
-    setUserName(userInfo.nickName);
+    console.log("setUserInfo:", userInfo);
+    setAvatar(userInfo.avatarUrl || userpng);
+    setUserName(userInfo.nickName || "匿名用户");
   }
 
   function onGotUserInfo(res) {
@@ -107,8 +124,6 @@ export default function UserInfo() {
         handleClick={() => {
           console.log("click", this.state);
         }}
-        title="个人信息-点击退出"
-        ricon="sign-out"
       />
       <View className="user-info-span">
         <View className="user-avatar">
@@ -139,8 +154,12 @@ export default function UserInfo() {
             console.log("atgrid:", item, index);
             switch (index) {
               case 0:
-                Taro.navigateTo({
-                  url: "/pages/user/Register",
+                //Taro.navigateTo({url: "/pages/user/Register",});
+                Taro.requestSubscribeMessage({
+                  tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
+                  success: (res) => {
+                    console.log("subscribe message success:", res);
+                  },
                 });
                 break;
               case 1:
@@ -150,13 +169,8 @@ export default function UserInfo() {
                 });
                 break;
               case 2:
-                //Taro.redirectTo({ url: "/pages/sheet/query" });
-                Taro.requestSubscribeMessage({
-                  tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
-                  success: (res) => {
-                    console.log("subscribe message success:", res);
-                  },
-                });
+                Taro.redirectTo({ url: "/pages/sheet/query" });
+
                 break;
               default:
                 console.log("wait...");
@@ -171,7 +185,7 @@ export default function UserInfo() {
                 size: 40,
                 color: "#62a60a",
               },
-              value: "系统信息",
+              value: "消息订阅",
             },
             {
               iconInfo: {

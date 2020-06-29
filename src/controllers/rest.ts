@@ -75,7 +75,7 @@ async function getWaybill(wbNum: string) {
           //存储本地运单号
           Taro.setStorage({ key: "waybill", data: wbNum });
           Taro.setStorage({ key: "wbstatus", data: status });
-
+          Taro.setStorage({ key: "waybilldate", data: new Date().valueOf() });
           res({
             result: "success",
             waybill: {
@@ -137,7 +137,7 @@ async function getWaybill(wbNum: string) {
                   status: "loaded",
                 },
                 {
-                  id: 21,
+                  id: 24,
                   sheetId: 123456,
                   seq: 5,
                   page: 1,
@@ -147,7 +147,7 @@ async function getWaybill(wbNum: string) {
                   status: "loaded",
                 },
                 {
-                  id: 22,
+                  id: 25,
                   sheetId: 123456,
                   seq: 6,
                   page: 2,
@@ -157,7 +157,7 @@ async function getWaybill(wbNum: string) {
                   status: "loaded",
                 },
                 {
-                  id: 21,
+                  id: 26,
                   sheetId: 123456,
                   seq: 7,
                   page: 2,
@@ -167,7 +167,7 @@ async function getWaybill(wbNum: string) {
                   status: "loaded",
                 },
                 {
-                  id: 22,
+                  id: 27,
                   sheetId: 123456,
                   seq: 8,
                   page: 2,
@@ -189,7 +189,7 @@ async function getWaybill(wbNum: string) {
 
 async function getWbPhotos(wbNum: string) {
   if (DEBUGGING) {
-    const photos = await taroRequest("/photos/bywb/" + wbNum, "GET", wbNum);
+    const photos = await taroRequest("/photos/bywb/" + wbNum, "GET", {});
     console.log("getWbPhotos:", photos);
     return photos.data;
   }
@@ -206,6 +206,53 @@ async function saveUserInfo(userInfo: RegUser) {
   return ret;
 }
 
+async function userLogin(cellphone: string, password: string) {
+  const url = SERVER_URL + "/logistics/login";
+  let userName = "";
+  let roleName = "";
+  let retVal = false;
+  console.log("controllers.rest.userLogin:", cellphone, password);
+  if (DEBUGGING) {
+    return new Promise((res, rej) => {
+      setTimeout(() => {
+        console.log("debugging");
+        if (cellphone === "1390000") {
+          userName = "何燕员";
+          roleName = "中心核验员";
+          retVal = true;
+        } else {
+          userName = "";
+          roleName = "";
+          retVal = false;
+        }
+        Taro.setStorage({ key: "roleName", data: roleName });
+        Taro.setStorage({ key: "userName", data: userName });
+        res(retVal);
+      }, 1000);
+    });
+  } else {
+    const ret = await Taro.request<TimsResponse>({
+      url,
+      method: "POST",
+      data: {
+        pwd: password,
+        phone: cellphone,
+      },
+      header: { "content-type": "application/x-www-form-urlencoded" },
+    });
+
+    if (ret.data.code === "0000") {
+      userName = ret.data.data.userName;
+      roleName = ret.data.data.roleName;
+      retVal = true;
+    }
+    Taro.setStorage({ key: "roleName", data: roleName });
+    Taro.setStorage({ key: "userName", data: userName });
+  }
+
+  return retVal;
+}
+
 async function taroRequest(url, method, data) {
   if (DEBUGGING) {
     console.log("taroRequest.SERVER_URL:", SERVER_URL, url);
@@ -219,4 +266,11 @@ async function taroRequest(url, method, data) {
   return ret;
 }
 
-export { SERVER_URL, getWaybill, confirmWaybill, getWbPhotos, saveUserInfo };
+export {
+  SERVER_URL,
+  getWaybill,
+  confirmWaybill,
+  getWbPhotos,
+  saveUserInfo,
+  userLogin,
+};

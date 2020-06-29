@@ -1,16 +1,8 @@
 import Taro from "@tarojs/taro";
 import { SERVER_URL } from "./rest";
-function scanBarcode() {
+function scanBarcode(cbBarcode) {
   Taro.scanCode({
-    success: (res) => {
-      //resolve(res);
-      console.log("scan barcode success:", res);
-      if (res.result) {
-        Taro.navigateTo({
-          url: "/pages/index/index?wbno=" + res.result,
-        });
-      }
-    },
+    success: cbBarcode,
   });
 }
 

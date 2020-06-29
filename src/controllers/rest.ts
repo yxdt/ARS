@@ -1,34 +1,34 @@
-import Taro, { offLocalServiceResolveFail } from "@tarojs/taro";
+import Taro from "@tarojs/taro";
 import { RegUser, WaybillConfirmParams, TimsResponse } from "src/types/ars";
 
 const DEBUGGING = true;
-
 const devUrl = "http://192.168.0.100:8765";
 const prodUrl = "https://tims.lg.com.cn"; //"https://www.hanyukj.cn";
 const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 
-async function saveDriverLocation(wbNum: string, loc: string) {
-  if (DEBUGGING) {
-    return new Promise((res, rej) => {
-      setTimeout(() => {
-        console.log("user.saveDriverLocation.timeout");
-        res({
-          shtteNum: wbNum,
-          result: "success",
-        });
-      }, 1000);
-    });
-  } else {
-    console.log("!!1not implemented yet!!!");
-  }
-}
+// async function saveDriverLocation(wbNum: string, loc: string) {
+//   if (DEBUGGING) {
+//     return new Promise((res, rej) => {
+//       setTimeout(() => {
+//         console.log("user.saveDriverLocation.timeout");
+//         res({
+//           shtteNum: wbNum,
+//           location: loc,
+//           result: "success",
+//         });
+//       }, 1000);
+//     });
+//   } else {
+//     console.log("!!1not implemented yet!!!");
+//   }
+// }
 
 async function confirmWaybill(wbInfo: WaybillConfirmParams) {
   const url = SERVER_URL + "/driver/confirm";
 
   if (DEBUGGING) {
     console.log("confirmWaybill.params:", wbInfo);
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
       setTimeout(() => {
         console.log("waybill.confirmWaybill.timeout");
         res({
@@ -55,7 +55,7 @@ async function confirmWaybill(wbInfo: WaybillConfirmParams) {
 
 async function getWaybill(wbNum: string) {
   if (DEBUGGING) {
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
       setTimeout(() => {
         console.log("waybill.getWaybill.timeout:");
         const status =
@@ -208,25 +208,25 @@ async function saveUserInfo(userInfo: RegUser) {
 
 async function userLogin(cellphone: string, password: string) {
   const url = SERVER_URL + "/logistics/login";
-  let userName = "";
-  let roleName = "";
-  let retVal = false;
+  //let userName = "";
+  //let roleName = "";
+  let retVal = { result: false, userName: "", roleName: "" };
   console.log("controllers.rest.userLogin:", cellphone, password);
   if (DEBUGGING) {
-    return new Promise((res, rej) => {
+    return new Promise((res) => {
       setTimeout(() => {
         console.log("debugging");
-        if (cellphone === "1390000") {
-          userName = "何燕员";
-          roleName = "中心核验员";
-          retVal = true;
+        if (cellphone === "1390000" && password !== "") {
+          retVal.userName = "何燕员";
+          retVal.roleName = "中心核验员";
+          retVal.result = true;
         } else {
-          userName = "";
-          roleName = "";
-          retVal = false;
+          retVal.userName = "";
+          retVal.roleName = "";
+          retVal.result = false;
         }
-        Taro.setStorage({ key: "roleName", data: roleName });
-        Taro.setStorage({ key: "userName", data: userName });
+        //Taro.setStorage({ key: "roleName", data: roleName });
+        //Taro.setStorage({ key: "userName", data: userName });
         res(retVal);
       }, 1000);
     });
@@ -242,12 +242,12 @@ async function userLogin(cellphone: string, password: string) {
     });
 
     if (ret.data.code === "0000") {
-      userName = ret.data.data.userName;
-      roleName = ret.data.data.roleName;
-      retVal = true;
+      retVal.userName = ret.data.data["userName"];
+      retVal.roleName = ret.data.data["roleName"];
+      retVal.result = true;
     }
-    Taro.setStorage({ key: "roleName", data: roleName });
-    Taro.setStorage({ key: "userName", data: userName });
+    //Taro.setStorage({ key: "roleName", data: roleName });
+    //Taro.setStorage({ key: "userName", data: userName });
   }
 
   return retVal;

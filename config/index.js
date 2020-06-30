@@ -1,6 +1,6 @@
 const config = {
   projectName: "TIMS",
-  date: "2020-6-27",
+  date: "2020-6-17",
   designWidth: 750,
   deviceRatio: {
     "640": 2.34 / 2,
@@ -9,32 +9,33 @@ const config = {
   },
   sourceRoot: "src",
   outputRoot: "dist",
-  babel: {
-    sourceMap: true,
-    presets: [
-      [
-        "env",
-        {
-          modules: false,
-        },
+  plugins: {
+    babel: {
+      sourceMap: true,
+      presets: [
+        [
+          "env",
+          {
+            modules: false,
+          },
+        ],
       ],
-    ],
-    plugins: [
-      "transform-decorators-legacy",
-      "transform-class-properties",
-      "transform-object-rest-spread",
-      [
-        "transform-runtime",
-        {
-          helpers: false,
-          polyfill: false,
-          regenerator: true,
-          moduleName: "babel-runtime",
-        },
+      plugins: [
+        "transform-decorators-legacy",
+        "transform-class-properties",
+        "transform-object-rest-spread",
+        [
+          "transform-runtime",
+          {
+            helpers: false,
+            polyfill: false,
+            regenerator: true,
+            moduleName: "babel-runtime",
+          },
+        ],
       ],
-    ],
+    },
   },
-  plugins: [],
   defineConstants: {},
   mini: {
     postcss: {

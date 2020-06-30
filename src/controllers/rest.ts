@@ -27,13 +27,13 @@ async function confirmWaybill(wbInfo: WaybillConfirmParams) {
   const url = SERVER_URL + "/driver/confirm";
 
   if (DEBUGGING) {
-    console.log("confirmWaybill.params:", wbInfo);
+    //console.log("confirmWaybill.params:", wbInfo);
     return new Promise((res) => {
       setTimeout(() => {
-        console.log("waybill.confirmWaybill.timeout");
+        //console.log("waybill.confirmWaybill.timeout");
         res({
-          messageId: "0000aksdkfasdfas",
-          data: {},
+          messageId: "ak22sdk223fas2423adasdfas",
+          data: null,
           code: "0000",
           message: "Successful operation",
           sentTime: new Date(),
@@ -57,124 +57,107 @@ async function getWaybill(wbNum: string) {
   if (DEBUGGING) {
     return new Promise((res) => {
       setTimeout(() => {
-        console.log("waybill.getWaybill.timeout:");
-        const status =
-          wbNum === "1" ? "arrived" : wbNum === "2" ? "confirmed" : "loaded";
-        const statusCaption =
-          wbNum === "1"
-            ? "已确认送达"
-            : wbNum === "2"
-            ? "中心已确认"
-            : "尚未送达";
+        //console.log("waybill.getWaybill.timeout:");
+        const status = wbNum === "1" ? 1 : wbNum === "2" ? 8 : 0;
+        // const statusCaption =
+        //   wbNum === "1"
+        //     ? "已确认送达"
+        //     : wbNum === "2"
+        //     ? "中心已确认"
+        //     : "尚未送达";
         if (wbNum === "000") {
-          res({ result: "not found" });
+          res({ code: "0000", data: null });
           //清除本地运单号
-          Taro.removeStorage({ key: "waybill" });
-          Taro.removeStorage({ key: "wbstatus" });
+          //Taro.removeStorage({ key: "waybill" });
+          //Taro.removeStorage({ key: "wbstatus" });
         } else {
           //存储本地运单号
-          Taro.setStorage({ key: "waybill", data: wbNum });
-          Taro.setStorage({ key: "wbstatus", data: status });
-          Taro.setStorage({ key: "waybilldate", data: new Date().valueOf() });
+          //Taro.setStorage({ key: "waybill", data: wbNum });
+          //Taro.setStorage({ key: "wbstatus", data: status });
+          //Taro.setStorage({ key: "waybilldate", data: new Date().valueOf() });
           res({
-            result: "success",
-            waybill: {
-              id: 123456,
-              sheetNum: wbNum,
-              status,
-              statusCaption,
+            code: "0000",
+            data: {
+              ordNo: wbNum,
+              logCd: "0101",
+              logName: "北京国美",
+              totalPage: 2,
+              shpToCd: "02",
+              shpToName: "呼和浩特国美",
               arriveTime: new Date(new Date().valueOf() - 22 * 60 * 60 * 1000),
-              loadNum: "load-num-123",
-              driverId: 100,
-              driverName: "张强",
-              plateNum: "京A-123456",
-              rdcCode: "0101",
-              rdcName: "北京国美",
-              shiptoCode: "02",
-              shiptoName: "呼和浩特国美",
-              shiptoAddress: "内蒙古呼和浩特长征东路123号",
-              shiptoTel: "0471-9879876",
-              totalPages: 2,
-              shipItems: [
+              status,
+              ordDetailList: [
                 {
                   id: 20,
-                  sheetId: 123456,
+                  ordNo: wbNum,
                   seq: 1,
                   page: 1,
                   orderNum: "KDP_ord-123",
                   modelNum: "model-02039",
                   qty: 1,
-                  status: "loaded",
                 },
                 {
                   id: 21,
-                  sheetId: 123456,
+                  ordNo: wbNum,
                   seq: 2,
                   page: 1,
                   orderNum: "12-OUYD-124",
                   modelNum: "AA-model-102039",
                   qty: 2,
-                  status: "loaded",
                 },
                 {
                   id: 22,
-                  sheetId: 123456,
+                  ordNo: wbNum,
                   seq: 3,
                   page: 1,
                   orderNum: "KDEA-124NBG",
                   modelNum: "KSO-model-022339",
                   qty: 10,
-                  status: "loaded",
                 },
                 {
                   id: 23,
-                  sheetId: 123456,
+                  ordNo: wbNum,
                   seq: 4,
                   page: 1,
                   orderNum: "zxcvKDP_ord-123",
                   modelNum: "adsf-model-02039",
                   qty: 1,
-                  status: "loaded",
                 },
                 {
                   id: 24,
-                  sheetId: 123456,
+                  ordNo: wbNum,
                   seq: 5,
                   page: 1,
                   orderNum: "asahfgh-12-OUYD-124",
                   modelNum: "ncvb-AA-model-102039",
                   qty: 2,
-                  status: "loaded",
                 },
                 {
                   id: 25,
-                  sheetId: 123456,
+                  ordNo: wbNum,
                   seq: 6,
                   page: 2,
                   orderNum: "vzxcvKDEA-12asd4NBG",
                   modelNum: "asdfasKSO-moasdel-022339",
                   qty: 10,
-                  status: "loaded",
                 },
                 {
                   id: 26,
-                  sheetId: 123456,
+                  ordNo: wbNum,
                   seq: 7,
                   page: 2,
                   orderNum: "asaasdfhfgh-12-OUYD-124",
                   modelNum: "ncvb-AA-model-102039",
                   qty: 2,
-                  status: "loaded",
                 },
                 {
                   id: 27,
-                  sheetId: 123456,
+                  ordNo: wbNum,
                   seq: 8,
                   page: 2,
                   orderNum: "884-vzxcvKDEA-12asd4NBG",
                   modelNum: "asdfasKSO-moasdel-022339",
                   qty: 10,
-                  status: "loaded",
                 },
               ],
             },
@@ -211,11 +194,11 @@ async function userLogin(cellphone: string, password: string) {
   //let userName = "";
   //let roleName = "";
   let retVal = { result: false, userName: "", roleName: "" };
-  console.log("controllers.rest.userLogin:", cellphone, password);
+  //console.log("controllers.rest.userLogin:", cellphone, password);
   if (DEBUGGING) {
     return new Promise((res) => {
       setTimeout(() => {
-        console.log("debugging");
+        //console.log("debugging");
         if (cellphone === "1390000" && password !== "") {
           retVal.userName = "何燕员";
           retVal.roleName = "中心核验员";

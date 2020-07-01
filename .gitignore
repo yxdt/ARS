@@ -1,9 +1,10 @@
 dist
 node_modules
 design
+coverage
 package-lock.json
 .DS_Store
 yarn.lock
 yarn-error.log
 readme_loc.md
-coverage
+

@@ -77,9 +77,38 @@ export interface PhotosResult {
 
 export interface TimsResponse {
   messageId: string;
-  data: object | null;
+  data: loginData | wbData | null;
   code: string;
   message: string;
   sentTime: Date;
   responseTime: Date;
+}
+export interface loginParam {
+  phone: string;
+  pwd: string;
+}
+export interface loginData {
+  result: boolean;
+  userName: string;
+  roleName: string;
+}
+export interface wbData {
+  ordNo: string;
+  logCd: string;
+  logName: string;
+  totalPage: number;
+  shpToCd: string;
+  shpToName: string;
+  arrivalTime: Date;
+  ordDetailList: Array<wbdData>;
+  status: number;
+}
+
+export interface wbdData {
+  id: number;
+  orderNum: string;
+  page: number;
+  seq: number;
+  modelNum: string;
+  qty: number;
 }

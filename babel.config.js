@@ -12,21 +12,4 @@ module.exports = {
     "@babel/preset-react",
     "@babel/preset-typescript",
   ],
-  plugins: [
-    "@babel/plugin-proposal-class-properties",
-    [
-      "@babel/plugin-transform-react-jsx",
-      {
-        pragma: "Nerv.createElement",
-      },
-    ],
-    ["@babel/plugin-proposal-object-rest-spread"],
-    [
-      "babel-plugin-transform-taroapi",
-      {
-        apis,
-        packageName: "@tarojs/taro-h5",
-      },
-    ],
-  ],
 };

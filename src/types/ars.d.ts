@@ -77,7 +77,7 @@ export interface PhotosResult {
 
 export interface TimsResponse {
   messageId: string;
-  data: JSON;
+  data: object | null;
   code: string;
   message: string;
   sentTime: Date;

@@ -193,6 +193,14 @@ async function userLogin(cellphone: string, password: string) {
   const url = SERVER_URL + "/logistics/login";
   //let userName = "";
   //let roleName = "";
+  const timsRet: TimsResponse = {
+    messageId: "abcd123asdfasdf123",
+    code: "0000",
+    message: "Successful operation",
+    sentTime: new Date(new Date().valueOf() - 5000), //5秒前
+    responseTime: new Date(),
+    data: null,
+  };
   let retVal = { result: false, userName: "", roleName: "" };
   //console.log("controllers.rest.userLogin:", cellphone, password);
   if (DEBUGGING) {
@@ -210,7 +218,8 @@ async function userLogin(cellphone: string, password: string) {
         }
         //Taro.setStorage({ key: "roleName", data: roleName });
         //Taro.setStorage({ key: "userName", data: userName });
-        res(retVal);
+        timsRet.data = retVal;
+        res(timsRet);
       }, 1000);
     });
   } else {
@@ -225,15 +234,22 @@ async function userLogin(cellphone: string, password: string) {
     });
 
     if (ret.data.code === "0000") {
-      retVal.userName = ret.data.data["userName"];
-      retVal.roleName = ret.data.data["roleName"];
-      retVal.result = true;
+      const retData = ret.data.data || { userName: "匿名用户", roleName: "" };
+      if (retData) {
+        retVal.userName = retData["userName"];
+        retVal.roleName = retData["roleName"];
+        retVal.result = true;
+      } else {
+        retVal.userName = "匿名用户";
+        retVal.roleName = "";
+        retVal.result = false;
+      }
     }
     //Taro.setStorage({ key: "roleName", data: roleName });
     //Taro.setStorage({ key: "userName", data: userName });
   }
-
-  return retVal;
+  timsRet.data = retVal;
+  return timsRet;
 }
 
 async function taroRequest(url, method, data) {

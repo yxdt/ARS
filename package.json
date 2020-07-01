@@ -26,7 +26,7 @@
     "dev:qq": "npm run build:qq -- --watch",
     "dev:quickapp": "npm run build:quickapp -- --watch",
     "test": "jest --coverage",
-    "test:ci": "npm run build:h5 && npm run test"
+    "pretest": "jest --updateSnapshot"
   },
   "author": "",
   "license": "MIT",
@@ -82,10 +82,13 @@
     "eslint-plugin-taro": "2.2.3",
     "jest": "^26.1.0",
     "miniprogram-automator": "^0.9.1",
+    "minium": "http://minitest.weixin.qq.com/minium/JavaScript/dist/minium-0.0.1.tar.gz",
     "nerv-server": "^1.5.7",
     "nerv-test-utils": "^1.5.7",
     "nervjs": "^1.5.7",
+    "react-is": "^16.13.1",
     "react-test-renderer": "^16.13.1",
+    "regenerator": "^0.14.5",
     "stylelint": "9.3.0",
     "stylelint-config-taro-rn": "2.2.3",
     "stylelint-taro-rn": "2.2.3",

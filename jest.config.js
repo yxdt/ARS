@@ -9,6 +9,7 @@ module.exports = {
     "<rootDir>/test/**/test.js",
     "<rootDir>/src/controllers/**/*.test.js",
     "<rootDir>/src/controllers/**/test.js",
+    "<rootDir>/wetest/**/*.test.js",
   ],
 
   transform: {
@@ -18,11 +19,4 @@ module.exports = {
     //"^.+\\.tsx?$": "ts-jest",
   },
   transformIgnorePatterns: ["<rootDir>/node_modules/"],
-  moduleNameMapper: {
-    react: "nervjs",
-    "react-addons-test-utils": "nerv-test-utils",
-    "react-dom": "nervjs",
-    weui: "<rootDir>/test/__mock__/styleMock.js",
-    "\\.(css|less|sass|scss)$": "<rootDir>/test/__mock__/styleMock.js",
-  },
 };

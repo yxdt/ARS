@@ -1,7 +1,8 @@
 import Taro from "@tarojs/taro";
-import { WxUserInfo, RegUser } from "src/types/ars";
-import { saveUserInfo, userLogin } from "./rest";
+//import { WxUserInfo, RegUser } from "src/types/ars";
+import { userLogin } from "./rest";
 import QQMapWX from "../libs/qqmap-wx-jssdk";
+import { TimsResponse } from "src/types/ars";
 
 function getDriverLocation(wbno: string, resolve: Function) {
   console.log("wbno:", wbno);
@@ -72,33 +73,35 @@ async function getUserInfo() {
   }
 }
 
-async function uploadWxUserInfo(
-  openId: string,
-  cell: string,
-  userType: string,
-  area: string,
-  userInfo: WxUserInfo
-) {
-  const regUserInfo: RegUser = {
-    userName: userInfo.nickName,
-    openId,
-    cellphone: cell,
-    password: "",
-    userType: userType,
-    area: area,
-    avatarUrl: userInfo.avatarUrl,
-    country: userInfo.country,
-    province: userInfo.province,
-    city: userInfo.city,
-    gender: userInfo.gender === 1 ? "男" : "女",
-  };
-  const ret = await saveUserInfo(regUserInfo);
-  return ret;
-}
+// async function uploadWxUserInfo(
+//   openId: string,
+//   cell: string,
+//   userType: string,
+//   area: string,
+//   userInfo: WxUserInfo
+// ) {
+//   const regUserInfo: RegUser = {
+//     userName: userInfo.nickName,
+//     openId,
+//     cellphone: cell,
+//     password: "",
+//     userType: userType,
+//     area: area,
+//     avatarUrl: userInfo.avatarUrl,
+//     country: userInfo.country,
+//     province: userInfo.province,
+//     city: userInfo.city,
+//     gender: userInfo.gender === 1 ? "男" : "女",
+//   };
+//   const ret = await saveUserInfo(regUserInfo);
+//   return ret;
+// }
 
 async function doLogin(cellphone, password) {
   console.log("controllers.user.doLogin:", cellphone, password);
-  return await userLogin(cellphone, password);
+  const res = await userLogin(cellphone, password);
+  if (res.code === "0000") {
+  }
 }
 
 export { getDriverLocation, getWxOpenId, getUserInfo, doLogin };

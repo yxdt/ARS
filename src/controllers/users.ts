@@ -1,24 +1,24 @@
-import Taro from '@tarojs/taro';
+import Taro from "@tarojs/taro";
 //import { WxUserInfo, RegUser } from "src/types/ars";
-import { userLogin } from './rest';
-import QQMapWX from '../libs/qqmap-wx-jssdk';
-import { loginData } from '../types/ars';
+import { userLogin } from "./rest";
+import QQMapWX from "../libs/qqmap-wx-jssdk";
+import { loginData } from "../types/ars";
 
 function getDriverLocation(wbno: string, resolve: Function) {
-  console.log('wbno:', wbno);
+  console.log("wbno:", wbno);
 
   Taro.getLocation({
-    type: 'wgs84',
+    type: "wgs84",
     success: (res) => {
       const qqmapsdk = new QQMapWX({
-        key: 'HV2BZ-HMTC6-IICS7-ESS5M-BFX2E-V6B5B',
+        key: "HV2BZ-HMTC6-IICS7-ESS5M-BFX2E-V6B5B",
       });
       const loc = { latitude: res.latitude, longitude: res.longitude };
-      console.log('cur position:', loc);
+      console.log("cur position:", loc);
       qqmapsdk.reverseGeocoder({
-        location: loc || '',
+        location: loc || "",
         success: (resLoc) => {
-          console.log('resLoc:', resLoc);
+          console.log("resLoc:", resLoc);
           resolve({
             latitude: res.latitude,
             longitude: res.longitude,
@@ -26,7 +26,7 @@ function getDriverLocation(wbno: string, resolve: Function) {
           });
         },
         fail: (err) => {
-          console.log('error when find address:', err);
+          console.log("error when find address:", err);
         },
       });
       //成功获取司机位置信息可以做一些服务器端操作，比如存储位置信息。
@@ -48,14 +48,14 @@ function getWxOpenId(cbOpenId: Function) {
     success: (res) => {
       let code = res.code;
       Taro.request({
-        url: 'https://api.hanyukj.cn/tims/getwxopenid/' + code,
+        url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
         data: {},
-        header: { 'content-type': 'json' },
+        header: { "content-type": "json" },
         success: (resp) => {
           let openId = JSON.parse(resp.data).openid;
-          Taro.setStorage({ key: 'userOpenId', data: openId });
-          console.log('controllers.users.getWxOpenId.openID:', openId);
-          console.log('resp:', resp);
+          Taro.setStorage({ key: "userOpenId", data: openId });
+          console.log("controllers.users.getWxOpenId.openID:", openId);
+          console.log("resp:", resp);
           cbOpenId(openId);
         },
       });
@@ -66,10 +66,10 @@ function getWxOpenId(cbOpenId: Function) {
 async function getUserInfo() {
   try {
     const ui = await Taro.getUserInfo();
-    console.log('Taro.getUserInfo:', ui);
+    console.log("Taro.getUserInfo:", ui);
     return ui.userInfo;
   } catch (err) {
-    console.log('err in controllers/users/getUserInfo:', err);
+    console.log("err in controllers/users/getUserInfo:", err);
   }
 }
 
@@ -103,12 +103,13 @@ async function doLogin(cellphone, password): Promise<loginData> {
   let restRet;
   try {
     restRet = await userLogin(cellphone, password);
-  } catch {
-    restRet = { code: '0500', data: null };
+  } catch (err) {
+    console.log("login error:", err);
+    restRet = { code: "0500", data: null };
   }
   //console.log('controllers.users.doLogin.res:', restRet);
-  let ret: loginData = { result: false, userName: '', roleName: '' };
-  if (restRet.code === '0000') {
+  let ret: loginData = { result: false, userName: "", roleName: "" };
+  if (restRet.code === "0000") {
     if (restRet.data) {
       ret = restRet.data;
     }

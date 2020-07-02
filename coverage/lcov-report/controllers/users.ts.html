@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">47.62% </span>
+                <span class="strong">48.84% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>20/42</span>
+                <span class='fraction'>21/43</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">43.59% </span>
+                <span class="strong">45% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>17/39</span>
+                <span class='fraction'>18/40</span>
             </div>
         
             
@@ -184,7 +184,8 @@
 <a name='L125'></a><a href='#L125'>125</a>
 <a name='L126'></a><a href='#L126'>126</a>
 <a name='L127'></a><a href='#L127'>127</a>
-<a name='L128'></a><a href='#L128'>128</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -290,6 +291,7 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -311,27 +313,27 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import Taro from '@tarojs/taro';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import Taro from "@tarojs/taro";
 //import { WxUserInfo, RegUser } from "src/types/ars";
-import { userLogin } from './rest';
-import QQMapWX from '../libs/qqmap-wx-jssdk';
-import { loginData } from '../types/ars';
+import { userLogin } from "./rest";
+import QQMapWX from "../libs/qqmap-wx-jssdk";
+import { loginData } from "../types/ars";
 &nbsp;
 function <span class="fstat-no" title="function not covered" >getDriverLocation(</span>wbno: string, resolve: Function) {
-<span class="cstat-no" title="statement not covered" >  console.log('wbno:', wbno);</span>
+<span class="cstat-no" title="statement not covered" >  console.log("wbno:", wbno);</span>
 &nbsp;
 <span class="cstat-no" title="statement not covered" >  Taro.getLocation({</span>
-    type: 'wgs84',
+    type: "wgs84",
     success: <span class="fstat-no" title="function not covered" >(r</span>es) =&gt; {
       const qqmapsdk = <span class="cstat-no" title="statement not covered" >new QQMapWX({</span>
-        key: 'HV2BZ-HMTC6-IICS7-ESS5M-BFX2E-V6B5B',
+        key: "HV2BZ-HMTC6-IICS7-ESS5M-BFX2E-V6B5B",
       });
       const loc = <span class="cstat-no" title="statement not covered" >{ latitude: res.latitude, longitude: res.longitude };</span>
-<span class="cstat-no" title="statement not covered" >      console.log('cur position:', loc);</span>
+<span class="cstat-no" title="statement not covered" >      console.log("cur position:", loc);</span>
 <span class="cstat-no" title="statement not covered" >      qqmapsdk.reverseGeocoder({</span>
-        location: loc || '',
+        location: loc || "",
         success: <span class="fstat-no" title="function not covered" >(r</span>esLoc) =&gt; {
-<span class="cstat-no" title="statement not covered" >          console.log('resLoc:', resLoc);</span>
+<span class="cstat-no" title="statement not covered" >          console.log("resLoc:", resLoc);</span>
 <span class="cstat-no" title="statement not covered" >          resolve({</span>
             latitude: res.latitude,
             longitude: res.longitude,
@@ -339,7 +341,7 @@ function <span class="fstat-no" title="function not covered" >getDriverLocation(
           });
         },
         fail: <span class="fstat-no" title="function not covered" >(e</span>rr) =&gt; {
-<span class="cstat-no" title="statement not covered" >          console.log('error when find address:', err);</span>
+<span class="cstat-no" title="statement not covered" >          console.log("error when find address:", err);</span>
         },
       });
       //成功获取司机位置信息可以做一些服务器端操作，比如存储位置信息。
@@ -361,14 +363,14 @@ function <span class="fstat-no" title="function not covered" >getWxOpenId(</span
     success: <span class="fstat-no" title="function not covered" >(r</span>es) =&gt; {
       let code = <span class="cstat-no" title="statement not covered" >res.code;</span>
 <span class="cstat-no" title="statement not covered" >      Taro.request({</span>
-        url: 'https://api.hanyukj.cn/tims/getwxopenid/' + code,
+        url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
         data: {},
-        header: { 'content-type': 'json' },
+        header: { "content-type": "json" },
         success: <span class="fstat-no" title="function not covered" >(r</span>esp) =&gt; {
           let openId = <span class="cstat-no" title="statement not covered" >JSON.parse(resp.data).openid;</span>
-<span class="cstat-no" title="statement not covered" >          Taro.setStorage({ key: 'userOpenId', data: openId });</span>
-<span class="cstat-no" title="statement not covered" >          console.log('controllers.users.getWxOpenId.openID:', openId);</span>
-<span class="cstat-no" title="statement not covered" >          console.log('resp:', resp);</span>
+<span class="cstat-no" title="statement not covered" >          Taro.setStorage({ key: "userOpenId", data: openId });</span>
+<span class="cstat-no" title="statement not covered" >          console.log("controllers.users.getWxOpenId.openID:", openId);</span>
+<span class="cstat-no" title="statement not covered" >          console.log("resp:", resp);</span>
 <span class="cstat-no" title="statement not covered" >          cbOpenId(openId);</span>
         },
       });
@@ -379,10 +381,10 @@ function <span class="fstat-no" title="function not covered" >getWxOpenId(</span
 async function <span class="fstat-no" title="function not covered" >getUserInfo(</span>) {
 <span class="cstat-no" title="statement not covered" >  try {</span>
     const ui = <span class="cstat-no" title="statement not covered" >await Taro.getUserInfo();</span>
-<span class="cstat-no" title="statement not covered" >    console.log('Taro.getUserInfo:', ui);</span>
+<span class="cstat-no" title="statement not covered" >    console.log("Taro.getUserInfo:", ui);</span>
 <span class="cstat-no" title="statement not covered" >    return ui.userInfo;</span>
   } catch (err) {
-<span class="cstat-no" title="statement not covered" >    console.log('err in controllers/users/getUserInfo:', err);</span>
+<span class="cstat-no" title="statement not covered" >    console.log("err in controllers/users/getUserInfo:", err);</span>
   }
 }
 &nbsp;
@@ -416,12 +418,13 @@ async function doLogin(cellphone, password): Promise&lt;loginData&gt; {
   let restRet;
   try {
     restRet = await userLogin(cellphone, password);
-  } catch {
-    restRet = { code: '0500', data: null };
+  } catch (err) {
+    console.log("login error:", err);
+    restRet = { code: "0500", data: null };
   }
   //console.log('controllers.users.doLogin.res:', restRet);
-  let ret: loginData = { result: false, userName: '', roleName: '' };
-  if (restRet.code === '0000') {
+  let ret: loginData = { result: false, userName: "", roleName: "" };
+  if (restRet.code === "0000") {
     <span class="missing-if-branch" title="else path not taken" >E</span>if (restRet.data) {
       ret = restRet.data;
     }
@@ -445,7 +448,7 @@ export { getDriverLocation, getWxOpenId, getUserInfo, doLogin };
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank">istanbul</a>
-                at Thu Jul 02 2020 00:11:49 GMT+0800 (China Standard Time)
+                at Thu Jul 02 2020 20:54:44 GMT+0800 (中国标准时间)
             </div>
         </div>
         <script src="../prettify.js"></script>

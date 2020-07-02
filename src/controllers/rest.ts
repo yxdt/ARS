@@ -1,10 +1,17 @@
-import Taro from '@tarojs/taro';
-import { RegUser, WaybillConfirmParams, TimsResponse } from '../types/ars';
-import { loginRequest, waybillRequest } from '../mock/api';
+import Taro from "@tarojs/taro";
+import {
+  RegUser,
+  WaybillConfirmParams,
+  TimsResponse,
+  wbData,
+  photoListData,
+  loginData,
+} from "../types/ars";
+import { loginRequest, waybillRequest, photosRequest } from "../mock/api";
 
 const DEBUGGING = true;
-const devUrl = 'http://192.168.0.100:8765';
-const prodUrl = 'https://tims.lg.com.cn'; //"https://www.hanyukj.cn";
+const devUrl = "http://192.168.0.100:8765";
+const prodUrl = "https://tims.lg.com.cn"; //"https://www.hanyukj.cn";
 const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 
 // async function saveDriverLocation(wbNum: string, loc: string) {
@@ -25,7 +32,7 @@ const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 // }
 
 async function confirmWaybill(wbInfo: WaybillConfirmParams) {
-  const url = SERVER_URL + '/driver/confirm';
+  const url = SERVER_URL + "/driver/confirm";
 
   if (DEBUGGING) {
     //console.log("confirmWaybill.params:", wbInfo);
@@ -33,10 +40,10 @@ async function confirmWaybill(wbInfo: WaybillConfirmParams) {
       setTimeout(() => {
         //console.log("waybill.confirmWaybill.timeout");
         res({
-          messageId: 'ak22sdk223fas2423adasdfas',
+          messageId: "ak22sdk223fas2423adasdfas",
           data: null,
-          code: '0000',
-          message: 'Successful operation',
+          code: "0000",
+          message: "Successful operation",
           sentTime: new Date(),
           responseTime: new Date(),
         });
@@ -45,48 +52,61 @@ async function confirmWaybill(wbInfo: WaybillConfirmParams) {
   } else {
     const ret = await Taro.request({
       url,
-      method: 'POST',
+      method: "POST",
       data: wbInfo,
-      header: { 'content-type': 'application/x-www-form-urlencoded' },
+      header: { "content-type": "application/x-www-form-urlencoded" },
     });
-    console.log('confirmWaybill.ret:', ret);
-    console.log('!!1not implemented yet!!!');
+    console.log("confirmWaybill.ret:", ret);
+    console.log("!!1not implemented yet!!!");
   }
 }
 
 async function getWaybill(wbNum: string) {
-  const ret = await taroRequest<TimsResponse>('/order/code/' + wbNum, 'GET', null, null);
+  const ret = await taroRequest<TimsResponse<wbData>>(
+    "/order/code/" + wbNum,
+    "GET",
+    null,
+    null
+  );
   return ret;
 }
 
 async function getWbPhotos(wbNum: string) {
   if (DEBUGGING) {
-    const photos = await taroRequest('/photos/bywb/' + wbNum, 'GET', {}, undefined);
-    console.log('getWbPhotos:', photos);
-    return photos.data;
+    const photos = await taroRequest<TimsResponse<photoListData>>(
+      "/photos/bywb/" + wbNum,
+      "GET",
+      {},
+      null
+    );
+    //console.log("getWbPhotos:", photos);
+    return photos;
   }
 }
 
 async function saveUserInfo(userInfo: RegUser) {
-  const url = '/users/save';
+  const url = "/users/save";
   const ret = await Taro.request({
     url: SERVER_URL + url,
-    method: 'POST',
+    method: "POST",
     data: userInfo,
-    header: { 'content-type': 'application/x-www-form-urlencoded' },
+    header: { "content-type": "application/x-www-form-urlencoded" },
   });
   return ret;
 }
 
-async function userLogin(cellphone: string, password: string): Promise<TimsResponse> {
-  const ret = await taroRequest<TimsResponse>(
-    '/logistics/login',
-    'POST',
+async function userLogin(
+  cellphone: string,
+  password: string
+): Promise<TimsResponse<loginData>> {
+  const ret = await taroRequest<TimsResponse<loginData>>(
+    "/logistics/login",
+    "POST",
     {
       pwd: password,
       phone: cellphone,
     },
-    { 'content-type': 'application/x-www-form-urlencoded' }
+    { "content-type": "application/x-www-form-urlencoded" }
   );
   //console.log('rest.userLogin.ret:', ret);
   //Taro.setStorage({ key: "roleName", data: roleName });
@@ -99,20 +119,29 @@ async function taroRequest<T>(url: string, method, data, header) {
   let ret;
   if (DEBUGGING) {
     //console.log('DEBUGGING.taroRequest.SERVER_URL:', url);
-    if (url === '/logistics/login') {
+    if (url === "/logistics/login") {
       ret = await loginRequest(data);
-    } else if (url.startsWith('/order/code/')) {
+    } else if (url.startsWith("/order/code/")) {
       ret = await waybillRequest(url);
+    } else if (url.startsWith("/photos/bywb/")) {
+      ret = await photosRequest(url);
     }
   } else {
     ret = await Taro.request<T>({
       url: SERVER_URL + url,
-      method: method || 'GET',
+      method: method || "GET",
       data: data || {},
-      header: header || { 'content-type': 'application/json' },
+      header: header || { "content-type": "application/json" },
     });
   }
   return ret;
 }
 
-export { SERVER_URL, getWaybill, confirmWaybill, getWbPhotos, saveUserInfo, userLogin };
+export {
+  SERVER_URL,
+  getWaybill,
+  confirmWaybill,
+  getWbPhotos,
+  saveUserInfo,
+  userLogin,
+};

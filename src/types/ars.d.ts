@@ -25,28 +25,10 @@ export interface WxUserInfo {
   language: string;
 }
 
-export interface ShipItem {
-  status: string;
-}
 export interface PhotoUrl {
   url: string;
 }
-export interface Waybill {
-  rdcCode: string;
-  shiptoCode: string;
-  plateNum: string;
-  totalPages: number;
-  status: string;
-  statusCaption: string;
-  sheetNum: string;
-  shiptoName: string;
-  shiptoTel: string;
-  rdcName: string;
-  driverName: string;
-  shipItems: ShipItem[];
-  photos: string[];
-  arriveTime: Date;
-}
+
 export interface WaybillConfirmParams {
   openid: string; //司机小程序用户openid
   sysTime: string; //到达时间
@@ -72,12 +54,12 @@ export interface InfoCardProps {
 }
 
 export interface PhotosResult {
-  photos: Array<string>;
+  photos: Array<photoData>;
 }
 
-export interface TimsResponse {
+export interface TimsResponse<T> {
   messageId: string;
-  data: loginData | wbData | null;
+  data: T | null;
   code: string;
   message: string;
   sentTime: Date;
@@ -92,6 +74,20 @@ export interface loginData {
   userName: string;
   roleName: string;
 }
+
+export interface Waybill {
+  wbNum: string;
+  rdcCode: string;
+  rdcName: string;
+  totalPages: number;
+  shiptoCode: string;
+  shiptoName: string;
+  arriveTime: Date;
+  status: string;
+  shipItems: ShipItem[];
+  photos: wbPhoto[];
+}
+
 export interface wbData {
   ordNo: string;
   logCd: string;
@@ -104,11 +100,34 @@ export interface wbData {
   status: number;
 }
 
+export interface ShipItem {
+  id: number;
+  orderNum: string;
+  model: string;
+  seq: number;
+  page: number;
+  qty: number;
+}
 export interface wbdData {
   id: number;
   orderNum: string;
   page: number;
   seq: number;
-  modelNum: string;
+  model: string;
   qty: number;
+}
+
+export interface wbPhoto {
+  url: string;
+  caption: string;
+  wbNum: string;
+  status: number;
+}
+
+export interface photoData {
+  url: string;
+  status: number; //0:上传， 1：通过， 2：驳回
+}
+export interface photoListData {
+  photos: photoData[];
 }

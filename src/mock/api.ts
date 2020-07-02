@@ -1,22 +1,28 @@
-import { loginData, loginParam, TimsResponse, wbData } from '../types/ars';
+import {
+  loginData,
+  loginParam,
+  TimsResponse,
+  wbData,
+  photoListData,
+} from "../types/ars";
 
 const users = [
   {
-    userName: '何燕员',
-    roleName: '中心核验员',
-    cellphone: '1390000',
-    password: '0000',
+    userName: "何燕员",
+    roleName: "中心核验员",
+    cellphone: "1390000",
+    password: "0000",
   },
 ];
 
 const waybillDataList: Array<wbData> = [
   {
-    ordNo: '999',
-    logCd: '0101',
-    logName: '北京国美',
+    ordNo: "999",
+    logCd: "0101",
+    logName: "北京国美",
     totalPage: 2,
-    shpToCd: '02',
-    shpToName: '呼和浩特国美',
+    shpToCd: "02",
+    shpToName: "呼和浩特国美",
     arrivalTime: new Date(new Date().valueOf() - 22 * 60 * 60 * 1000),
     status: 0,
     ordDetailList: [
@@ -24,113 +30,144 @@ const waybillDataList: Array<wbData> = [
         id: 20,
         seq: 1,
         page: 1,
-        orderNum: 'KDP_ord-123',
-        modelNum: 'model-02039',
+        orderNum: "KDP_ord-123",
+        model: "model-02039",
         qty: 1,
       },
       {
         id: 21,
         seq: 2,
         page: 1,
-        orderNum: '12-OUYD-124',
-        modelNum: 'AA-model-102039',
+        orderNum: "12-OUYD-124",
+        model: "AA-model-102039",
         qty: 2,
       },
       {
         id: 22,
         seq: 3,
         page: 1,
-        orderNum: 'KDEA-124NBG',
-        modelNum: 'KSO-model-022339',
+        orderNum: "KDEA-124NBG",
+        model: "KSO-model-022339",
         qty: 10,
       },
       {
         id: 23,
         seq: 4,
         page: 1,
-        orderNum: 'zxcvKDP_ord-123',
-        modelNum: 'adsf-model-02039',
+        orderNum: "zxcvKDP_ord-123",
+        model: "adsf-model-02039",
         qty: 1,
       },
       {
         id: 24,
         seq: 5,
         page: 1,
-        orderNum: 'asahfgh-12-OUYD-124',
-        modelNum: 'ncvb-AA-model-102039',
+        orderNum: "asahfgh-12-OUYD-124",
+        model: "ncvb-AA-model-102039",
         qty: 2,
       },
       {
         id: 25,
         seq: 6,
         page: 2,
-        orderNum: 'vzxcvKDEA-12asd4NBG',
-        modelNum: 'asdfasKSO-moasdel-022339',
+        orderNum: "vzxcvKDEA-12asd4NBG",
+        model: "asdfasKSO-moasdel-022339",
         qty: 10,
       },
       {
         id: 26,
         seq: 7,
         page: 2,
-        orderNum: 'asaasdfhfgh-12-OUYD-124',
-        modelNum: 'ncvb-AA-model-102039',
+        orderNum: "asaasdfhfgh-12-OUYD-124",
+        model: "ncvb-AA-model-102039",
         qty: 2,
       },
       {
         id: 27,
         seq: 8,
         page: 2,
-        orderNum: '884-vzxcvKDEA-12asd4NBG',
-        modelNum: 'asdfasKSO-moasdel-022339',
+        orderNum: "884-vzxcvKDEA-12asd4NBG",
+        model: "asdfasKSO-moasdel-022339",
         qty: 10,
       },
     ],
   },
 ];
+
+const pics = [
+  "r_asdf_1592546904641.jpg",
+  "r_ffsd_1592540841762.jpg",
+  "r_qwe_1592462754442.jpg",
+  "r_qwer_1592538896117.jpg",
+  "r_rrryyy_1592547360459.jpg",
+  "r_wert_1592547945057.jpg",
+  "r_lsks_1592547556687.jpg",
+  "r_rtyy_1592541405051.jpg",
+  "r_wert_1592547631111.jpg",
+  "r_0_1592539609615.jpg",
+  "r_1_1592538897931.jpg",
+  "r_1_1592547360459.jpg",
+  "r_2_239393930.png",
+  "r_2_1592539521819.jpg",
+];
+
+function photosRequest(url: string) {
+  const wbno = url.substr(url.lastIndexOf("/") + 1);
+  const photos: photoListData = {
+    photos: pics
+      .filter((item) => item.indexOf("_" + wbno + "_") > 0)
+      .map((item, index) => ({ url: item, status: index % 3 })),
+  };
+  return request(photos, true);
+}
+
 function waybillRequest(url: string) {
-  const wbNum = url.substr(url.lastIndexOf('/') + 1);
+  const wbNum = url.substr(url.lastIndexOf("/") + 1);
   let success = true;
   let wbDat: wbData | null = waybillDataList[0];
   wbDat.ordNo = wbNum;
   wbDat.status = 0;
   //console.log('waybillRequest.wbNum:', wbNum, url);
-  if (wbNum === '2') {
+  if (wbNum === "2") {
     wbDat.status = 8;
-  } else if (wbNum === '1') {
+    success = true;
+  } else if (wbNum === "1") {
     wbDat.status = 1;
-  } else if (wbNum === '000') {
+    success = true;
+  } else if (wbNum === "000") {
     wbDat = null;
-  } else if (wbNum === '999') {
+    success = true;
+  } else if (wbNum === "999") {
     success = false;
   }
-  return request(wbDat, success);
+  return request<wbData>(wbDat, success);
 }
 function loginRequest(data: loginParam) {
   const retVal: loginData = {
-    userName: '',
-    roleName: '',
+    userName: "",
+    roleName: "",
     result: false,
   };
   let success = true;
 
-  if (data.phone === '1390000' && data.pwd !== '') {
+  if (data.phone === "1390000" && data.pwd !== "") {
     retVal.userName = users[0].userName;
     retVal.roleName = users[0].roleName;
     retVal.result = true;
-  } else if (data.phone === '000000') {
+  } else if (data.phone === "000000") {
     //fail
     success = false;
   }
   return request(retVal, success);
 }
 
-function request(data: loginData | wbData | null, success: boolean) {
+function request<T>(data: T | null, success: boolean) {
   return new Promise((res, rej) => {
     setTimeout(() => {
-      const timsRet: TimsResponse = {
-        messageId: 'abcd1234asdfasdfas9876',
-        code: '0000',
-        message: 'successful operation',
+      const timsRet: TimsResponse<T> = {
+        messageId: "abcd1234asdfasdfas9876",
+        code: "0000",
+        message: "successful operation",
         sentTime: new Date(new Date().valueOf() - 5000), //5 seconds ago
         responseTime: new Date(),
         data,
@@ -138,12 +175,12 @@ function request(data: loginData | wbData | null, success: boolean) {
       if (success) {
         res(timsRet);
       } else {
-        timsRet.code = '0400';
-        timsRet.message = 'error';
+        timsRet.code = "0400";
+        timsRet.message = "error";
         timsRet.data = null;
         rej(timsRet);
       }
     }, 1000);
   });
 }
-export { loginRequest, waybillRequest };
+export { loginRequest, waybillRequest, photosRequest };

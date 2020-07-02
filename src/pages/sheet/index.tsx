@@ -12,20 +12,14 @@ import {
 } from "taro-ui";
 import "./index.scss";
 import Loading from "../../components/loading";
-import {
-  getWaybill,
-  confirmWaybill,
-  getWbPhotos,
-  SERVER_URL,
-} from "../../controllers/rest";
+import { confirmWaybill } from "../../controllers/rest";
+import { loadWaybill } from "../../controllers/waybill";
 import { getDriverLocation } from "../../controllers/users";
 
 import ShipItems from "../../components/shipitems";
 import {
   WaybillResult,
   Waybill,
-  Result,
-  PhotosResult,
   WaybillConfirmParams,
   TimsResponse,
 } from "../../types/ars";
@@ -87,56 +81,33 @@ export default class Index extends Component<null, SheetState> {
   componentWillMount() {}
 
   componentDidMount() {
-    console.log("componentDidMount.props:", this.props, this.$router.params);
+    console.log(
+      "sheet.index.componentDidMount.props:",
+      this.props,
+      this.$router.params
+    );
     const wbno = this.$router.params.wbno;
-    const rdcno = this.$router.params.rdc;
-    const cell = this.$router.params.cell;
+    //const rdcno = this.$router.params.rdc;
+    //const cell = this.$router.params.cell;
     const isSuper = this.$router.params.super === "1";
-    getWaybill(wbno, rdcno, cell)
+    loadWaybill(wbno)
       .then((ret: WaybillResult) => {
         console.log("getWaybill.ret:", ret);
         if (ret.result === "success") {
           const iCnt = ret.waybill.shipItems.length;
-          //ret.waybill.rdcCode = rdcno; //todo: update here for dbl-check
-          getWbPhotos(wbno)
-            .then((pret: PhotosResult) => {
-              ret.waybill.photos = pret.photos.map((item, index) => ({
-                url: SERVER_URL + "/" + item.url,
-                caption:
-                  item.status === "rejected"
-                    ? "已拒收,需重新上传"
-                    : "图片" + index,
-              }));
-              this.setState({
-                loading: false,
-                waybill: ret.waybill,
-                itemCount: iCnt,
-                arrived: ret.waybill.status === "arrived",
-                confirmed: ret.waybill.status === "confirmed",
-                confirmArrive: ret.waybill.status === "loaded",
-                confirmTime: new Date(),
-                valid: true,
-                isSuper,
-              });
-            })
-            .catch((err) => {
-              console.log("err:", err);
-              Taro.atMessage({
-                message: "运单信息获取失败，请重试！",
-                type: "error",
-                duration: 8000,
-              });
-              this.setState({
-                loading: false,
-                failed: true,
-                valid: false,
-                itemCount: 0,
-                arrived: false,
-                confirmArrive: false,
-                isSuper,
-              });
-              throw err;
-            });
+          //ret.waybill.rdcCode = rdcno;
+          //todo: update here for dbl-check
+          this.setState({
+            loading: false,
+            waybill: ret.waybill,
+            itemCount: iCnt,
+            arrived: ret.waybill.status === "arrived",
+            confirmed: ret.waybill.status === "confirmed",
+            confirmArrive: ret.waybill.status === "loaded",
+            confirmTime: new Date(),
+            valid: true,
+            isSuper,
+          });
         } else {
           this.setState({
             loading: false,
@@ -225,7 +196,7 @@ export default class Index extends Component<null, SheetState> {
         console.log("driver loc ,cellphone:", res, params);
 
         confirmWaybill(params)
-          .then((ret: TimsResponse) => {
+          .then((ret: TimsResponse<null>) => {
             console.log("confirmWaybill.ret:", ret);
             if (ret.code === "0000") {
               this.setState({
@@ -236,7 +207,6 @@ export default class Index extends Component<null, SheetState> {
                 waybill: {
                   ...this.state.waybill,
                   status: "arrived",
-                  statusCaption: "已确认送达",
                 },
               });
             } else {

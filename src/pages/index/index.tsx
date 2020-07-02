@@ -16,7 +16,7 @@ export default function Index() {
   const [isScan, setIsScan] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  //console.log("$router.params:", props, this.$router);
+  console.log("$router.params:", this.$router.params);
 
   if (this.$router.params.wbno) {
     setIsScan(true);
@@ -24,9 +24,12 @@ export default function Index() {
     //setManual(true);
   } else {
     let curwbno = Taro.getStorageSync("waybill");
-    const wbnodate: Date = new Date(Taro.getStorageSync("waybilldate"));
+    const wbnodate: number =
+      Taro.getStorageSync("waybilldate") || new Date().valueOf();
+
     const today = new Date();
-    if (today.valueOf() - wbnodate.valueOf() > 24 * 60 * 60 * 1000) {
+    console.log("localcurwbno, wbnodate:", curwbno, wbnodate);
+    if (wbnodate && today.valueOf() - wbnodate > 24 * 60 * 60 * 1000) {
       //本地运单信息超过一天自动清除
       curwbno = "";
       Taro.removeStorage("waybill");
@@ -47,12 +50,12 @@ export default function Index() {
     //if (!manual) {
     //  setManual(true);
     //} else {
+    console.log("openSheet.waybillNum:", waybillNum);
     Taro.navigateTo({
-      url:
-        "/pages/sheet/index?wbno=" +
-        waybillNum +
-        //"&rdc=" +
-        rdcNum, //+
+      url: "/pages/sheet/index?wbno=" + waybillNum,
+      //+
+      //"&rdc=" +
+      //rdcNum, //+
       //"&cell=" +
       //cellphone,
     });
@@ -82,8 +85,13 @@ export default function Index() {
               type="text"
               value={waybillNum}
               onChange={(val: string) => {
-                //console.log(val);
+                //console.log("new wbNum:", val);
                 setWaybillNum(val);
+                Taro.setStorage({ key: "waybill", data: val });
+                Taro.setStorage({
+                  key: "waybilldate",
+                  data: new Date().valueOf(),
+                });
               }}
               placeholder="扫码或手工输入装车号及验证码"
               placeholderStyle="font-size:0.8rem;"

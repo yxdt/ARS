@@ -48,3 +48,7 @@ describe('Load Waybill Test', () => {
     });
   });
 });
+
+describe('Confirm Waybill Test', () => {
+  it('should confirm', () => {});
+});

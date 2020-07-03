@@ -1,5 +1,5 @@
-import Taro from "@tarojs/taro";
-import { SERVER_URL } from "./rest";
+import Taro from '@tarojs/taro';
+import { SERVER_URL } from './rest';
 function scanBarcode(cbBarcode) {
   Taro.scanCode({
     success: cbBarcode,
@@ -9,24 +9,22 @@ function scanBarcode(cbBarcode) {
 function takePicture(resolve) {
   const ctx = Taro.createCameraContext();
   ctx.takePhoto({
-    quality: "high",
+    quality: 'high',
     success: resolve,
   });
 }
 
-function uploadPicture(
-  wbno: string,
-  filePath: string,
-  cbResult: any,
-  cbFail: any
-) {
-  console.log("uploadPicture:", wbno, filePath);
+function uploadPicture(wbno: string, filePath: string, cbResult: any, cbFail: any) {
+  console.log('uploadPicture:', wbno, filePath);
+  const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
+  const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : '';
   Taro.uploadFile({
-    url: SERVER_URL + "/photos/upload",
+    url: SERVER_URL + '/photos/upload',
     filePath,
-    name: "photo",
+    name: 'photo',
     formData: {
-      wbno: wbno,
+      ordNo,
+      shpToCd,
     },
     timeout: 5000, //for testing purpose
     success: cbResult,

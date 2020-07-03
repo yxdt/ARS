@@ -1,11 +1,14 @@
-import { getWaybill, getWbPhotos } from "./rest";
+import { getWaybill, getWbPhotos, confirmWaybill } from "./rest";
 import {
   wbData,
   TimsResponse,
   WaybillResult,
   Waybill,
   photoListData,
+  WaybillConfirmParams,
+  Result,
 } from "../types/ars";
+import { getDriverInfo } from "./users";
 
 async function loadWaybill(wbno: string): Promise<WaybillResult> {
   //console.log('controllers.user.doLogin:', cellphone, password);
@@ -104,4 +107,53 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
   });
 }
 
-export { loadWaybill };
+async function confirmArrive(
+  wbno: string,
+  shiptoCode: string,
+  cellphone: string,
+  arriveTime: Date
+): Promise<Result> {
+  const driverInfo = await getDriverInfo(cellphone);
+  console.log("confirmArrive.wbno,ordNo,shpToCd:", wbno);
+  const wbcParam: WaybillConfirmParams = {
+    ...driverInfo,
+    sysTime: arriveTime,
+    ordNo: wbno,
+    shpToCd: shiptoCode,
+  };
+  let result: TimsResponse<Result>;
+  let success = false;
+  let ret: Result = { result: "success" };
+  try {
+    result = await confirmWaybill(wbcParam);
+    if (result && result.code === "0000" && result.data) {
+      success = true;
+      ret.result = result.data.result;
+    }
+  } catch (e) {
+    //console.log("waybill.confirmArrive.error.e:", e);
+    result = e;
+    //{
+    //  messageId: 'abcd1234asdfasdfas9876',
+    //  code: '0400',
+    //  message: 'error',
+    //  sentTime: 2020-07-03T08:20:14.748Z,
+    //  responseTime: 2020-07-03T08:20:19.748Z,
+    //  data: null
+    //}
+
+    ret.result = "error";
+    //result = { result: "error" };
+  }
+
+  return new Promise((res, rej) => {
+    if (success) {
+      res(ret);
+    } else {
+      //console.log('controllers.users.doLogin.res.rej:', restRet);
+      rej(ret);
+    }
+  });
+}
+
+export { loadWaybill, confirmArrive };

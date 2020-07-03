@@ -1,5 +1,5 @@
 import Taro, { Component, Config } from "@tarojs/taro";
-import { View, Text, Picker, CoverView, Button } from "@tarojs/components";
+import { View, Text, Button } from "@tarojs/components";
 import {
   AtButton,
   AtModal,
@@ -13,7 +13,7 @@ import {
 import "./index.scss";
 import Loading from "../../components/loading";
 import { confirmWaybill } from "../../controllers/rest";
-import { loadWaybill } from "../../controllers/waybill";
+import { loadWaybill, confirmArrive } from "../../controllers/waybill";
 import { getDriverLocation } from "../../controllers/users";
 
 import ShipItems from "../../components/shipitems";
@@ -177,56 +177,45 @@ export default class Index extends Component<null, SheetState> {
     //dirver position address openid
     const openid = Taro.getStorageSync("userOpenId");
     console.log("sheet.index.driverConfirmArrive.openid:", openid);
+    let ret: Result;
 
     if (this.state.rdcNum === this.state.waybill.rdcCode) {
       //you can confirm with the waybill
       this.setState({ confirming: true });
-      getDriverLocation(this.state.waybill.sheetNum, (res) => {
-        //do
-        const params: WaybillConfirmParams = {
-          openid,
-          sysTime: new Date().toLocaleString("zh-CN"),
-          ordNo: this.state.waybill.sheetNum,
-          shpToCd: this.state.rdcNum,
-          latitude: res.latitude,
-          longitude: res.longitude,
-          address: res.address,
-          phone: this.state.cellphone,
-        };
-        console.log("driver loc ,cellphone:", res, params);
 
-        confirmWaybill(params)
-          .then((ret: TimsResponse<null>) => {
-            console.log("confirmWaybill.ret:", ret);
-            if (ret.code === "0000") {
-              this.setState({
-                arrived: true,
-                loading: false,
-                confirmArrive: false,
-                confirming: false,
-                waybill: {
-                  ...this.state.waybill,
-                  status: "arrived",
-                },
-              });
-            } else {
-              //sth. wrong with the input
-              Taro.atMessage({
-                message: "操作失败：" + ret.message,
-                type: "error",
-                duration: 8000,
-              });
-            }
-          })
-          .catch((err) => {
-            //Confirming failed
-            Taro.atMessage({
-              message: "操作失败，请重试：" + err.errMsg,
-              type: "error",
-              duration: 5000,
+      confirmArrive(
+        this.state.waybill.wbNum,
+        this.state.waybill.rdcCode,
+        this.state.cellphone,
+        this.state.confirmTime
+      )
+        .then((ret) => {
+          if (ret.result === "success") {
+            this.setState({
+              arrived: true,
+              loading: false,
+              confirmArrive: false,
+              confirming: false,
+              waybill: {
+                ...this.state.waybill,
+                status: "arrived",
+              },
             });
+          } else {
+            Taro.atMessage({
+              message: "操作失败：订单信息有误。",
+              type: "error",
+              duration: 8000,
+            });
+          }
+        })
+        .catch((ret) => {
+          Taro.atMessage({
+            message: "操作失败：" + ret.message,
+            type: "error",
+            duration: 8000,
           });
-      });
+        });
     } else {
       //wrong rdcNumber input
       console.log("wrong rdc code input");
@@ -247,8 +236,6 @@ export default class Index extends Component<null, SheetState> {
       confirmed,
       valid,
       failed,
-      rdcNum,
-      cellphone,
     } = this.state;
     console.log("loading:", loading);
     if (loading) {

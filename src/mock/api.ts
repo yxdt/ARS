@@ -4,6 +4,8 @@ import {
   TimsResponse,
   wbData,
   photoListData,
+  WaybillConfirmParams,
+  WaybillConfirmData,
 } from "../types/ars";
 
 const users = [
@@ -111,6 +113,22 @@ const pics = [
   "r_2_1592539521819.jpg",
 ];
 
+function wbcRequest(data: WaybillConfirmParams) {
+  const ret: WaybillConfirmData = {
+    result: "success",
+  };
+  let success = true;
+  if (data.ordNo === "1") {
+    //confirmed already
+    ret.result = "fail";
+  } else if (data.ordNo === "999") {
+    //fake server fail
+    success = false;
+  }
+  console.log("mock.api.wbcRequest.data, result:", data, ret);
+  return request(ret, success);
+}
+
 function photosRequest(url: string) {
   const wbno = url.substr(url.lastIndexOf("/") + 1);
   const photos: photoListData = {
@@ -162,6 +180,7 @@ function loginRequest(data: loginParam) {
 }
 
 function request<T>(data: T | null, success: boolean) {
+  //console.log("mock.api.request.data,success:", data, success);
   return new Promise((res, rej) => {
     setTimeout(() => {
       const timsRet: TimsResponse<T> = {
@@ -183,4 +202,4 @@ function request<T>(data: T | null, success: boolean) {
     }, 1000);
   });
 }
-export { loginRequest, waybillRequest, photosRequest };
+export { loginRequest, waybillRequest, photosRequest, wbcRequest };

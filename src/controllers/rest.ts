@@ -6,8 +6,14 @@ import {
   wbData,
   photoListData,
   loginData,
+  WaybillConfirmData,
 } from "../types/ars";
-import { loginRequest, waybillRequest, photosRequest } from "../mock/api";
+import {
+  loginRequest,
+  waybillRequest,
+  photosRequest,
+  wbcRequest,
+} from "../mock/api";
 
 const DEBUGGING = true;
 const devUrl = "http://192.168.0.100:8765";
@@ -32,33 +38,13 @@ const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 // }
 
 async function confirmWaybill(wbInfo: WaybillConfirmParams) {
-  const url = SERVER_URL + "/driver/confirm";
-
-  if (DEBUGGING) {
-    //console.log("confirmWaybill.params:", wbInfo);
-    return new Promise((res) => {
-      setTimeout(() => {
-        //console.log("waybill.confirmWaybill.timeout");
-        res({
-          messageId: "ak22sdk223fas2423adasdfas",
-          data: null,
-          code: "0000",
-          message: "Successful operation",
-          sentTime: new Date(),
-          responseTime: new Date(),
-        });
-      }, 1000);
-    });
-  } else {
-    const ret = await Taro.request({
-      url,
-      method: "POST",
-      data: wbInfo,
-      header: { "content-type": "application/x-www-form-urlencoded" },
-    });
-    console.log("confirmWaybill.ret:", ret);
-    console.log("!!1not implemented yet!!!");
-  }
+  const ret = await taroRequest<TimsResponse<WaybillConfirmData>>(
+    "/driver/confirm",
+    "POST",
+    wbInfo,
+    { "content-type": "application/x-www-form-urlencoded" }
+  );
+  return ret;
 }
 
 async function getWaybill(wbNum: string) {
@@ -125,6 +111,8 @@ async function taroRequest<T>(url: string, method, data, header) {
       ret = await waybillRequest(url);
     } else if (url.startsWith("/photos/bywb/")) {
       ret = await photosRequest(url);
+    } else if (url === "/driver/confirm") {
+      ret = await wbcRequest(data);
     }
   } else {
     ret = await Taro.request<T>({
@@ -139,6 +127,7 @@ async function taroRequest<T>(url: string, method, data, header) {
 
 export {
   SERVER_URL,
+  DEBUGGING,
   getWaybill,
   confirmWaybill,
   getWbPhotos,

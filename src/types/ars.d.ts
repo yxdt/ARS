@@ -29,9 +29,17 @@ export interface PhotoUrl {
   url: string;
 }
 
+export interface DriverInfo {
+  openid: string;
+  phone: string;
+  address: string;
+  latitude: string;
+  longitude: string;
+}
+
 export interface WaybillConfirmParams {
   openid: string; //司机小程序用户openid
-  sysTime: string; //到达时间
+  sysTime: Date; //到达时间
   ordNo: string; //运单号
   shpToCd: string; //四位验证码
   latitude: string;
@@ -39,8 +47,15 @@ export interface WaybillConfirmParams {
   address: string;
   phone: string;
 }
-export interface WaybillResult {
+export interface WaybillConfirmData {
   result: string;
+}
+
+export interface PhotosResult extends Result {
+  photos: Array<photoData>;
+}
+
+export interface WaybillResult extends Result {
   waybill: Waybill;
 }
 export interface Result {
@@ -51,10 +66,6 @@ export interface InfoCardProps {
   message: string;
   extMessage: string;
   backFunc: Function;
-}
-
-export interface PhotosResult {
-  photos: Array<photoData>;
 }
 
 export interface TimsResponse<T> {

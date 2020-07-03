@@ -2,10 +2,45 @@ import Taro from "@tarojs/taro";
 //import { WxUserInfo, RegUser } from "src/types/ars";
 import { userLogin } from "./rest";
 import QQMapWX from "../libs/qqmap-wx-jssdk";
-import { loginData } from "../types/ars";
+import { loginData, DriverInfo } from "../types/ars";
 
-function getDriverLocation(wbno: string, resolve: Function) {
-  console.log("wbno:", wbno);
+function getDriverInfo(phone: string): Promise<DriverInfo> {
+  let driverInfo: DriverInfo = {
+    phone,
+    openid: "",
+    latitude: "",
+    longitude: "",
+    address: "",
+  };
+  return new Promise((res) => {
+    //测试号标志
+    if (phone === "1390000") {
+      setTimeout(() => {
+        driverInfo.latitude = "123.45";
+        driverInfo.longitude = "234.56";
+        driverInfo.address = "北京市东城区长安街1号";
+        driverInfo.openid = "123abcdefg9887";
+
+        console.log("getDriverInfo.driverInfo:", driverInfo);
+        res(driverInfo);
+      }, 1000);
+    } else {
+      getWxOpenId((openid) => {
+        driverInfo.openid = openid;
+        getDriverLocation((ret) => {
+          driverInfo.latitude = ret.latitude;
+          driverInfo.longitude = ret.longitude;
+          driverInfo.address = ret.address;
+          console.log("getDriverInfo.driverInfo:", driverInfo);
+          res(driverInfo);
+        });
+      });
+    }
+  });
+}
+
+function getDriverLocation(resolve: Function) {
+  //console.log("wbno:", wbno);
 
   Taro.getLocation({
     type: "wgs84",
@@ -125,4 +160,4 @@ async function doLogin(cellphone, password): Promise<loginData> {
   });
 }
 
-export { getDriverLocation, getWxOpenId, getUserInfo, doLogin };
+export { getDriverLocation, getWxOpenId, getUserInfo, doLogin, getDriverInfo };

@@ -54,15 +54,12 @@ export default class Index extends Component<null, SheetState> {
         shiptoCode: "",
         rdcCode: "",
         arriveTime: new Date(),
-        plateNum: "",
         totalPages: 1,
         status: "",
         statusCaption: "",
-        sheetNum: "",
+        wbNum: "",
         shiptoName: "",
-        shiptoTel: "",
         rdcName: "",
-        driverName: "",
         shipItems: [],
         photos: [],
       },
@@ -172,12 +169,11 @@ export default class Index extends Component<null, SheetState> {
 
   driverConfirmArrive() {
     console.log("confirm arrive");
-    console.log("sheetNum:", this.state.waybill.sheetNum);
+    console.log("sheetNum:", this.state.waybill.wbNum);
     console.log("rdcNum:", this.state.rdcNum, this.state.waybill.rdcCode);
     //dirver position address openid
     const openid = Taro.getStorageSync("userOpenId");
     console.log("sheet.index.driverConfirmArrive.openid:", openid);
-    let ret: Result;
 
     if (this.state.rdcNum === this.state.waybill.rdcCode) {
       //you can confirm with the waybill
@@ -199,11 +195,12 @@ export default class Index extends Component<null, SheetState> {
               waybill: {
                 ...this.state.waybill,
                 status: "arrived",
+                statusCaption: "司机已确认到达",
               },
             });
           } else {
             Taro.atMessage({
-              message: "操作失败：订单信息有误。",
+              message: "操作失败：订单信息有误，请重试。",
               type: "error",
               duration: 8000,
             });
@@ -211,14 +208,14 @@ export default class Index extends Component<null, SheetState> {
         })
         .catch((ret) => {
           Taro.atMessage({
-            message: "操作失败：" + ret.message,
+            message: "操作失败，错误原因：" + ret.message,
             type: "error",
             duration: 8000,
           });
         });
     } else {
       //wrong rdcNumber input
-      console.log("wrong rdc code input");
+      //console.log("wrong rdc code input");
       Taro.atMessage({
         message: "接收码输入错误，请重试！",
         type: "error",
@@ -347,7 +344,7 @@ export default class Index extends Component<null, SheetState> {
               </AtModalAction>
             </AtModal>
           </View>
-          <Text className="form-caption"> 装 车 号：{waybill.sheetNum}</Text>
+          <Text className="form-caption"> 装 车 号：{waybill.wbNum}</Text>
           {arrived ? (
             <Text className="form-caption">
               到达时间：

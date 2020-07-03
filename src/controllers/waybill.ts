@@ -25,6 +25,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
     shiptoName: "",
     arriveTime: new Date(),
     status: "loaded",
+    statusCaption: "已装车",
     shipItems: [],
     photos: [],
   };
@@ -45,24 +46,32 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
   if (restRet && restRet.code === "0000" && restRet.data) {
     const retData = <wbData>restRet.data;
     let status: string = "loaded";
+    let statusCaption: string = "已装车";
     switch (retData.status) {
       case 1:
         status = "arrived";
+        statusCaption = "司机已确认到达";
         break;
       case 2:
         status = "uploaded";
+        statusCaption = "回执已上传";
         break;
       case 3:
         status = "rejected";
+        statusCaption = "上传回执未通过";
         break;
       case 4:
         status = "reup";
+        statusCaption = "回执已重新上传";
+
         break;
       case 8:
         status = "confirmed";
+        statusCaption = "中心已确认";
         break;
       default:
         status = "loaded";
+        statusCaption = "已装车";
         break;
     }
     ret = {
@@ -83,6 +92,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
         qty: item.qty,
       })),
       status,
+      statusCaption,
     };
     success = true;
     //console.log("....wb loaded....");

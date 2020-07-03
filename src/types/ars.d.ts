@@ -95,6 +95,7 @@ export interface Waybill {
   shiptoName: string;
   arriveTime: Date;
   status: string;
+  statusCaption: string;
   shipItems: ShipItem[];
   photos: wbPhoto[];
 }

@@ -10,11 +10,15 @@ import {
 import ArsTabBar from "../../components/tabbar";
 import NavBar from "../../components/navbar";
 import InfoCard from "../../components/infocard";
+import { uploadResult } from "src/types/ars";
 export interface CameraStates {
   src: string;
-  preview: boolean;
+  preview: boolean; // 拍完照片预览
   curwbno: string;
   uploading: boolean;
+  uploaded: boolean; //是否已上传？
+  continueUpload: boolean; //是否继续上传？
+  openid: string;
 }
 
 export interface CameraProps {
@@ -25,6 +29,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
   constructor() {
     super(...arguments);
     let curwbno = Taro.getStorageSync("waybill");
+    let openid = Taro.getStorageSync("userOpenId");
     const wbnodate: Date = new Date(Taro.getStorageSync("waybilldate"));
     const today = new Date();
     if (today.valueOf() - wbnodate.valueOf() > 24 * 60 * 60 * 1000) {
@@ -38,6 +43,9 @@ export default class Index extends Component<CameraProps, CameraStates> {
       preview: false,
       curwbno,
       uploading: false,
+      uploaded: false,
+      continueUpload: false,
+      openid,
     };
     this.takePic.bind(this);
     //this.scanCode.bind(this);
@@ -80,31 +88,20 @@ export default class Index extends Component<CameraProps, CameraStates> {
   }
   uploadPic() {
     //console.log("camera.uploadPic:", this.state.curwbno, this.state.src);
-    this.setState({ uploading: true });
-    uploadPicture(
-      this.state.curwbno,
-      this.state.src,
-      (res) => {
+    this.setState({ uploading: true, uploaded: false });
+    uploadPicture(this.state.curwbno, this.state.src, this.state.openid)
+      .then((res: uploadResult) => {
         //console.log("upload-result:", res);
-        //{data: "{"result":"success","id":"5eec3ea936aabb13a43fa9d1"}",
-        // statusCode: 200,
-        // header: {…},
-        // cookies: Array(0), errMsg: "uploadFile:ok"}
         this.setState({ uploading: false });
         let isSuccess = false;
         //成功上传
-        if (res.statusCode === 200) {
-          const result = JSON.parse(res.data);
-
-          //成功记录
-          if (result.result === "success") {
-            isSuccess = true;
-            Taro.atMessage({
-              message: "照片上传成功",
-              type: "success",
-            });
-            this.setState({ preview: false });
-          }
+        if (res.result === "success") {
+          isSuccess = true;
+          Taro.atMessage({
+            message: "照片上传成功",
+            type: "success",
+          });
+          this.setState({ preview: false, uploaded: true });
         }
         if (!isSuccess) {
           this.setState({ uploading: false });
@@ -113,22 +110,21 @@ export default class Index extends Component<CameraProps, CameraStates> {
             type: "error",
           });
         }
-      },
-      (err) => {
+      })
+      .catch((err) => {
         this.setState({ uploading: false });
         Taro.atMessage({
           message: "回执上传失败，请重试：" + err.errMsg,
           type: "error",
         });
-      }
-    );
+      });
   }
 
   render() {
     console.log("props, router:", this.props, this.$router.params);
 
     const isScan = this.$router.params.isScan;
-    const { curwbno } = this.state;
+    const { curwbno, uploaded, continueUpload } = this.state;
     console.log("curwbno:", curwbno, this.state);
     if (curwbno.length <= 0) {
       return (
@@ -140,6 +136,23 @@ export default class Index extends Component<CameraProps, CameraStates> {
             Taro.redirectTo({ url: "/pages/index/index" });
           }}
         />
+      );
+    }
+    if (uploaded) {
+      return (
+        <View style="display:flex; flex-direction:row; position:fixed; bottom: 100; left: 0">
+          <Button className="preview-confirm-button" onClick={this.uploadPic}>
+            继续上传
+          </Button>
+          <Button
+            className="preview-confirm-button"
+            onClick={() => {
+              this.setState({ preview: false });
+            }}
+          >
+            全部上传完成
+          </Button>
+        </View>
       );
     }
     return (
@@ -176,7 +189,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
                 });
               }}
             ></Image>
-            <View style="display:flex; flex-direction:row">
+            <View style="display:flex; flex-direction:row; position:fixed; bottom: 100; left: 0">
               <Button
                 className="preview-confirm-button"
                 onClick={this.uploadPic}

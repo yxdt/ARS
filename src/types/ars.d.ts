@@ -1,3 +1,7 @@
+//命名规则：
+//xxxxParams: 向服务器发送的参数
+//xxxxData：从服务器返回的结果
+
 //司机不要求注册，中心人员需要后台手工确认绑定openid或手机
 export interface RegUser {
   userName: string; //default is wx.nickName
@@ -142,4 +146,17 @@ export interface photoData {
 }
 export interface photoListData {
   photos: photoData[];
+}
+
+export interface uploadParams {
+  openid: string;
+  ordNo: string;
+  shpToCd: string;
+}
+export interface uploadData {
+  fileName: string;
+  filePath: string;
+}
+export interface uploadResult extends Result {
+  upload: uploadData;
 }

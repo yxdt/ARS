@@ -79,23 +79,28 @@ function getDriverLocation(resolve: Function) {
   });
 }
 function getWxOpenId(cbOpenId: Function) {
-  Taro.login({
-    success: (res) => {
-      let code = res.code;
-      Taro.request({
-        url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
-        data: {},
-        header: { "content-type": "json" },
-        success: (resp) => {
-          let openId = JSON.parse(resp.data).openid;
-          Taro.setStorage({ key: "userOpenId", data: openId });
-          console.log("controllers.users.getWxOpenId.openID:", openId);
-          console.log("resp:", resp);
-          cbOpenId(openId);
-        },
-      });
-    },
-  });
+  const locOpenId = Taro.getStorageSync("userOpenId");
+  if (locOpenId && locOpenId.length > 0) {
+    cbOpenId(locOpenId);
+  } else {
+    Taro.login({
+      success: (res) => {
+        let code = res.code;
+        Taro.request({
+          url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
+          data: {},
+          header: { "content-type": "json" },
+          success: (resp) => {
+            let openId = JSON.parse(resp.data).openid;
+            Taro.setStorage({ key: "userOpenId", data: openId });
+            console.log("controllers.users.getWxOpenId.openID:", openId);
+            console.log("resp:", resp);
+            cbOpenId(openId);
+          },
+        });
+      },
+    });
+  }
 }
 
 async function getUserInfo() {

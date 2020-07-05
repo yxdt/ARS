@@ -124,7 +124,7 @@ async function confirmArrive(
   arriveTime: Date
 ): Promise<Result> {
   const driverInfo = await getDriverInfo(cellphone);
-  console.log("confirmArrive.wbno,ordNo,shpToCd:", wbno);
+  //console.log("confirmArrive.wbno,ordNo,shpToCd:", wbno);
   const wbcParam: WaybillConfirmParams = {
     ...driverInfo,
     sysTime: arriveTime,

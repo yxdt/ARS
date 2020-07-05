@@ -21,7 +21,7 @@ function getDriverInfo(phone: string): Promise<DriverInfo> {
         driverInfo.address = "北京市东城区长安街1号";
         driverInfo.openid = "123abcdefg9887";
 
-        console.log("getDriverInfo.driverInfo:", driverInfo);
+        //console.log("getDriverInfo.driverInfo:", driverInfo);
         res(driverInfo);
       }, 1000);
     } else {
@@ -31,7 +31,7 @@ function getDriverInfo(phone: string): Promise<DriverInfo> {
           driverInfo.latitude = ret.latitude;
           driverInfo.longitude = ret.longitude;
           driverInfo.address = ret.address;
-          console.log("getDriverInfo.driverInfo:", driverInfo);
+          //console.log("getDriverInfo.driverInfo:", driverInfo);
           res(driverInfo);
         });
       });
@@ -49,11 +49,11 @@ function getDriverLocation(resolve: Function) {
         key: "HV2BZ-HMTC6-IICS7-ESS5M-BFX2E-V6B5B",
       });
       const loc = { latitude: res.latitude, longitude: res.longitude };
-      console.log("cur position:", loc);
+      //console.log("cur position:", loc);
       qqmapsdk.reverseGeocoder({
         location: loc || "",
         success: (resLoc) => {
-          console.log("resLoc:", resLoc);
+          //console.log("resLoc:", resLoc);
           resolve({
             latitude: res.latitude,
             longitude: res.longitude,
@@ -93,8 +93,8 @@ function getWxOpenId(cbOpenId: Function) {
           success: (resp) => {
             let openId = JSON.parse(resp.data).openid;
             Taro.setStorage({ key: "userOpenId", data: openId });
-            console.log("controllers.users.getWxOpenId.openID:", openId);
-            console.log("resp:", resp);
+            //console.log("controllers.users.getWxOpenId.openID:", openId);
+            //console.log("resp:", resp);
             cbOpenId(openId);
           },
         });
@@ -106,10 +106,10 @@ function getWxOpenId(cbOpenId: Function) {
 async function getUserInfo() {
   try {
     const ui = await Taro.getUserInfo();
-    console.log("Taro.getUserInfo:", ui);
+    //console.log("Taro.getUserInfo:", ui);
     return ui.userInfo;
   } catch (err) {
-    console.log("err in controllers/users/getUserInfo:", err);
+    //console.log("err in controllers/users/getUserInfo:", err);
   }
 }
 
@@ -144,7 +144,7 @@ async function doLogin(cellphone, password): Promise<loginData> {
   try {
     restRet = await userLogin(cellphone, password);
   } catch (err) {
-    console.log("login error:", err);
+    //console.log("login error:", err);
     restRet = { code: "0500", data: null };
   }
   //console.log('controllers.users.doLogin.res:', restRet);

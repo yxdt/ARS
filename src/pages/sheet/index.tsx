@@ -12,17 +12,11 @@ import {
 } from "taro-ui";
 import "./index.scss";
 import Loading from "../../components/loading";
-import { confirmWaybill } from "../../controllers/rest";
+import { sendArriveMessage } from "../../controllers/rest";
 import { loadWaybill, confirmArrive } from "../../controllers/waybill";
-import { getDriverLocation } from "../../controllers/users";
 
 import ShipItems from "../../components/shipitems";
-import {
-  WaybillResult,
-  Waybill,
-  WaybillConfirmParams,
-  TimsResponse,
-} from "../../types/ars";
+import { WaybillResult, Waybill } from "../../types/ars";
 import InfoCard from "../../components/infocard";
 
 export interface SheetState {
@@ -198,6 +192,7 @@ export default class Index extends Component<null, SheetState> {
                 statusCaption: "司机已确认到达",
               },
             });
+            sendArriveMessage(this.state.waybill.wbNum, openid);
           } else {
             Taro.atMessage({
               message: "操作失败：订单信息有误，请重试。",

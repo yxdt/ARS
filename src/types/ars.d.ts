@@ -17,6 +17,7 @@ export interface RegUser {
   gender: string; //wx 1: 男 other: 女
 }
 
+//微信提供的用户公开信息
 export interface WxUserInfo {
   nickName: string;
   avatarUrl: string;
@@ -29,10 +30,7 @@ export interface WxUserInfo {
   language: string;
 }
 
-export interface PhotoUrl {
-  url: string;
-}
-
+//用于确认到达前获取司机相关信息
 export interface DriverInfo {
   openid: string;
   phone: string;
@@ -41,6 +39,7 @@ export interface DriverInfo {
   longitude: string;
 }
 
+//用于到达确认
 export interface WaybillConfirmParams {
   openid: string; //司机小程序用户openid
   sysTime: Date; //到达时间
@@ -55,16 +54,13 @@ export interface WaybillConfirmData {
   result: string;
 }
 
-export interface PhotosResult extends Result {
-  photos: Array<photoData>;
-}
-
 export interface WaybillResult extends Result {
   waybill: Waybill;
 }
 export interface Result {
   result: string;
 }
+
 export interface InfoCardProps {
   title: string;
   message: string;
@@ -72,6 +68,7 @@ export interface InfoCardProps {
   backFunc: Function;
 }
 
+//后台API调用的返回接口
 export interface TimsResponse<T> {
   messageId: string;
   data: T | null;
@@ -80,6 +77,7 @@ export interface TimsResponse<T> {
   sentTime: Date;
   responseTime: Date;
 }
+
 export interface loginParam {
   phone: string;
   pwd: string;
@@ -140,6 +138,9 @@ export interface wbPhoto {
   status: number;
 }
 
+// export interface PhotoUrl {
+//   url: string;
+// }
 export interface photoData {
   url: string;
   status: number; //0:上传， 1：通过， 2：驳回
@@ -148,6 +149,11 @@ export interface photoListData {
   photos: photoData[];
 }
 
+export interface PhotosResult extends Result {
+  photos: Array<photoData>;
+}
+
+//回执上传
 export interface uploadParams {
   openid: string;
   ordNo: string;
@@ -159,4 +165,16 @@ export interface uploadData {
 }
 export interface uploadResult extends Result {
   upload: uploadData;
+}
+
+//系统消息
+//"{errcode:0,errmsg:ok}"
+//"{errcode:43101,errmsg:"user refuse to accept the msg hint: [IgcdkAwgE-EAeUea]"}"
+export interface messageData {
+  errcode: string;
+  errmsg: string;
+}
+
+export interface messageResult extends Result {
+  info: messageData;
 }

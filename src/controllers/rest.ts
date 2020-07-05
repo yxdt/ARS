@@ -7,12 +7,16 @@ import {
   photoListData,
   loginData,
   WaybillConfirmData,
+  messageData,
 } from "../types/ars";
 import {
   loginRequest,
   waybillRequest,
   photosRequest,
   wbcRequest,
+  arriveMsgRequest,
+  uploadMsgRequest,
+  rejectMsgRequest,
 } from "../mock/api";
 
 const DEBUGGING = true;
@@ -36,6 +40,37 @@ const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 //     console.log("!!1not implemented yet!!!");
 //   }
 // }
+async function sendArriveMessage(
+  wbno: string, //shipCode + rdcCode
+  openid: string
+) {
+  const ret = await taroRequest<TimsResponse<messageData>>(
+    "/message/arrive?wbno=" + wbno + "&openid=" + openid,
+    "GET",
+    null,
+    null
+  );
+  return ret;
+}
+async function sendUploadMessage(wbno: string, openid: string) {
+  const ret = await taroRequest<TimsResponse<messageData>>(
+    "/message/upload?wbno=" + wbno + "&openid=" + openid,
+    "GET",
+    null,
+    null
+  );
+  return ret;
+}
+
+async function sendRejectMessage(wbno: string, openid: string) {
+  const ret = await taroRequest<TimsResponse<messageData>>(
+    "/message/reject?wbno=" + wbno + "&openid=" + openid,
+    "GET",
+    null,
+    null
+  );
+  return ret;
+}
 
 async function confirmWaybill(wbInfo: WaybillConfirmParams) {
   const ret = await taroRequest<TimsResponse<WaybillConfirmData>>(
@@ -56,6 +91,8 @@ async function getWaybill(wbNum: string) {
   );
   return ret;
 }
+
+//async function uploadPhoto() {}
 
 async function getWbPhotos(wbNum: string) {
   if (DEBUGGING) {
@@ -113,6 +150,12 @@ async function taroRequest<T>(url: string, method, data, header) {
       ret = await photosRequest(url);
     } else if (url === "/driver/confirm") {
       ret = await wbcRequest(data);
+    } else if (url.startsWith("/message/arrive")) {
+      ret = await arriveMsgRequest(url);
+    } else if (url.startsWith("/message/upload")) {
+      ret = await uploadMsgRequest(url);
+    } else if (url.startsWith("/message/reject")) {
+      ret = await rejectMsgRequest(url);
     }
   } else {
     ret = await Taro.request<T>({
@@ -133,4 +176,7 @@ export {
   getWbPhotos,
   saveUserInfo,
   userLogin,
+  sendArriveMessage,
+  sendUploadMessage,
+  sendRejectMessage,
 };

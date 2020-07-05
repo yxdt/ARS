@@ -33,6 +33,17 @@ button {
 }
 .camera-button-span {
   margin-bottom: 1rem;
+  position: absolute;
+  bottom: 15%;
+  left: 42%;
+}
+.upload-button-span {
+  margin-bottom: 1rem;
+  position: absolute;
+  display: flex;
+  flex-direction: row;
+  bottom: 15%;
+  width: 100%;
 }
 
 .full-screen {
@@ -47,9 +58,11 @@ button {
 
 .camera-span {
   margin: 0;
-  height: 730px;
+  padding: 0;
 }
 .expand {
+  width: 100%;
+  height: 100%;
 }
 .preview-span {
   position: absolute;

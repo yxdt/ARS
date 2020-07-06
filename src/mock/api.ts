@@ -7,6 +7,8 @@ import {
   WaybillConfirmParams,
   WaybillConfirmData,
   messageData,
+  verifyParams,
+  verifyData,
 } from "../types/ars";
 
 const users = [
@@ -147,9 +149,21 @@ function msgRequest(url: string) {
     //sim a fail one
     success = false;
   }
-  return request(msgData, success);
+  return request<messageData>(msgData, success);
 }
 
+function verifyRequest(data: verifyParams) {
+  const vData: verifyData = {
+    result: "success",
+  };
+  let success = true;
+  if (data.ordNo === "000") {
+    vData.result = "fail";
+  } else if (data.ordNo === "999") {
+    success = false;
+  }
+  return request<verifyData>(vData, success);
+}
 function wbcRequest(data: WaybillConfirmParams) {
   const ret: WaybillConfirmData = {
     result: "success",
@@ -173,7 +187,7 @@ function photosRequest(url: string) {
       .filter((item) => item.indexOf("_" + wbno + "_") > 0)
       .map((item, index) => ({ url: item, status: index % 3 })),
   };
-  return request(photos, true);
+  return request<photoListData>(photos, true);
 }
 
 function waybillRequest(url: string) {
@@ -201,14 +215,12 @@ function loginRequest(data: loginParam) {
   const retVal: loginData = {
     userName: "",
     roleName: "",
-    result: false,
   };
   let success = true;
 
   if (data.phone === "1390000" && data.pwd !== "") {
     retVal.userName = users[0].userName;
     retVal.roleName = users[0].roleName;
-    retVal.result = true;
   } else if (data.phone === "000000") {
     //fail
     success = false;
@@ -247,4 +259,5 @@ export {
   arriveMsgRequest,
   uploadMsgRequest,
   rejectMsgRequest,
+  verifyRequest,
 };

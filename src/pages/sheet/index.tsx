@@ -168,7 +168,9 @@ export default class Index extends Component<null, SheetState> {
     //dirver position address openid
     const openid = Taro.getStorageSync("userOpenId");
     console.log("sheet.index.driverConfirmArrive.openid:", openid);
-
+    if (this.state.cellphone) {
+      Taro.setStorage({ key: "cellphone", data: this.state.cellphone });
+    }
     if (this.state.rdcNum === this.state.waybill.rdcCode) {
       //you can confirm with the waybill
       this.setState({ confirming: true });

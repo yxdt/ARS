@@ -8,6 +8,8 @@ import {
   loginData,
   WaybillConfirmData,
   messageData,
+  verifyData,
+  verifyParams,
 } from "../types/ars";
 import {
   loginRequest,
@@ -17,7 +19,9 @@ import {
   arriveMsgRequest,
   uploadMsgRequest,
   rejectMsgRequest,
+  verifyRequest,
 } from "../mock/api";
+import { ViewProps } from "@tarojs/components/types/View";
 
 const DEBUGGING = true;
 const devUrl = "http://192.168.0.100:8765";
@@ -68,6 +72,16 @@ async function sendRejectMessage(wbno: string, openid: string) {
     "GET",
     null,
     null
+  );
+  return ret;
+}
+
+async function verifyPhoto(verifydata: verifyParams) {
+  const ret = await taroRequest<TimsResponse<verifyData>>(
+    "/logistics/confirm",
+    "POST",
+    verifydata,
+    { "content-type": "application/x-www-form-urlencoded" }
   );
   return ret;
 }
@@ -156,6 +170,8 @@ async function taroRequest<T>(url: string, method, data, header) {
       ret = await uploadMsgRequest(url);
     } else if (url.startsWith("/message/reject")) {
       ret = await rejectMsgRequest(url);
+    } else if (url === "/logistics/confirm") {
+      ret = await verifyRequest(data);
     }
   } else {
     ret = await Taro.request<T>({
@@ -179,4 +195,5 @@ export {
   sendArriveMessage,
   sendUploadMessage,
   sendRejectMessage,
+  verifyPhoto,
 };

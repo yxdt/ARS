@@ -1,6 +1,13 @@
 import Taro, { useState } from "@tarojs/taro";
 import { View, Text, Image, Picker, Button } from "@tarojs/components";
-import { AtAvatar, AtGrid, AtList, AtListItem, AtFloatLayout } from "taro-ui";
+import {
+  AtAvatar,
+  AtGrid,
+  AtList,
+  AtListItem,
+  AtFloatLayout,
+  AtMessage,
+} from "taro-ui";
 
 import "./index.scss";
 import NavBar from "../../components/navbar";
@@ -9,17 +16,23 @@ import { WxUserInfo } from "../../types/ars";
 import { SERVER_URL } from "../../controllers/rest";
 import userpng from "../../assets/img/user.png";
 export default function UserInfo() {
-  const [curAvatar, setAvatar] = useState(userpng);
-  const [userName, setUserName] = useState("");
-  const [userType, setUserType] = useState("中心人员");
-  const [cellphone, setCellphone] = useState("13823803380");
-  const [plateNum, setPlateNum] = useState("京A-876543");
-  const [truckType, setTruckType] = useState(1);
+  const [curAvatar, setAvatar] = useState(
+    Taro.getStorageSync("avatar") || userpng
+  );
+  const [nickName, setNickName] = useState(
+    Taro.getStorageSync("nickName") || ""
+  );
+  const [cellphone] = useState(Taro.getStorageSync("cellphone") || "");
+  const [userName, setUserName] = useState(
+    Taro.getStorageSync("userName") || ""
+  );
+  const [roleName] = useState(Taro.getStorageSync("roleName") || "");
   const [openDetail, setOpenDetail] = useState(false);
-  const [init, setInit] = useState(true);
+  //const [init, setInit] = useState(true);
   const userAuth: boolean = Taro.getStorageSync("userAuth");
+  const loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
 
-  console.log("UserInfo:", this);
+  //console.log("UserInfo:", this);
 
   function getUserInfo() {
     let curUserInfo = {};
@@ -39,8 +52,10 @@ export default function UserInfo() {
       .then((ret) => {
         console.log("getUserInfo.ret:", ret);
         //if (isWx) {
-        Taro.setStorage({ key: "userName", data: ret.userInfo.nickName });
+        Taro.setStorage({ key: "nickName", data: ret.userInfo.nickName });
         Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
+        setNickName(ret.userInfo.nickName);
+        setAvatar(ret.userInfo.avatarUrl);
         //}T
         setUserInfo(ret.userInfo);
 
@@ -94,6 +109,7 @@ export default function UserInfo() {
   function setUserInfo(userInfo: WxUserInfo) {
     console.log("setUserInfo:", userInfo);
     setAvatar(userInfo.avatarUrl || userpng);
+    setNickName(userInfo.nickName || "匿名用户");
     setUserName(userInfo.nickName || "匿名用户");
   }
 
@@ -106,25 +122,22 @@ export default function UserInfo() {
       getUserInfo();
     }
   }
-  if (init) {
-    setInit(false);
-    console.log(this.$router.params);
+  // if (init) {
+  //   setInit(false);
+  //   console.log(this.$router.params);
 
-    if (this.$router.params) {
-      setUserInfo(this.$router.params);
-    }
-  }
+  //   if (this.$router.params) {
+  //     setUserInfo(this.$router.params);
+  //   }
+  // }
   function onOpenDetail() {
     console.log("onOpenDetail:", openDetail);
     setOpenDetail(!openDetail);
   }
   return (
     <View className="index">
-      <NavBar
-        handleClick={() => {
-          console.log("click", this.state);
-        }}
-      />
+      <NavBar />
+      <AtMessage />
       <View className="user-info-span">
         <View className="user-avatar">
           <AtAvatar image={curAvatar} size="normal" />
@@ -133,7 +146,7 @@ export default function UserInfo() {
           {userAuth ? (
             <View className="user-detail">
               <View className="user-detail-1">
-                {userName}（{userType}）
+                {userName || nickName}（{roleName || "未登录"}）
               </View>
               <View className="user-detail-2">手机：{cellphone}</View>
             </View>
@@ -164,12 +177,20 @@ export default function UserInfo() {
                 break;
               case 1:
                 //getUserInfo();
-                Taro.redirectTo({
-                  url: "/pages/camera/verify",
-                });
+                loggedIn
+                  ? Taro.navigateTo({ url: "/pages/camera/verify" })
+                  : Taro.atMessage({
+                      message: "请先登录到系统",
+                      type: "error",
+                    });
                 break;
               case 2:
-                Taro.redirectTo({ url: "/pages/sheet/query" });
+                loggedIn
+                  ? Taro.navigateTo({ url: "/pages/sheet/query" })
+                  : Taro.atMessage({
+                      message: "请先登录到系统",
+                      type: "error",
+                    });
 
                 break;
               default:
@@ -192,8 +213,7 @@ export default function UserInfo() {
                 prefixClass: "fa",
                 value: "wpforms",
                 size: 40,
-
-                color: "#ce007c",
+                color: loggedIn ? "#ce007c" : "#d6d6d6",
               },
               value: "回执审核",
             },
@@ -202,7 +222,7 @@ export default function UserInfo() {
                 prefixClass: "fa",
                 value: "pencil-square-o",
                 size: 40,
-                color: "#d15805",
+                color: loggedIn ? "#d15805" : "#d6d6d6",
               },
               value: "运单查询",
             },

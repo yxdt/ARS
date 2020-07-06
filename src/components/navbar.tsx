@@ -19,11 +19,12 @@ export default function NavBar(props) {
           });
           Taro.removeStorage({ key: "userName" });
         } else {
-          this.props.handleClick();
+          //not logged in yet
+          Taro.redirectTo({ url: "/pages/user/Login" });
         }
       }}
-      onClickRgIconNd={this.props.handleClick}
-      onClickLeftIcon={this.props.handleClick}
+      //onClickRgIconNd={this.props.handleClick}
+      //onClickLeftIcon={this.props.handleClick}
       title={props.title || (loggedIn ? "点击退出" : "配送中心人员登录")}
       color="#ffffff"
       leftText=""

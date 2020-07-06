@@ -2,7 +2,7 @@ import Taro from "@tarojs/taro";
 //import { WxUserInfo, RegUser } from "src/types/ars";
 import { userLogin } from "./rest";
 import QQMapWX from "../libs/qqmap-wx-jssdk";
-import { loginData, DriverInfo } from "../types/ars";
+import { DriverInfo, loginResult } from "../types/ars";
 
 function getDriverInfo(phone: string): Promise<DriverInfo> {
   let driverInfo: DriverInfo = {
@@ -137,9 +137,13 @@ async function getUserInfo() {
 //   return ret;
 // }
 
-async function doLogin(cellphone, password): Promise<loginData> {
+async function doLogin(cellphone, password): Promise<loginResult> {
   //console.log('controllers.user.doLogin:', cellphone, password);
   let success = false;
+  let ret: loginResult = {
+    result: "success",
+    user: { userName: "", roleName: "" },
+  };
   let restRet;
   try {
     restRet = await userLogin(cellphone, password);
@@ -147,13 +151,16 @@ async function doLogin(cellphone, password): Promise<loginData> {
     //console.log("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  //console.log('controllers.users.doLogin.res:', restRet);
-  let ret: loginData = { result: false, userName: "", roleName: "" };
+  console.log("controllers.users.doLogin.res:", restRet);
   if (restRet.code === "0000") {
-    if (restRet.data) {
-      ret = restRet.data;
+    if (restRet.data && restRet.data.userName) {
+      ret.user = restRet.data;
+    } else {
+      ret.result = "fail";
     }
     success = true;
+  } else {
+    ret.result = "error";
   }
   return new Promise((res, rej) => {
     if (success) {

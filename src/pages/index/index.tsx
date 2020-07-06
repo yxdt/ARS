@@ -50,7 +50,7 @@ export default function Index() {
     //if (!manual) {
     //  setManual(true);
     //} else {
-    console.log("openSheet.waybillNum:", waybillNum);
+    //console.log("openSheet.waybillNum:", waybillNum);
     Taro.navigateTo({
       url: "/pages/sheet/index?wbno=" + waybillNum,
       //+
@@ -61,14 +61,10 @@ export default function Index() {
     });
     //}
   }
-  function login() {
-    Taro.navigateTo({
-      url: "/pages/user/Login",
-    });
-  }
+
   return (
     <View className="index">
-      <NavBar handleClick={login} style="font-size:0.8rem" />
+      <NavBar />
       <View className="home-title-span">
         <Text className="home-title">
           欢迎使用 <Text className="home-title-hilite">TIMS</Text>\n

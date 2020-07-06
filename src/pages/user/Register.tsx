@@ -35,6 +35,8 @@ export default function Register() {
     //userInfo = res || {};
     if (res) {
       userInfo = res;
+      Taro.setStorage({ key: "nickName", data: res.nickName });
+      Taro.setStorage({ key: "avatar", data: res.avatarUrl });
     }
     console.log("userInfo:", userInfo);
     setUserName(userInfo.nickName || "匿名用户");

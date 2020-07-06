@@ -83,9 +83,12 @@ export interface loginParam {
   pwd: string;
 }
 export interface loginData {
-  result: boolean;
+  //result: boolean;
   userName: string;
   roleName: string;
+}
+export interface loginResult extends Result {
+  user: loginData;
 }
 
 export interface Waybill {
@@ -177,4 +180,21 @@ export interface messageData {
 
 export interface messageResult extends Result {
   info: messageData;
+}
+
+//回执核验
+export interface verifyParams {
+  ordNo: string;
+  shpToCd: string;
+  status: number;
+  remark: string;
+  imgid: string;
+  openid: string;
+}
+export interface verifyData {
+  result: string;
+}
+
+export interface verifyResult extends Result {
+  filename: string;
 }

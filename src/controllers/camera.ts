@@ -1,6 +1,12 @@
 import Taro from "@tarojs/taro";
 import { SERVER_URL } from "./rest";
-import { TimsResponse, uploadResult } from "src/types/ars";
+import {
+  TimsResponse,
+  uploadResult,
+  verifyParams,
+  verifyResult,
+} from "src/types/ars";
+import { verifyRequest } from "src/mock/api";
 function scanBarcode(cbBarcode) {
   Taro.scanCode({
     success: cbBarcode,
@@ -61,4 +67,48 @@ function uploadPicture(
   });
 }
 
-export { scanBarcode, takePicture, uploadPicture };
+function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
+  let vrfResult: verifyResult;
+  try {
+    vrfResult = await verifyPhoto(vrf);
+  } catch (e) {
+    vrfResult = e;
+  }
+}
+function approvePicture(wbno: string, imgid: string, openid: string) {
+  const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
+  const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
+  const status = 0; //approved
+  const remark = "";
+  const vrf: verifyParams = {
+    ordNo,
+    shpToCd,
+    status,
+    remark,
+    imgid,
+    openid,
+  };
+  return verifyPicture(vrf);
+}
+function rejectPicture(wbno: string, imgid: string, openid: string) {
+  const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
+  const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
+  const status = 1; //rejected
+  const remark = "";
+  const vrf: verifyParams = {
+    ordNo,
+    shpToCd,
+    status,
+    remark,
+    imgid,
+    openid,
+  };
+  return verifyPicture(vrf);
+}
+export {
+  scanBarcode,
+  takePicture,
+  uploadPicture,
+  approvePicture,
+  rejectPicture,
+};

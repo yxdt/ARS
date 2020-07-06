@@ -23,14 +23,33 @@ export default function Login() {
     setLoging(true);
     doLogin(cellphone, password)
       .then((ret) => {
+        let message, type;
         console.log("login result:", ret);
-        if (ret) {
-          Taro.redirectTo({ url: "/pages/user/userinfo?usertype=super" });
+        if (ret.result === "success") {
+          type = "success";
+          message = "登录成功！";
+          Taro.setStorageSync("roleName", ret.user.roleName);
+          Taro.setStorageSync("userName", ret.user.userName);
+          Taro.setStorage({ key: "cellphone", data: cellphone });
+          Taro.redirectTo({ url: "/pages/user/userinfo" });
+          //Taro.navigateBack();
+        } else if (ret.result === "error") {
+          //网络或服务器错误
+          type = "error";
+          message = "网络访问或服务器错误，请重试。";
+          Taro.removeStorage({ key: "roleName" });
+          Taro.removeStorage({ key: "userName" });
+        } else {
+          //登录失败
+          type = "error";
+          message = "手机或密码错误，登录失败，请重试。";
+          Taro.removeStorage({ key: "roleName" });
+          Taro.removeStorage({ key: "userName" });
         }
         Taro.atMessage({
-          message: ret ? "登录成功！" : "登录失败，请重试",
-          type: ret ? "success" : "error",
-          duration: 5000,
+          message,
+          type,
+          duration: 6000,
         });
       })
       .finally(() => {

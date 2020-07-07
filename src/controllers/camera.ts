@@ -1,12 +1,13 @@
 import Taro from "@tarojs/taro";
-import { SERVER_URL } from "./rest";
+import { SERVER_URL, verifyPhoto } from "./rest";
 import {
   TimsResponse,
   uploadResult,
   verifyParams,
   verifyResult,
+  verifyData,
 } from "src/types/ars";
-import { verifyRequest } from "src/mock/api";
+
 function scanBarcode(cbBarcode) {
   Taro.scanCode({
     success: cbBarcode,
@@ -26,7 +27,7 @@ function uploadPicture(
   filePath: string,
   openid: string
 ): Promise<uploadResult> {
-  console.log("uploadPicture:", wbno, filePath);
+  //console.log("uploadPicture:", wbno, filePath);
   const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
   const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
   let ret: uploadResult = {
@@ -67,15 +68,48 @@ function uploadPicture(
   });
 }
 
-function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
-  let vrfResult: verifyResult;
+async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
+  let vrfResult: TimsResponse<verifyData>;
+  let success = true;
+  const ret: verifyResult = {
+    result: "approve",
+    remark: vrf.remark,
+    filename: vrf.imgid,
+  };
+  //console.log("camera.verifyPicture.vrf:", vrf);
   try {
     vrfResult = await verifyPhoto(vrf);
   } catch (e) {
-    vrfResult = e;
+    vrfResult = {
+      code: "0500",
+      data: null,
+      message: "数据访问错误",
+      messageId: "0000000000",
+      sentTime: new Date(),
+      responseTime: new Date(),
+    };
+    success = false;
   }
+  //console.log("camera.verifyPicture.verifyPhoto.result:", vrfResult);
+  if (vrfResult.code === "0000") {
+    ret.result = vrfResult.data?.result || "";
+  } else {
+    ret.result = "error";
+    success = false;
+  }
+  return new Promise((res, rej) => {
+    if (success) {
+      res(ret);
+    } else {
+      rej(ret);
+    }
+  });
 }
-function approvePicture(wbno: string, imgid: string, openid: string) {
+function approvePicture(
+  wbno: string,
+  imgid: string,
+  openid: string
+): Promise<verifyResult> {
   const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
   const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
   const status = 0; //approved
@@ -90,11 +124,16 @@ function approvePicture(wbno: string, imgid: string, openid: string) {
   };
   return verifyPicture(vrf);
 }
-function rejectPicture(wbno: string, imgid: string, openid: string) {
+function rejectPicture(
+  wbno: string,
+  imgid: string,
+  remark: string,
+  openid: string
+): Promise<verifyResult> {
   const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
   const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
   const status = 1; //rejected
-  const remark = "";
+
   const vrf: verifyParams = {
     ordNo,
     shpToCd,

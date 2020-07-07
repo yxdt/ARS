@@ -1,4 +1,4 @@
-import { getWaybill, getWbPhotos, confirmWaybill } from "./rest";
+import { getWaybill, getWbPhotos, confirmWaybill, queryWaybill } from "./rest";
 import {
   wbData,
   TimsResponse,
@@ -7,6 +7,8 @@ import {
   photoListData,
   WaybillConfirmParams,
   Result,
+  queryParams,
+  queryResult,
 } from "../types/ars";
 import { getDriverInfo } from "./users";
 
@@ -32,15 +34,19 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
   try {
     restRet = await getWaybill(wbno);
   } catch (err) {
-    console.log("get waybill error:", err);
+    //console.log("get waybill error:", err);
+    //err = null;
+    restRet = err;
     //restRet = { code: "0500", data: null };
   }
   try {
     photoRet = await getWbPhotos(wbno);
     //console.log("waybill.loadWaybill.photoRet:", photoRet);
   } catch (err) {
-    console.log("get photo list error:", err);
+    //console.log("get photo list error:", err);
+    photoRet = err;
   }
+
   //console.log('controllers.users.doLogin.res:', restRet);
 
   if (restRet && restRet.code === "0000" && restRet.data) {
@@ -166,4 +172,45 @@ async function confirmArrive(
   });
 }
 
-export { loadWaybill, confirmArrive };
+async function queryWaybills(query: queryParams): Promise<queryResult> {
+  //console.log('controllers.user.doLogin:', cellphone, password);
+  let success = false;
+  let ret: queryResult = {
+    result: "success",
+    count: 0,
+    waybills: [],
+  };
+  let restRet;
+  try {
+    restRet = await queryWaybill(query);
+  } catch (err) {
+    //console.log("login error:", err);
+    restRet = { code: "0500", data: null };
+  }
+  //console.log("controllers.users.doLogin.res:", restRet);
+  if (restRet.code === "0000") {
+    if (restRet.data && restRet.data.waybills) {
+      ret.waybills = restRet.data.waybills;
+      ret.count = restRet.data.waybills.length;
+    } else {
+      ret.result = "fail";
+      ret.count = 0;
+      ret.waybills = null;
+    }
+    success = true;
+  } else {
+    ret.result = "error";
+    ret.count = 0;
+    ret.waybills = null;
+  }
+  return new Promise((res, rej) => {
+    if (success) {
+      res(ret);
+    } else {
+      //console.log('controllers.waybill.queryWaybills.res.rej:', restRet);
+      rej(ret);
+    }
+  });
+}
+
+export { loadWaybill, confirmArrive, queryWaybills };

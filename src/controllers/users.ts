@@ -151,7 +151,7 @@ async function doLogin(cellphone, password): Promise<loginResult> {
     //console.log("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  console.log("controllers.users.doLogin.res:", restRet);
+  //console.log("controllers.users.doLogin.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.userName) {
       ret.user = restRet.data;

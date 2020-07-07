@@ -1,6 +1,7 @@
 //命名规则：
 //xxxxParams: 向服务器发送的参数
 //xxxxData：从服务器返回的结果
+//xxxxResult：系统对从服务器返回的结果进行二次处理后的用于业务逻辑的结果
 
 //司机不要求注册，中心人员需要后台手工确认绑定openid或手机
 export interface RegUser {
@@ -30,6 +31,19 @@ export interface WxUserInfo {
   language: string;
 }
 
+//信息提示卡属性
+export interface InfoCardProps {
+  title: string;
+  message: string;
+  extMessage: string;
+  backFunc: Function;
+}
+
+//返回结果的基础接口
+export interface Result {
+  result: string;
+}
+
 //用于确认到达前获取司机相关信息
 export interface DriverInfo {
   openid: string;
@@ -53,22 +67,11 @@ export interface WaybillConfirmParams {
 export interface WaybillConfirmData {
   result: string;
 }
-
 export interface WaybillResult extends Result {
   waybill: Waybill;
 }
-export interface Result {
-  result: string;
-}
 
-export interface InfoCardProps {
-  title: string;
-  message: string;
-  extMessage: string;
-  backFunc: Function;
-}
-
-//后台API调用的返回接口
+//后台API调用的返回接口属性
 export interface TimsResponse<T> {
   messageId: string;
   data: T | null;
@@ -78,6 +81,7 @@ export interface TimsResponse<T> {
   responseTime: Date;
 }
 
+//中心人员用户登录相关
 export interface loginParam {
   phone: string;
   pwd: string;
@@ -91,6 +95,7 @@ export interface loginResult extends Result {
   user: loginData;
 }
 
+//运单相关
 export interface Waybill {
   wbNum: string;
   rdcCode: string;
@@ -173,16 +178,49 @@ export interface uploadResult extends Result {
 //系统消息
 //"{errcode:0,errmsg:ok}"
 //"{errcode:43101,errmsg:"user refuse to accept the msg hint: [IgcdkAwgE-EAeUea]"}"
-export interface messageData {
+export interface msgSentData {
   errcode: string;
   errmsg: string;
 }
 
-export interface messageResult extends Result {
-  info: messageData;
+export interface msgSentResult extends Result {
+  info: msgSentData;
 }
 
-//回执核验
+export interface message {
+  msgId: number;
+  title: string;
+  content: string;
+  ordNo: string;
+  cdc: string;
+  sentTime: Date;
+  status: number; //0:用户已拒收, 1:已接收, 2:用户已读，
+  toOpenid: string; //接收者openid
+}
+
+export interface messages {
+  messages: Array<message>;
+}
+
+export interface msgQueryParams {
+  beginDate: Date;
+  endDate: Date;
+  toOpenid: string;
+  ordNo: string;
+  cdcCode: string;
+  status: number;
+}
+
+export interface msgQueryData {
+  messages: Array<message> | null;
+}
+export interface msgQueryResult {
+  result: string;
+  messages: Array<message> | null;
+  count: number;
+}
+
+//已上传回执核验
 export interface verifyParams {
   ordNo: string;
   shpToCd: string;
@@ -197,4 +235,21 @@ export interface verifyData {
 
 export interface verifyResult extends Result {
   filename: string;
+  remark: string;
+}
+
+//运单查询
+export interface queryParams {
+  beginDate: Date;
+  endDate: Date;
+  cdcCode: string;
+  wbStatus: number;
+  ordNo: string;
+}
+export interface queryData {
+  waybills: Array<wbData> | null;
+}
+export interface queryResult extends Result {
+  count: number;
+  waybills: Array<wbData> | null;
 }

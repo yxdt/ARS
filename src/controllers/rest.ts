@@ -7,9 +7,13 @@ import {
   photoListData,
   loginData,
   WaybillConfirmData,
-  messageData,
+  msgSentData,
   verifyData,
   verifyParams,
+  queryParams,
+  queryData,
+  msgQueryParams,
+  msgQueryData,
 } from "../types/ars";
 import {
   loginRequest,
@@ -20,8 +24,9 @@ import {
   uploadMsgRequest,
   rejectMsgRequest,
   verifyRequest,
+  queryRequest,
+  queryMsgRequest,
 } from "../mock/api";
-import { ViewProps } from "@tarojs/components/types/View";
 
 const DEBUGGING = true;
 const devUrl = "http://192.168.0.100:8765";
@@ -48,7 +53,7 @@ async function sendArriveMessage(
   wbno: string, //shipCode + rdcCode
   openid: string
 ) {
-  const ret = await taroRequest<TimsResponse<messageData>>(
+  const ret = await taroRequest<TimsResponse<msgSentData>>(
     "/message/arrive?wbno=" + wbno + "&openid=" + openid,
     "GET",
     null,
@@ -57,7 +62,7 @@ async function sendArriveMessage(
   return ret;
 }
 async function sendUploadMessage(wbno: string, openid: string) {
-  const ret = await taroRequest<TimsResponse<messageData>>(
+  const ret = await taroRequest<TimsResponse<msgSentData>>(
     "/message/upload?wbno=" + wbno + "&openid=" + openid,
     "GET",
     null,
@@ -67,7 +72,7 @@ async function sendUploadMessage(wbno: string, openid: string) {
 }
 
 async function sendRejectMessage(wbno: string, openid: string) {
-  const ret = await taroRequest<TimsResponse<messageData>>(
+  const ret = await taroRequest<TimsResponse<msgSentData>>(
     "/message/reject?wbno=" + wbno + "&openid=" + openid,
     "GET",
     null,
@@ -76,7 +81,21 @@ async function sendRejectMessage(wbno: string, openid: string) {
   return ret;
 }
 
-async function verifyPhoto(verifydata: verifyParams) {
+async function queryMessage(
+  query: msgQueryParams
+): Promise<TimsResponse<msgQueryData>> {
+  const ret = await taroRequest<TimsResponse<msgQueryData>>(
+    "/message/query",
+    "POST",
+    query,
+    { "content-type": "application/x-www-form-urlencoded" }
+  );
+  return ret;
+}
+
+async function verifyPhoto(
+  verifydata: verifyParams
+): Promise<TimsResponse<verifyData>> {
   const ret = await taroRequest<TimsResponse<verifyData>>(
     "/logistics/confirm",
     "POST",
@@ -102,6 +121,16 @@ async function getWaybill(wbNum: string) {
     "GET",
     null,
     null
+  );
+  return ret;
+}
+
+async function queryWaybill(query: queryParams) {
+  const ret = await taroRequest<TimsResponse<queryData>>(
+    "/order/search",
+    "POST",
+    query,
+    { "content-type": "application/x-www-form-urlencoded" }
   );
   return ret;
 }
@@ -172,6 +201,10 @@ async function taroRequest<T>(url: string, method, data, header) {
       ret = await rejectMsgRequest(url);
     } else if (url === "/logistics/confirm") {
       ret = await verifyRequest(data);
+    } else if (url === "/order/search") {
+      ret = await queryRequest(data);
+    } else if (url === "/message/query") {
+      ret = await queryMsgRequest(data);
     }
   } else {
     ret = await Taro.request<T>({
@@ -189,6 +222,7 @@ export {
   DEBUGGING,
   getWaybill,
   confirmWaybill,
+  queryWaybill,
   getWbPhotos,
   saveUserInfo,
   userLogin,
@@ -196,4 +230,5 @@ export {
   sendUploadMessage,
   sendRejectMessage,
   verifyPhoto,
+  queryMessage,
 };

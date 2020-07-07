@@ -6,9 +6,13 @@ import {
   photoListData,
   WaybillConfirmParams,
   WaybillConfirmData,
-  messageData,
+  msgSentData,
   verifyParams,
   verifyData,
+  queryParams,
+  queryData,
+  msgQueryData,
+  msgQueryParams,
 } from "../types/ars";
 
 const users = [
@@ -97,6 +101,122 @@ const waybillDataList: Array<wbData> = [
       },
     ],
   },
+  {
+    ordNo: "1",
+    logCd: "0102",
+    logName: "天津中心",
+    totalPage: 1,
+    shpToCd: "03",
+    shpToName: "赤峰国美",
+    arrivalTime: new Date(new Date().valueOf() - 22 * 60 * 60 * 1000),
+    status: 0,
+    ordDetailList: [
+      {
+        id: 20,
+        seq: 1,
+        page: 1,
+        orderNum: "KDP_ord-123",
+        model: "model-02039",
+        qty: 1,
+      },
+      {
+        id: 21,
+        seq: 2,
+        page: 1,
+        orderNum: "12-OUYD-124",
+        model: "AA-model-102039",
+        qty: 2,
+      },
+      {
+        id: 22,
+        seq: 3,
+        page: 1,
+        orderNum: "KDEA-124NBG",
+        model: "KSO-model-022339",
+        qty: 10,
+      },
+      {
+        id: 23,
+        seq: 4,
+        page: 1,
+        orderNum: "zxcvKDP_ord-123",
+        model: "adsf-model-02039",
+        qty: 1,
+      },
+      {
+        id: 24,
+        seq: 5,
+        page: 1,
+        orderNum: "asahfgh-12-OUYD-124",
+        model: "ncvb-AA-model-102039",
+        qty: 2,
+      },
+    ],
+  },
+  {
+    ordNo: "2",
+    logCd: "0102",
+    logName: "天津国美",
+    totalPage: 1,
+    shpToCd: "04",
+    shpToName: "石家庄国美",
+    arrivalTime: new Date(new Date().valueOf() - 22 * 60 * 60 * 1000),
+    status: 0,
+    ordDetailList: [
+      {
+        id: 20,
+        seq: 1,
+        page: 1,
+        orderNum: "KDP_ord-123",
+        model: "model-02039",
+        qty: 1,
+      },
+      {
+        id: 21,
+        seq: 2,
+        page: 1,
+        orderNum: "12-OUYD-124",
+        model: "AA-model-102039",
+        qty: 2,
+      },
+      {
+        id: 22,
+        seq: 3,
+        page: 1,
+        orderNum: "KDEA-124NBG",
+        model: "KSO-model-022339",
+        qty: 10,
+      },
+    ],
+  },
+  {
+    ordNo: "1093",
+    logCd: "0101",
+    logName: "北京国美",
+    totalPage: 1,
+    shpToCd: "01",
+    shpToName: "张家口国美",
+    arrivalTime: new Date(new Date().valueOf() - 22 * 60 * 60 * 1000),
+    status: 0,
+    ordDetailList: [
+      {
+        id: 20,
+        seq: 1,
+        page: 1,
+        orderNum: "KDP_ord-123",
+        model: "model-02039",
+        qty: 1,
+      },
+      {
+        id: 21,
+        seq: 2,
+        page: 1,
+        orderNum: "12-OUYD-124",
+        model: "AA-model-102039",
+        qty: 2,
+      },
+    ],
+  },
 ];
 
 const pics = [
@@ -115,6 +235,64 @@ const pics = [
   "r_2_239393930.png",
   "r_2_1592539521819.jpg",
 ];
+
+const messages = [
+  {
+    msgId: 10,
+    title: "货物送达确认",
+    content: "司机：139398828已送达",
+    ordNo: "1",
+    cdc: "0101",
+    sentTime: new Date(new Date().valueOf() - 3 * 24 * 60 * 60 * 1000),
+    status: 0,
+    toOpenid: "sjlajdfaslkfda",
+  },
+  {
+    msgId: 30,
+    title: "货物送达确认",
+    content: "司机：133203828已送达",
+    ordNo: "2",
+    cdc: "0001",
+    sentTime: new Date(new Date().valueOf() - 4 * 24 * 60 * 60 * 1000),
+    status: 0,
+    toOpenid: "sa223jlajdfaslkfda",
+  },
+  {
+    msgId: 320,
+    title: "回执已上传",
+    content: "司机：139398828回执完成上传",
+    ordNo: "1",
+    cdc: "0101",
+    sentTime: new Date(new Date().valueOf() - 2.5 * 24 * 60 * 60 * 1000),
+    status: 0,
+    toOpenid: "sjlajdfaslkfda",
+  },
+  {
+    msgId: 40,
+    title: "回执已退回",
+    content: "原因：不清晰，请重拍",
+    ordNo: "2",
+    cdc: "0001",
+    sentTime: new Date(new Date().valueOf() - 4 * 24 * 60 * 60 * 1000),
+    status: 0,
+    toOpenid: "sa223jlajdfaslkfda",
+  },
+];
+
+async function queryMsgRequest(
+  queryData: msgQueryParams
+): Promise<TimsResponse<msgQueryData>> {
+  const data: msgQueryData = {
+    messages: messages,
+  };
+  let success = true;
+  if (queryData.ordNo === "000") {
+    data.messages = null;
+  } else if (queryData.ordNo === "999") {
+    success = false;
+  }
+  return request<msgQueryData>(data, success);
+}
 
 function rejectMsgRequest(url: string) {
   return msgRequest(url);
@@ -135,8 +313,8 @@ function msgRequest(url: string) {
     url.indexOf("wbno=") + 5,
     url.indexOf("&") - url.indexOf("wbno=") - 5
   );
-  console.log("mock.api.msgRequest.url, wbno:", url, wbno);
-  const msgData: messageData = {
+  //console.log("mock.api.msgRequest.url, wbno:", url, wbno);
+  const msgData: msgSentData = {
     errcode: "0",
     errmsg: "ok",
   };
@@ -149,18 +327,26 @@ function msgRequest(url: string) {
     //sim a fail one
     success = false;
   }
-  return request<messageData>(msgData, success);
+  return request<msgSentData>(msgData, success);
 }
 
 function verifyRequest(data: verifyParams) {
   const vData: verifyData = {
-    result: "success",
+    result: "",
   };
   let success = true;
-  if (data.ordNo === "000") {
-    vData.result = "fail";
-  } else if (data.ordNo === "999") {
+  if (data.ordNo === "999") {
+    //模拟外部错误
     success = false;
+  } else if (data.openid === "000000") {
+    //模拟没有权限
+    vData.result = "noperm";
+  } else if (data.status === 1) {
+    //回执审核不通过
+    vData.result = "reject";
+  } else if (data.status === 0) {
+    //回执审核通过
+    vData.result = "approve";
   }
   return request<verifyData>(vData, success);
 }
@@ -182,12 +368,31 @@ function wbcRequest(data: WaybillConfirmParams) {
 
 function photosRequest(url: string) {
   const wbno = url.substr(url.lastIndexOf("/") + 1);
+  let success = true;
+
   const photos: photoListData = {
     photos: pics
       .filter((item) => item.indexOf("_" + wbno + "_") > 0)
       .map((item, index) => ({ url: item, status: index % 3 })),
   };
-  return request<photoListData>(photos, true);
+  if (wbno === "999") {
+    success = false;
+  }
+  return request<photoListData>(photos, success);
+}
+
+function queryRequest(data: queryParams) {
+  let success = true;
+  let qData: queryData = {
+    waybills: waybillDataList,
+  };
+  if (data.ordNo === "999") {
+    success = false;
+  } else if (data.ordNo === "000") {
+    qData.waybills = null;
+    success = true;
+  }
+  return request<queryData>(qData, success);
 }
 
 function waybillRequest(url: string) {
@@ -230,7 +435,7 @@ function loginRequest(data: loginParam) {
 
 function request<T>(data: T | null, success: boolean) {
   //console.log("mock.api.request.data,success:", data, success);
-  return new Promise((res, rej) => {
+  return new Promise<TimsResponse<T>>((res, rej) => {
     setTimeout(() => {
       const timsRet: TimsResponse<T> = {
         messageId: "abcd1234asdfasdfas9876",
@@ -259,5 +464,7 @@ export {
   arriveMsgRequest,
   uploadMsgRequest,
   rejectMsgRequest,
+  queryMsgRequest,
   verifyRequest,
+  queryRequest,
 };

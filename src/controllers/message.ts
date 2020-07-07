@@ -1,16 +1,47 @@
-import { msgQueryParams, msgQueryResult } from "../types/ars";
-import { queryMessage } from "./rest";
+import { msgQueryParams, msgQueryResult, Result, TimsResponse } from '../types/ars';
+import { queryMessage, markMessage } from './rest';
 
 async function markRead(msgId: number): Promise<Result> {
+  return markTheMessage(msgId, 2);
+}
+async function markHide(msgId: number): Promise<Result> {
+  return markTheMessage(msgId, 3);
+}
+async function markTheMessage(msgid: number, mark: number): Promise<Result> {
   let success = false;
+  let ret: Result = {
+    result: 'success',
+  };
+  let restRet: TimsResponse<string>;
+  try {
+    restRet = await markMessage(msgid, mark);
+  } catch (e) {
+    restRet = e;
+  }
+  //console.log('controllers.message.restRet:', restRet);
+  if (restRet.code === '0000') {
+    ret.result = restRet.data || 'fail';
+    success = true;
+  } else {
+    ret.result = 'error';
+    success = false;
+  }
+  return new Promise((res, rej) => {
+    if (success) {
+      res(ret);
+    } else {
+      //console.log('controllers.waybill.queryWaybills.res.rej:', restRet);
+      rej(ret);
+    }
+  });
 }
 
 async function queryMessages(query: msgQueryParams): Promise<msgQueryResult> {
-  console.log("controllers.message.queryMessages.param:", query);
+  //console.log('controllers.message.queryMessages.param:', query);
 
   let success = false;
   let ret: msgQueryResult = {
-    result: "success",
+    result: 'success',
     count: 0,
     messages: null,
   };
@@ -19,21 +50,21 @@ async function queryMessages(query: msgQueryParams): Promise<msgQueryResult> {
     restRet = await queryMessage(query);
   } catch (err) {
     //console.log("login error:", err);
-    restRet = { code: "0500", data: null };
+    restRet = { code: '0500', data: null };
   }
   //console.log("controllers.users.doLogin.res:", restRet);
-  if (restRet.code === "0000") {
+  if (restRet.code === '0000') {
     if (restRet.data && restRet.data.messages) {
       ret.messages = restRet.data.messages;
       ret.count = restRet.data.messages.length;
     } else {
-      ret.result = "fail";
+      ret.result = 'fail';
       ret.count = 0;
       ret.messages = null;
     }
     success = true;
   } else {
-    ret.result = "error";
+    ret.result = 'error';
     ret.count = 0;
     ret.messages = null;
   }
@@ -47,4 +78,4 @@ async function queryMessages(query: msgQueryParams): Promise<msgQueryResult> {
   });
 }
 
-export { queryMessages };
+export { queryMessages, markRead, markHide };

@@ -8,6 +8,7 @@ import {
   AtFloatLayout,
   AtMessage,
   AtSwitch,
+  AtSteps,
 } from "taro-ui";
 
 import "./index.scss";
@@ -38,6 +39,7 @@ export default function UserInfo() {
   const [ShowAll, setShowAll] = useState(false);
   const userAuth: boolean = Taro.getStorageSync("userAuth");
   const loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
+  const curWb = Taro.getStorageSync("waybill");
 
   //console.log("UserInfo:", this);
   //let msgList: Array<message>;
@@ -187,6 +189,33 @@ export default function UserInfo() {
             </Button>
           )}
         </View>
+      </View>
+      <View className="list-span">
+        <Text className="list-title">
+          最新运单{curWb.length > 0 ? "【" + curWb + "】" : ""}处理进度
+        </Text>
+        {curWb.length <= 0 ? (
+          <Text>没有运单</Text>
+        ) : (
+          <AtSteps
+            items={[
+              {
+                title: "确认到达",
+                desc: "到达日期：2020-07-07",
+                status: "success",
+              },
+              {
+                title: "回执上传",
+                desc: "上传日期：2020-07-07",
+                status: "success",
+              },
+              { title: "回执审核", desc: "审核日期：2020-07-07" },
+              { title: "运单完成", desc: "" },
+            ]}
+            current={2}
+            onChange={() => {}}
+          />
+        )}
       </View>
       <View style={{ fontSize: "0.8rem", color: "#ff0000" }}>
         <AtGrid

@@ -213,4 +213,6 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
   });
 }
 
+async function queryWaybillStatus(wbno: string):Promise<
+
 export { loadWaybill, confirmArrive, queryWaybills };

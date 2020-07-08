@@ -91,8 +91,8 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
     success = false;
   }
   //console.log("camera.verifyPicture.verifyPhoto.result:", vrfResult);
-  if (vrfResult.code === "0000") {
-    ret.result = vrfResult.data?.result || "";
+  if (vrfResult.code === "0000" && vrfResult.data) {
+    ret.result = vrfResult.data.result || "";
   } else {
     ret.result = "error";
     success = false;

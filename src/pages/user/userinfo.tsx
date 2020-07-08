@@ -7,14 +7,17 @@ import {
   AtListItem,
   AtFloatLayout,
   AtMessage,
+  AtSwitch,
 } from "taro-ui";
 
 import "./index.scss";
 import NavBar from "../../components/navbar";
 import ArsTabBar from "../../components/tabbar";
-import { WxUserInfo } from "../../types/ars";
+import { WxUserInfo, message, msgQueryParams } from "../../types/ars";
 import { SERVER_URL } from "../../controllers/rest";
+import { queryMessages, markRead } from "../../controllers/message";
 import userpng from "../../assets/img/user.png";
+import MessageDetail from "../../components/messagedetail";
 export default function UserInfo() {
   const [curAvatar, setAvatar] = useState(
     Taro.getStorageSync("avatar") || userpng
@@ -28,11 +31,34 @@ export default function UserInfo() {
   );
   const [roleName] = useState(Taro.getStorageSync("roleName") || "");
   const [openDetail, setOpenDetail] = useState(false);
-  //const [init, setInit] = useState(true);
+  const [msgCount, setMsgCount] = useState(0);
+  const [curMessage, setCurMessage] = useState({});
+  const [messages, setMessages] = useState({ count: 0, messages: [] });
+  const [init, setInit] = useState(true);
+  const [ShowAll, setShowAll] = useState(false);
   const userAuth: boolean = Taro.getStorageSync("userAuth");
   const loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
 
   //console.log("UserInfo:", this);
+  //let msgList: Array<message>;
+  const msgQuery: msgQueryParams = {
+    beginDate: new Date(new Date().valueOf() - 7 * 24 * 60 * 60 * 1000),
+    endDate: new Date(),
+    toOpenid: Taro.getStorageSync("userOpenId"),
+    ordNo: "",
+    cdcCode: "",
+    status: 0,
+  };
+  if (init) {
+    setInit(false);
+    queryMessages(msgQuery).then((ret) => {
+      console.log("userinfo.queryMessages.ret:", ret);
+      if (ret.count > 0) {
+        setMessages(ret);
+        setMsgCount(ret.count);
+      }
+    });
+  }
 
   function getUserInfo() {
     let curUserInfo = {};
@@ -133,6 +159,7 @@ export default function UserInfo() {
   function onOpenDetail() {
     console.log("onOpenDetail:", openDetail);
     setOpenDetail(!openDetail);
+    //setMsgCount(messages.count);
   }
   return (
     <View className="index">
@@ -230,50 +257,77 @@ export default function UserInfo() {
         ></AtGrid>
       </View>
       <View className="list-span">
-        <Text className="list-title">系统消息</Text>
-        <AtList className="message-list">
-          <AtListItem className="list-items" title="运单已交付"></AtListItem>
-          <AtListItem
-            className="list-items"
-            title="货品已入库"
-            extraText="详细信息"
-            onClick={onOpenDetail}
-          ></AtListItem>
-          <AtListItem
-            className="list-items"
-            title="回执已上传成功"
-            extraText="标记已读"
-          ></AtListItem>
-          <AtListItem className="list-items" title="运单已交付"></AtListItem>
-          <AtListItem
-            className="list-items"
-            title="货品已入库"
-            extraText="详细信息"
-          ></AtListItem>
-          <AtListItem
-            className="list-items"
-            title="回执已上传成功"
-            extraText="标记已读"
-          ></AtListItem>
-          <AtListItem className="list-items" title="运单已交付"></AtListItem>
-          <AtListItem
-            className="list-items"
-            title="货品已入库"
-            extraText="详细信息"
-          ></AtListItem>
-          <AtListItem
-            className="list-items"
-            title="回执已上传成功"
-            extraText="标记已读"
-          ></AtListItem>
-        </AtList>
+        <View className="list-head">
+          <Text className="list-title">系统消息</Text>
+          <AtSwitch
+            title="显示已读"
+            color="#a50034"
+            className="list-head-right"
+            checked={ShowAll}
+            onChange={() => {
+              setShowAll(!ShowAll);
+            }}
+          ></AtSwitch>
+        </View>
+        {msgCount <= 0 ? (
+          <Text>没有新消息</Text>
+        ) : (
+          <AtList className="message-list">
+            {messages.messages
+              .filter((item) => ShowAll || item.status !== 3)
+              .map((item) => {
+                return (
+                  <AtListItem
+                    key={"user-message-" + item.msgId}
+                    className="list-items"
+                    title={item.title}
+                    note={item.content}
+                    extraText={item.status === 3 ? "已读" : ""}
+                    onClick={() => {
+                      setCurMessage(item);
+                      onOpenDetail();
+                      //setMsgCount(0);
+                    }}
+                  />
+                );
+              })}
+          </AtList>
+        )}
       </View>
       <AtFloatLayout
         isOpened={openDetail}
-        title="消息标题"
+        title={curMessage.title}
         onClose={onOpenDetail}
       >
-        消息详细信息消息详细信息，消息详细信息消息详细信息消息详细信息，消息详细信息。
+        <MessageDetail
+          title={curMessage.title}
+          content={curMessage.content}
+          ordNo={curMessage.ordNo}
+          cdc={curMessage.cdc}
+          sentTime={curMessage.sentTime}
+          msgId={curMessage.msgId}
+          markFunc={(msgid) => {
+            console.log("mark read:", msgid);
+            markRead(msgid).then((res) => {
+              if (res.result === "success") {
+                for (var i = 0; i < messages.messages.length; i++) {
+                  if (messages.messages[i].msgId === msgid) {
+                    messages.messages[i].status = 3;
+                    messages.count--;
+                    setMsgCount(messages.count);
+                    break;
+                  }
+                }
+                Taro.atMessage({
+                  message: "操作成功",
+                  type: "success",
+                });
+                onOpenDetail();
+              }
+            });
+            //setMsgCount(messages.count);
+          }}
+        />
       </AtFloatLayout>
       <ArsTabBar current={2} />
     </View>

@@ -39,6 +39,17 @@ export interface InfoCardProps {
   backFunc: Function;
 }
 
+//系统消息详情
+export interface MessageDetailProps {
+  title: string;
+  content: string;
+  ordNo: string;
+  cdc: string;
+  sentTime: string;
+  markFunc: Function;
+  msgId: string;
+}
+
 //返回结果的基础接口
 export interface Result {
   result: string;
@@ -193,8 +204,8 @@ export interface message {
   content: string;
   ordNo: string;
   cdc: string;
-  sentTime: Date;
-  status: number; //0:用户已拒收, 1:已接收, 2:用户已读，
+  sentTime: string;
+  status: number; //0:用户已拒收, 1:已接收, 2:用户已读，3:用户标记隐藏
   toOpenid: string; //接收者openid
 }
 

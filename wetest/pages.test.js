@@ -1,15 +1,22 @@
-const automator = require("miniprogram-automator");
-const regeneratorRuntime = require("regenerator-runtime");
-const { getApp } = require("@tarojs/taro");
+const automator = require('miniprogram-automator');
+const regeneratorRuntime = require('regenerator-runtime');
+//const { getApp } = require("@tarojs/taro");
 
-describe("pages snapshot test", () => {
+describe('pages snapshot test', () => {
   let mPrg;
   let page;
 
   beforeAll(async () => {
     mPrg = await automator.launch({
-      cliPath: "F:\\Devtools\\wxTools\\wdt\\cli.bat",
-      projectPath: "F:\\work2020\\Shipping\\ARS\\dist",
+      //below is for windows
+      //you should comment it when running in Mac
+      //cliPath: 'F:\\Devtools\\wxTools\\wdt\\cli.bat',
+      //projectPath: 'F:\\work2020\\Shipping\\ARS\\dist',
+
+      //below is for Mac OS X
+      projectPath: '/Users/terry/desktop/works2020/ars/dist',
+      //wsEndpoint: 'ws://localhost:9420',
+      //projectPath: '\\Users\\terry\\Desktop\\works2020\\ARS\\dist',
     });
     // 直接更改全局变量
     //await mPrg.evaluate(() => {
@@ -17,7 +24,7 @@ describe("pages snapshot test", () => {
     //  getApp().globalData.waybillNum = "9999";
     //});
 
-    page = await mPrg.reLaunch("/pages/index/index");
+    page = await mPrg.reLaunch('/pages/index/index');
     //console.log("the initial page:", page);
     await page.waitFor(500);
   }, 25000);
@@ -27,67 +34,67 @@ describe("pages snapshot test", () => {
   });
 
   //Index 快照测试，确定界面不会发生变化
-  it("index page should load properly", async () => {
-    const element = await page.$("page");
+  it('index page should load properly', async () => {
+    const element = await page.$('page');
     const pagewxml = await element.wxml();
     expect(pagewxml).toMatchSnapshot();
   });
 
-  it("index page should have elements", async () => {
-    const wbInput = await page.$(".home-input input");
-    const wbInputClass = await wbInput.attribute("class");
-    expect(await wbInputClass).toContain("at-input__input ");
+  it('index page should have elements', async () => {
+    const wbInput = await page.$('.home-input input');
+    const wbInputClass = await wbInput.attribute('class');
+    expect(await wbInputClass).toContain('at-input__input ');
 
-    const btn = await page.$(".home-button div");
+    const btn = await page.$('.home-button div');
     const btnText = await btn.text();
-    expect(await btnText).toBe("获取交货单信息");
+    expect(await btnText).toBe('获取交货单信息');
 
-    const btnIcon = await page.$(".home-button div at-icon text");
-    const btnIconClass = await btnIcon.attribute("class");
-    expect(await btnIconClass).toContain("fa fa-search");
+    const btnIcon = await page.$('.home-button div at-icon text');
+    const btnIconClass = await btnIcon.attribute('class');
+    expect(await btnIconClass).toContain('fa fa-search');
   });
 
   //Camera 快照测试
-  it("Camera page should load properly", async () => {
-    page = await mPrg.redirectTo("/pages/camera/camera");
+  it('Camera page should load properly', async () => {
+    page = await mPrg.redirectTo('/pages/camera/camera');
     await page.waitFor(500);
-    const element = await page.$("page");
+    const element = await page.$('page');
     const pagewxml = await element.wxml();
     expect(pagewxml).toMatchSnapshot();
   });
 
   //userinfo 快照测试
-  it("userinfo page should load properly", async () => {
-    page = await mPrg.navigateTo("/pages/user/userinfo");
+  it('userinfo page should load properly', async () => {
+    page = await mPrg.navigateTo('/pages/user/userinfo');
     await page.waitFor(500);
-    const element = await page.$("page");
+    const element = await page.$('page');
     const pagewxml = await element.wxml();
     expect(pagewxml).toMatchSnapshot();
   });
 
   //Waybill 快照测试，确定界面不会发生变化
-  it("Waybill detail page should load properly", async () => {
-    page = await mPrg.navigateTo("/pages/sheet/index?wbno=1111");
+  it('Waybill detail page should load properly', async () => {
+    page = await mPrg.navigateTo('/pages/sheet/index?wbno=1111');
     await page.waitFor(500);
-    const element = await page.$("page");
+    const element = await page.$('page');
     const pagewxml = await element.wxml();
     expect(pagewxml).toMatchSnapshot();
   });
 
   //Waybill query 快照测试，确定界面不会发生变化
-  it("Waybill query list page should load properly", async () => {
-    page = await mPrg.navigateTo("/pages/sheet/query");
+  it('Waybill query list page should load properly', async () => {
+    page = await mPrg.navigateTo('/pages/sheet/query');
     await page.waitFor(500);
-    const element = await page.$("page");
+    const element = await page.$('page');
     const pagewxml = await element.wxml();
     expect(pagewxml).toMatchSnapshot();
   });
 
   //camera verify 快照测试，确定界面不会发生变化
-  it("camera verify list page should load properly", async () => {
-    page = await mPrg.navigateTo("/pages/camera/verify");
+  it('camera verify list page should load properly', async () => {
+    page = await mPrg.navigateTo('/pages/camera/verify');
     await page.waitFor(500);
-    const element = await page.$("page");
+    const element = await page.$('page');
     const pagewxml = await element.wxml();
     expect(pagewxml).toMatchSnapshot();
   });

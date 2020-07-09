@@ -129,7 +129,6 @@ export interface wbData {
   shpToCd: string;
   shpToName: string;
   arrivalTime: Date;
-  log;
   ordDetailList: Array<wbdData>;
   status: number;
 }

@@ -14,6 +14,7 @@ import {
   queryData,
   msgQueryParams,
   msgQueryData,
+  wbStatusData,
 } from '../types/ars';
 import {
   loginRequest,
@@ -27,6 +28,7 @@ import {
   queryRequest,
   queryMsgRequest,
   markMsgRequest,
+  wbStatusRequest,
 } from '../mock/api';
 
 const DEBUGGING = true;
@@ -97,7 +99,10 @@ async function queryWaybill(query: queryParams) {
   const ret = await taroRequest<TimsResponse<queryData>>('/order/search', 'POST', query, { 'content-type': 'application/x-www-form-urlencoded' });
   return ret;
 }
-
+async function queryWbStatus(wbNum: string) {
+  const ret = await taroRequest<TimsResponse<wbStatusData>>('/order/status?wbno=' + wbNum, 'GET', null, null);
+  return ret;
+}
 //async function uploadPhoto() {}
 
 async function getWbPhotos(wbNum: string) {
@@ -162,6 +167,8 @@ async function taroRequest<T>(url: string, method, data, header) {
       ret = await queryMsgRequest(data);
     } else if (url.startsWith('/message/mark')) {
       ret = await markMsgRequest(url);
+    } else if (url.startsWith('/order/status')) {
+      ret = await wbStatusRequest(url);
     }
   } else {
     ret = await Taro.request<T>({
@@ -180,6 +187,7 @@ export {
   getWaybill,
   confirmWaybill,
   queryWaybill,
+  queryWbStatus,
   getWbPhotos,
   saveUserInfo,
   userLogin,

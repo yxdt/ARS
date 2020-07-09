@@ -120,7 +120,7 @@ export interface Waybill {
   shipItems: ShipItem[];
   photos: wbPhoto[];
 }
-
+//api 查询返回值
 export interface wbData {
   ordNo: string;
   logCd: string;
@@ -132,7 +132,7 @@ export interface wbData {
   ordDetailList: Array<wbdData>;
   status: number;
 }
-
+//运单详情项目
 export interface ShipItem {
   id: number;
   orderNum: string;
@@ -141,6 +141,7 @@ export interface ShipItem {
   page: number;
   qty: number;
 }
+//运单详情项目
 export interface wbdData {
   id: number;
   orderNum: string;
@@ -149,7 +150,7 @@ export interface wbdData {
   model: string;
   qty: number;
 }
-
+//运单回执
 export interface wbPhoto {
   url: string;
   caption: string;
@@ -157,9 +158,27 @@ export interface wbPhoto {
   status: number;
 }
 
+//运单状态及日期
+export interface wbStatus {
+  status: number;
+  doneDate: Date | null;
+  caption: string;
+  comment: string;
+  seq: number;
+}
+
+export interface wbStatusData {
+  statusList: Array<wbStatus>;
+}
+
+export interface wbStatusResult extends Result {
+  statusList: Array<wbStatus>;
+  wbno: string;
+}
 // export interface PhotoUrl {
 //   url: string;
 // }
+//回执照片查询返回值
 export interface photoData {
   url: string;
   status: number; //0:上传， 1：通过， 2：驳回

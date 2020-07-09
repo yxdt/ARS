@@ -1,4 +1,4 @@
-import { getWaybill, getWbPhotos, confirmWaybill, queryWaybill } from "./rest";
+import { getWaybill, getWbPhotos, confirmWaybill, queryWaybill, queryWbStatus } from './rest';
 import {
   wbData,
   TimsResponse,
@@ -9,8 +9,9 @@ import {
   Result,
   queryParams,
   queryResult,
-} from "../types/ars";
-import { getDriverInfo } from "./users";
+  wbStatusResult,
+} from '../types/ars';
+import { getDriverInfo } from './users';
 
 async function loadWaybill(wbno: string): Promise<WaybillResult> {
   //console.log('controllers.user.doLogin:', cellphone, password);
@@ -19,15 +20,15 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
   let restRet: TimsResponse<wbData> | null = null;
   let photoRet: TimsResponse<photoListData> | null = null;
   let ret: Waybill = {
-    wbNum: "",
-    rdcCode: "",
-    rdcName: "",
+    wbNum: '',
+    rdcCode: '',
+    rdcName: '',
     totalPages: 0,
-    shiptoCode: "",
-    shiptoName: "",
+    shiptoCode: '',
+    shiptoName: '',
     arriveTime: new Date(),
-    status: "loaded",
-    statusCaption: "已装车",
+    status: 'loaded',
+    statusCaption: '已装车',
     shipItems: [],
     photos: [],
   };
@@ -49,35 +50,35 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
 
   //console.log('controllers.users.doLogin.res:', restRet);
 
-  if (restRet && restRet.code === "0000" && restRet.data) {
+  if (restRet && restRet.code === '0000' && restRet.data) {
     const retData = <wbData>restRet.data;
-    let status: string = "loaded";
-    let statusCaption: string = "已装车";
+    let status: string = 'loaded';
+    let statusCaption: string = '已装车';
     switch (retData.status) {
       case 1:
-        status = "arrived";
-        statusCaption = "司机已确认到达";
+        status = 'arrived';
+        statusCaption = '司机已确认到达';
         break;
       case 2:
-        status = "uploaded";
-        statusCaption = "回执已上传";
+        status = 'uploaded';
+        statusCaption = '回执已上传';
         break;
       case 3:
-        status = "rejected";
-        statusCaption = "上传回执未通过";
+        status = 'rejected';
+        statusCaption = '上传回执未通过';
         break;
       case 4:
-        status = "reup";
-        statusCaption = "回执已重新上传";
+        status = 'reup';
+        statusCaption = '回执已重新上传';
 
         break;
       case 8:
-        status = "confirmed";
-        statusCaption = "中心已确认";
+        status = 'confirmed';
+        statusCaption = '中心已确认';
         break;
       default:
-        status = "loaded";
-        statusCaption = "已装车";
+        status = 'loaded';
+        statusCaption = '已装车';
         break;
     }
     ret = {
@@ -103,32 +104,26 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
     success = true;
     //console.log("....wb loaded....");
   }
-  if (photoRet && photoRet.code === "0000" && photoRet.data) {
+  if (photoRet && photoRet.code === '0000' && photoRet.data) {
     ret.photos = (<photoListData>photoRet.data).photos.map((item) => ({
       url: item.url,
       status: item.status,
-      caption:
-        item.status === 2 ? "驳回" : item.status === 1 ? "通过" : "已上传",
+      caption: item.status === 2 ? '驳回' : item.status === 1 ? '通过' : '已上传',
       wbNum: wbno,
     }));
     //console.log("....photos loaded....");
   }
   return new Promise((res, rej) => {
     if (success) {
-      res({ result: "success", waybill: ret });
+      res({ result: 'success', waybill: ret });
     } else {
       //console.log('controllers.users.doLogin.res.rej:', restRet);
-      rej({ result: "fail", waybill: null });
+      rej({ result: 'fail', waybill: null });
     }
   });
 }
 
-async function confirmArrive(
-  wbno: string,
-  shiptoCode: string,
-  cellphone: string,
-  arriveTime: Date
-): Promise<Result> {
+async function confirmArrive(wbno: string, shiptoCode: string, cellphone: string, arriveTime: Date): Promise<Result> {
   const driverInfo = await getDriverInfo(cellphone);
   //console.log("confirmArrive.wbno,ordNo,shpToCd:", wbno);
   const wbcParam: WaybillConfirmParams = {
@@ -139,10 +134,10 @@ async function confirmArrive(
   };
   let result: TimsResponse<Result>;
   let success = false;
-  let ret: Result = { result: "success" };
+  let ret: Result = { result: 'success' };
   try {
     result = await confirmWaybill(wbcParam);
-    if (result && result.code === "0000" && result.data) {
+    if (result && result.code === '0000' && result.data) {
       success = true;
       ret.result = result.data.result;
     }
@@ -158,7 +153,7 @@ async function confirmArrive(
     //  data: null
     //}
 
-    ret.result = "error";
+    ret.result = 'error';
     //result = { result: "error" };
   }
 
@@ -176,7 +171,7 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
   //console.log('controllers.user.doLogin:', cellphone, password);
   let success = false;
   let ret: queryResult = {
-    result: "success",
+    result: 'success',
     count: 0,
     waybills: [],
   };
@@ -185,21 +180,21 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
     restRet = await queryWaybill(query);
   } catch (err) {
     //console.log("login error:", err);
-    restRet = { code: "0500", data: null };
+    restRet = { code: '0500', data: null };
   }
   //console.log("controllers.users.doLogin.res:", restRet);
-  if (restRet.code === "0000") {
+  if (restRet.code === '0000') {
     if (restRet.data && restRet.data.waybills) {
       ret.waybills = restRet.data.waybills;
       ret.count = restRet.data.waybills.length;
     } else {
-      ret.result = "fail";
+      ret.result = 'fail';
       ret.count = 0;
       ret.waybills = null;
     }
     success = true;
   } else {
-    ret.result = "error";
+    ret.result = 'error';
     ret.count = 0;
     ret.waybills = null;
   }
@@ -213,6 +208,44 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
   });
 }
 
-async function queryWaybillStatus(wbno: string):Promise<
+async function queryWaybillStatus(wbno: string): Promise<wbStatusResult> {
+  let success = false;
+  let ret: wbStatusResult = {
+    result: 'success',
+    wbno,
+    statusList: [],
+  };
+  let restRet;
+  try {
+    restRet = await queryWbStatus(wbno);
+  } catch (err) {
+    //console.log("login error:", err);
+    restRet = { code: '0500', data: null };
+    success = false;
+  }
+  //console.log('controllers.waybill.queryWaybillStatus.res:', restRet);
+  if (restRet.code === '0000') {
+    if (restRet.data.statusList && restRet.data.statusList.length > 0) {
+      ret.statusList = restRet.data.statusList;
+      ret.result = 'success';
+    } else {
+      ret.result = 'fail';
+      ret.statusList = [];
+    }
+    success = true;
+  } else {
+    ret.result = 'error';
+    ret.statusList = [];
+  }
+  //console.log('controllers.waybill.queryWaybillStatus.ret:', ret);
+  return new Promise((res, rej) => {
+    if (success) {
+      res(ret);
+    } else {
+      //console.log('controllers.waybill.queryWaybills.res.rej:', restRet);
+      rej(ret);
+    }
+  });
+}
 
-export { loadWaybill, confirmArrive, queryWaybills };
+export { loadWaybill, confirmArrive, queryWaybills, queryWaybillStatus };

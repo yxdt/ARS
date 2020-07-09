@@ -14,11 +14,19 @@ import {
 import "./index.scss";
 import NavBar from "../../components/navbar";
 import ArsTabBar from "../../components/tabbar";
-import { WxUserInfo, message, msgQueryParams } from "../../types/ars";
+import {
+  WxUserInfo,
+  message,
+  msgQueryParams,
+  wbStatus,
+  msgQueryResult,
+} from "../../types/ars";
 import { SERVER_URL } from "../../controllers/rest";
 import { queryMessages, markRead } from "../../controllers/message";
+import { queryWaybillStatus } from "../../controllers/waybill";
 import userpng from "../../assets/img/user.png";
 import MessageDetail from "../../components/messagedetail";
+import { Item } from "taro-ui/types/steps";
 export default function UserInfo() {
   const [curAvatar, setAvatar] = useState(
     Taro.getStorageSync("avatar") || userpng
@@ -34,12 +42,17 @@ export default function UserInfo() {
   const [openDetail, setOpenDetail] = useState(false);
   const [msgCount, setMsgCount] = useState(0);
   const [curMessage, setCurMessage] = useState({});
-  const [messages, setMessages] = useState({ count: 0, messages: [] });
+  const [messages, setMessages] = useState<msgQueryResult>({
+    result: "",
+    count: 0,
+    messages: [],
+  });
   const [init, setInit] = useState(true);
   const [ShowAll, setShowAll] = useState(false);
   const userAuth: boolean = Taro.getStorageSync("userAuth");
   const loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
   const curWb = Taro.getStorageSync("waybill");
+  const [wbStatus, setWbStatus] = useState<Item[]>([]);
 
   //console.log("UserInfo:", this);
   //let msgList: Array<message>;
@@ -60,6 +73,29 @@ export default function UserInfo() {
         setMsgCount(ret.count);
       }
     });
+    if (curWb && curWb.length > 0) {
+      queryWaybillStatus(curWb).then((ret) => {
+        if (ret.result === "success") {
+          setWbStatus(
+            ret.statusList.map((item) => {
+              const ret: Item = {
+                title: item.caption,
+                desc: item.comment,
+              };
+              if (item.doneDate) {
+                ret.status = "success";
+                ret.title =
+                  ret.title +
+                  "[" +
+                  item.doneDate.toLocaleDateString().substr(5) +
+                  "]";
+              }
+              return ret;
+            })
+          );
+        }
+      });
+    }
   }
 
   function getUserInfo() {
@@ -190,6 +226,7 @@ export default function UserInfo() {
           )}
         </View>
       </View>
+
       <View className="list-span">
         <Text className="list-title">
           最新运单{curWb.length > 0 ? "【" + curWb + "】" : ""}处理进度
@@ -197,24 +234,7 @@ export default function UserInfo() {
         {curWb.length <= 0 ? (
           <Text>没有运单</Text>
         ) : (
-          <AtSteps
-            items={[
-              {
-                title: "确认到达",
-                desc: "到达日期：2020-07-07",
-                status: "success",
-              },
-              {
-                title: "回执上传",
-                desc: "上传日期：2020-07-07",
-                status: "success",
-              },
-              { title: "回执审核", desc: "审核日期：2020-07-07" },
-              { title: "运单完成", desc: "" },
-            ]}
-            current={2}
-            onChange={() => {}}
-          />
+          <AtSteps items={wbStatus} current={2} onChange={() => {}} />
         )}
       </View>
       <View style={{ fontSize: "0.8rem", color: "#ff0000" }}>

@@ -129,6 +129,7 @@ export interface wbData {
   shpToCd: string;
   shpToName: string;
   arrivalTime: Date;
+  log;
   ordDetailList: Array<wbdData>;
   status: number;
 }
@@ -182,6 +183,7 @@ export interface wbStatusResult extends Result {
 export interface photoData {
   url: string;
   status: number; //0:上传， 1：通过， 2：驳回
+  remark: string;
 }
 export interface photoListData {
   photos: photoData[];
@@ -224,7 +226,7 @@ export interface message {
   ordNo: string;
   cdc: string;
   sentTime: string;
-  status: number; //0:用户已拒收, 1:已接收, 2:用户已读，3:用户标记隐藏
+  status: number; //0:新生成, 1:已接收, 2:用户已拒收，3:用户标记已读
   toOpenid: string; //接收者openid
 }
 

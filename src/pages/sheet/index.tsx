@@ -95,7 +95,7 @@ export default class Index extends Component<null, SheetState> {
             arrived: ret.waybill.status === "arrived",
             confirmed: ret.waybill.status === "confirmed",
             confirmArrive: ret.waybill.status === "loaded",
-            confirmTime: new Date(),
+            confirmTime: ret.waybill.arriveTime,
             valid: true,
             isSuper,
           });
@@ -264,7 +264,8 @@ export default class Index extends Component<null, SheetState> {
         />
       );
     }
-    const confirmString = "当前时间：" + new Date().toLocaleString("zh-CN");
+    const confirmString =
+      "到达时间：" + waybill.arriveTime.toLocaleString("zh-CN");
     const confirmString2 = "请输入验证码、手机号确认送达";
     const confirmString3 = "请注意，一旦确认将无法修改。";
     console.log("waybill:", waybill);

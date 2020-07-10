@@ -51,6 +51,7 @@ export default function Index() {
     //  setManual(true);
     //} else {
     //console.log("openSheet.waybillNum:", waybillNum);
+
     Taro.navigateTo({
       url: "/pages/sheet/index?wbno=" + waybillNum,
       //+

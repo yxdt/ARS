@@ -14,8 +14,8 @@ describe('pages snapshot test', () => {
       //projectPath: 'F:\\work2020\\Shipping\\ARS\\dist',
 
       //below is for Mac OS X
-      projectPath: '/Users/terry/desktop/works2020/ars/dist',
-      //wsEndpoint: 'ws://localhost:9420',
+      projectPath: '/Users/terry/desktop/works2020/ars/dist/',
+      wsEndpoint: 'ws://localhost:9420',
       //projectPath: '\\Users\\terry\\Desktop\\works2020\\ARS\\dist',
     });
     // 直接更改全局变量

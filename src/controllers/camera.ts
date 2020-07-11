@@ -6,8 +6,6 @@ import {
   verifyParams,
   verifyResult,
   verifyData,
-  PhotosResult,
-  photoListData,
   uvPhotoResult,
   uvPhotoListData,
 } from "../types/ars";

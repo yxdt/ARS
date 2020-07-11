@@ -302,5 +302,5 @@ export interface queryData {
 }
 export interface queryResult extends Result {
   count: number;
-  waybills: Array<wbData> | null;
+  waybills: Array<Waybill> | null;
 }

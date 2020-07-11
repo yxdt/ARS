@@ -42,7 +42,7 @@ export default function ShipItems(props) {
                         console.log('you clicked a list item.', item);
                       }}
                       title={item.orderNum}
-                      note={item.modelNum}
+                      note={item.model}
                       extraText={'' + item.qty}></AtListItem>
                   );
                 })}

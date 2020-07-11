@@ -1,4 +1,34 @@
-const { approvePicture, rejectPicture } = require("../camera.ts");
+const {
+  approvePicture,
+  rejectPicture,
+  queryUnVerifiedPhotos,
+} = require("../camera.ts");
+
+describe("Query un-verified Photos.", () => {
+  it("should get 3 photos return", () => {
+    expect.assertions(3);
+    return queryUnVerifiedPhotos("1").then((res) => {
+      expect(res.result).toBe("success");
+      expect(res.photos).not.toBeNull();
+      expect(res.photos.length).toBe(3);
+    });
+  });
+  it("should get 0 photos in return", () => {
+    expect.assertions(2);
+    return queryUnVerifiedPhotos("000").then((res) => {
+      console.log("test.camera.queryUnverifiedPhotos.fail.res:", res);
+      expect(res.result).toBe("success");
+      expect(res.photos).toBeNull();
+    });
+  });
+  it("should get error", () => {
+    expect.assertions(2);
+    return queryUnVerifiedPhotos("999").catch((res) => {
+      expect(res.result).toBe("error");
+      expect(res.photos).toBeNull();
+    });
+  });
+});
 
 describe("Approve Uploaded Picture.", () => {
   it("should approve the picture", () => {

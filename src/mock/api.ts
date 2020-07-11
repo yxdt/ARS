@@ -15,6 +15,7 @@ import {
   msgQueryParams,
   wbStatusData,
   wbStatus,
+  uvPhotoListData,
 } from "../types/ars";
 
 const users = [
@@ -226,7 +227,7 @@ const pics = [
   "r_ffsd_1592540841762.jpg",
   "r_qwe_1592462754442.jpg",
   "r_qwer_1592538896117.jpg",
-  "r_rrryyy_1592547360459.jpg",
+  "r_1_1592547360459.jpg",
   "r_wert_1592547945057.jpg",
   "r_lsks_1592547556687.jpg",
   "r_rtyy_1592541405051.jpg",
@@ -432,6 +433,29 @@ function wbcRequest(data: WaybillConfirmParams) {
   return request(ret, success);
 }
 
+async function unVerifiedRequest(url: string) {
+  const openid = url.substr(url.lastIndexOf("/") + 1);
+  let success = true;
+  let photos: uvPhotoListData | null = {
+    photos: pics //返回3条记录
+      .filter((item) => item.indexOf("_1_") > 0)
+      .map((item) => ({
+        url: item,
+        status: 0,
+        ordNo: "1",
+        shpToCd: "0101",
+        cdcName: "北京中心",
+        state: 0,
+      })),
+  };
+  if (openid === "999") {
+    success = false;
+  } else if (openid === "000") {
+    photos = null;
+  }
+  return request<uvPhotoListData>(photos, success);
+}
+
 function photosRequest(url: string) {
   const wbno = url.substr(url.lastIndexOf("/") + 1);
   let success = true;
@@ -528,6 +552,7 @@ export {
   waybillRequest,
   wbStatusRequest,
   photosRequest,
+  unVerifiedRequest,
   wbcRequest,
   arriveMsgRequest,
   uploadMsgRequest,

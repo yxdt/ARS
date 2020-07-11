@@ -1,26 +1,61 @@
 import Taro, { useState } from "@tarojs/taro";
 import { View, Text, Button, Image } from "@tarojs/components";
 import {
-  AtInput,
   AtMessage,
   AtList,
   AtListItem,
-  AtRadio,
-  AtButton,
+  AtModal,
+  AtModalHeader,
+  AtModalContent,
+  AtInput,
+  AtModalAction,
 } from "taro-ui";
 import "./camera.scss";
 
 import ArsTabBar from "../../components/tabbar";
 import { SERVER_URL } from "../../controllers/rest";
 
+import {
+  queryUnVerifiedPhotos,
+  approvePicture,
+  rejectPicture,
+} from "../../controllers/camera";
+import { photoData, uvPhotoData } from "../../types/ars";
+
 export default function Verify() {
   const [selPic, setSelPic] = useState("");
   const [preview, setPreview] = useState(false);
   const [days, setDays] = useState(1);
 
-  function handleClick(val) {
-    console.log("handleClick:", val);
-    setSelPic(val);
+  const [photos, setPhotos] = useState<Array<uvPhotoData> | null>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [confirmReject, setConfirmReject] = useState(false);
+  const [remark, setRemark] = useState("");
+  const [curWbno, setCurWbno] = useState("");
+  const [curImgid, setCurImgid] = useState("");
+  const [curPhoto, setCurPhoto] = useState<uvPhotoData>({
+    url: "",
+    ordNo: "",
+    shpToCd: "",
+    cdcName: "",
+    state: 0,
+  });
+
+  if (!loaded) {
+    queryUnVerifiedPhotos(Taro.getStorageSync("userOpenId"))
+      .then((res) => {
+        if (res.result === "success" && res.photos) {
+          setPhotos(res.photos);
+        }
+      })
+      .finally(() => {
+        setLoaded(true);
+      });
+  }
+
+  function handleClick(url) {
+    console.log("handleClick:", url);
+    setSelPic(url);
     setPreview(true);
   }
 
@@ -51,8 +86,36 @@ export default function Verify() {
             <Button
               className="preview-confirm-button"
               onClick={() => {
-                setPreview(false);
-                console.log("confirmed!");
+                approvePicture(
+                  curWbno,
+                  curImgid,
+                  Taro.getStorageSync("userOpenId")
+                )
+                  .then((ret) => {
+                    if (ret.result === "approve") {
+                      curPhoto.state = 1;
+                      Taro.atMessage({
+                        message: "照片审核通过",
+                        type: "success",
+                      });
+                    } else {
+                      Taro.atMessage({
+                        message: "照片审核操作失败，请重试",
+                        type: "error",
+                      });
+                    }
+                    console.log("approvePicture.result:", ret);
+                  })
+                  .catch(() => {
+                    Taro.atMessage({
+                      message: "照片审核操作失败，请重试",
+                      type: "error",
+                    });
+                  })
+                  .finally(() => {
+                    setPreview(false);
+                    console.log("confirmed!");
+                  });
               }}
             >
               通过
@@ -60,50 +123,110 @@ export default function Verify() {
             <Button
               className="preview-confirm-button"
               onClick={() => {
-                setPreview(false);
-                console.log("rejected!");
+                setConfirmReject(true);
               }}
             >
               退回
             </Button>
           </View>
+          <AtModal isOpened={confirmReject}>
+            <AtModalHeader>退回操作</AtModalHeader>
+            <AtModalContent>
+              <View className="toast-main">
+                <View className="confirm-info">请给出退回原因</View>
+                <AtInput
+                  key={"reject-reason"}
+                  type="text"
+                  className="modal-input"
+                  title="原因："
+                  value={remark}
+                  name="remark"
+                  placeholder="写出退回原因"
+                  onChange={(theval) => {
+                    console.log("remark:", theval);
+                    setRemark(theval);
+                  }}
+                ></AtInput>
+              </View>
+            </AtModalContent>
+            <AtModalAction>
+              <Button
+                className="home-input-semi-left"
+                onClick={() => {
+                  //Taro.navigateBack();
+                  setConfirmReject(false);
+                }}
+              >
+                取消
+              </Button>
+              <Button
+                className="home-input-semi-right"
+                onClick={() => {
+                  rejectPicture(
+                    curWbno,
+                    curImgid,
+                    remark,
+                    Taro.getStorageSync("userOpenId")
+                  )
+                    .then((ret) => {
+                      console.log("rejectPicture.result:", ret);
+                      if (ret.result === "reject") {
+                        curPhoto.state = 2;
+                        Taro.atMessage({
+                          message: "照片审核退回成功",
+                          type: "success",
+                        });
+                      } else {
+                        Taro.atMessage({
+                          message: "照片审核操作失败，请重试",
+                          type: "error",
+                        });
+                      }
+                    })
+                    .catch(() => {
+                      Taro.atMessage({
+                        message: "照片审核操作失败，请重试",
+                        type: "error",
+                      });
+                    })
+                    .finally(() => {
+                      setPreview(false);
+                      console.log("rejected!");
+                    });
+                }}
+              >
+                确认退回
+              </Button>
+            </AtModalAction>
+          </AtModal>
         </View>
       ) : (
         <View className="sheet-info-span">
           <AtList>
-            <AtListItem
-              title="BJ02003033"
-              note="0001(北京收货中心)"
-              extraText="第1页"
-              arrow="right"
-              thumb={SERVER_URL + "/r_2_239393930.png"}
-              key={SERVER_URL + "/r_2_239393930.png" + "_1"}
-              onClick={(val) => {
-                handleClick(SERVER_URL + "/r_2_239393930.png");
-              }}
-            ></AtListItem>
-            <AtListItem
-              key={SERVER_URL + "/r_2_239393930.png" + "_2"}
-              title="BJ0203303033"
-              note="0101(天津收货中心)"
-              extraText="第2页"
-              arrow="right"
-              thumb={SERVER_URL + "/r_2_239393930.png"}
-              onClick={(val) => {
-                handleClick(SERVER_URL + "/r_2_239393930.png");
-              }}
-            ></AtListItem>
-            <AtListItem
-              key={SERVER_URL + "/r_2_239393930.png" + "_3"}
-              title="BJ02003033"
-              note="0001(北京收货中心)"
-              extraText="第3页"
-              arrow="right"
-              thumb={SERVER_URL + "/r_2_239393930.png"}
-              onClick={(val) => {
-                handleClick(SERVER_URL + "/r_2_239393930.png");
-              }}
-            ></AtListItem>
+            {photos && photos.length > 0 ? (
+              photos
+                .filter((item) => item.state === 0)
+                .map((item, index) => {
+                  return (
+                    <AtListItem
+                      title={item.ordNo}
+                      note={item.shpToCd + "(" + item.cdcName + ")"}
+                      extraText={"第" + index + "项"}
+                      arrow="right"
+                      thumb={SERVER_URL + item.url}
+                      key={SERVER_URL + item.url + "_1"}
+                      onClick={(val) => {
+                        setCurImgid(item.url);
+                        setCurWbno(item.ordNo + item.shpToCd);
+                        setCurPhoto(item);
+                        handleClick(SERVER_URL + item.url);
+                      }}
+                    ></AtListItem>
+                  );
+                })
+            ) : (
+              <Text>没有待审核回执</Text>
+            )}
           </AtList>
         </View>
       )}

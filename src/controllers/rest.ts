@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro';
+import Taro from "@tarojs/taro";
 import {
   RegUser,
   WaybillConfirmParams,
@@ -15,7 +15,8 @@ import {
   msgQueryParams,
   msgQueryData,
   wbStatusData,
-} from '../types/ars';
+  uvPhotoListData,
+} from "../types/ars";
 import {
   loginRequest,
   waybillRequest,
@@ -29,11 +30,12 @@ import {
   queryMsgRequest,
   markMsgRequest,
   wbStatusRequest,
-} from '../mock/api';
+  unVerifiedRequest,
+} from "../mock/api";
 
 const DEBUGGING = true;
-const devUrl = 'http://192.168.0.100:8765';
-const prodUrl = 'https://tims.lg.com.cn'; //"https://www.hanyukj.cn";
+const devUrl = "http://192.168.0.100:8765";
+const prodUrl = "https://tims.lg.com.cn"; //"https://www.hanyukj.cn";
 const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 
 // async function saveDriverLocation(wbNum: string, loc: string) {
@@ -56,83 +58,157 @@ async function sendArriveMessage(
   wbno: string, //shipCode + rdcCode
   openid: string
 ) {
-  const ret = await taroRequest<TimsResponse<msgSentData>>('/message/arrive?wbno=' + wbno + '&openid=' + openid, 'GET', null, null);
+  const ret = await taroRequest<TimsResponse<msgSentData>>(
+    "/message/arrive?wbno=" + wbno + "&openid=" + openid,
+    "GET",
+    null,
+    null
+  );
   return ret;
 }
 async function sendUploadMessage(wbno: string, openid: string) {
-  const ret = await taroRequest<TimsResponse<msgSentData>>('/message/upload?wbno=' + wbno + '&openid=' + openid, 'GET', null, null);
+  const ret = await taroRequest<TimsResponse<msgSentData>>(
+    "/message/upload?wbno=" + wbno + "&openid=" + openid,
+    "GET",
+    null,
+    null
+  );
   return ret;
 }
 
 async function sendRejectMessage(wbno: string, openid: string) {
-  const ret = await taroRequest<TimsResponse<msgSentData>>('/message/reject?wbno=' + wbno + '&openid=' + openid, 'GET', null, null);
+  const ret = await taroRequest<TimsResponse<msgSentData>>(
+    "/message/reject?wbno=" + wbno + "&openid=" + openid,
+    "GET",
+    null,
+    null
+  );
   return ret;
 }
 async function markMessage(
   msgid: number,
   mark: number //2: read, 3:hide
 ): Promise<TimsResponse<string>> {
-  const ret = await taroRequest<TimsResponse<string>>('/message/mark?msgid=' + msgid + '&mark=' + mark, 'GET', null, null);
+  const ret = await taroRequest<TimsResponse<string>>(
+    "/message/mark?msgid=" + msgid + "&mark=" + mark,
+    "GET",
+    null,
+    null
+  );
   return ret;
 }
-async function queryMessage(query: msgQueryParams): Promise<TimsResponse<msgQueryData>> {
-  const ret = await taroRequest<TimsResponse<msgQueryData>>('/message/query', 'POST', query, { 'content-type': 'application/x-www-form-urlencoded' });
+async function queryMessage(
+  query: msgQueryParams
+): Promise<TimsResponse<msgQueryData>> {
+  const ret = await taroRequest<TimsResponse<msgQueryData>>(
+    "/message/query",
+    "POST",
+    query,
+    { "content-type": "application/x-www-form-urlencoded" }
+  );
   return ret;
 }
 
-async function verifyPhoto(verifydata: verifyParams): Promise<TimsResponse<verifyData>> {
-  const ret = await taroRequest<TimsResponse<verifyData>>('/logistics/confirm', 'POST', verifydata, { 'content-type': 'application/x-www-form-urlencoded' });
+async function queryUnVerified(
+  openid: string
+): Promise<TimsResponse<uvPhotoListData>> {
+  const ret = await taroRequest<TimsResponse<uvPhotoListData>>(
+    "/photos/unverify/" + openid,
+    "GET",
+    null,
+    null
+  );
+  return ret;
+}
+
+async function verifyPhoto(
+  verifydata: verifyParams
+): Promise<TimsResponse<verifyData>> {
+  const ret = await taroRequest<TimsResponse<verifyData>>(
+    "/logistics/confirm",
+    "POST",
+    verifydata,
+    { "content-type": "application/x-www-form-urlencoded" }
+  );
   return ret;
 }
 
 async function confirmWaybill(wbInfo: WaybillConfirmParams) {
-  const ret = await taroRequest<TimsResponse<WaybillConfirmData>>('/driver/confirm', 'POST', wbInfo, { 'content-type': 'application/x-www-form-urlencoded' });
+  const ret = await taroRequest<TimsResponse<WaybillConfirmData>>(
+    "/driver/confirm",
+    "POST",
+    wbInfo,
+    { "content-type": "application/x-www-form-urlencoded" }
+  );
   return ret;
 }
 
 async function getWaybill(wbNum: string) {
-  const ret = await taroRequest<TimsResponse<wbData>>('/order/code/' + wbNum, 'GET', null, null);
+  const ret = await taroRequest<TimsResponse<wbData>>(
+    "/order/code/" + wbNum,
+    "GET",
+    null,
+    null
+  );
   return ret;
 }
 
 async function queryWaybill(query: queryParams) {
-  const ret = await taroRequest<TimsResponse<queryData>>('/order/search', 'POST', query, { 'content-type': 'application/x-www-form-urlencoded' });
+  const ret = await taroRequest<TimsResponse<queryData>>(
+    "/order/search",
+    "POST",
+    query,
+    { "content-type": "application/x-www-form-urlencoded" }
+  );
   return ret;
 }
 async function queryWbStatus(wbNum: string) {
-  const ret = await taroRequest<TimsResponse<wbStatusData>>('/order/status?wbno=' + wbNum, 'GET', null, null);
+  const ret = await taroRequest<TimsResponse<wbStatusData>>(
+    "/order/status?wbno=" + wbNum,
+    "GET",
+    null,
+    null
+  );
   return ret;
 }
 //async function uploadPhoto() {}
 
 async function getWbPhotos(wbNum: string) {
   if (DEBUGGING) {
-    const photos = await taroRequest<TimsResponse<photoListData>>('/photos/bywb/' + wbNum, 'GET', {}, null);
+    const photos = await taroRequest<TimsResponse<photoListData>>(
+      "/photos/bywb/" + wbNum,
+      "GET",
+      {},
+      null
+    );
     //console.log("getWbPhotos:", photos);
     return photos;
   }
 }
 
 async function saveUserInfo(userInfo: RegUser) {
-  const url = '/users/save';
+  const url = "/users/save";
   const ret = await Taro.request({
     url: SERVER_URL + url,
-    method: 'POST',
+    method: "POST",
     data: userInfo,
-    header: { 'content-type': 'application/x-www-form-urlencoded' },
+    header: { "content-type": "application/x-www-form-urlencoded" },
   });
   return ret;
 }
 
-async function userLogin(cellphone: string, password: string): Promise<TimsResponse<loginData>> {
+async function userLogin(
+  cellphone: string,
+  password: string
+): Promise<TimsResponse<loginData>> {
   const ret = await taroRequest<TimsResponse<loginData>>(
-    '/logistics/login',
-    'POST',
+    "/logistics/login",
+    "POST",
     {
       pwd: password,
       phone: cellphone,
     },
-    { 'content-type': 'application/x-www-form-urlencoded' }
+    { "content-type": "application/x-www-form-urlencoded" }
   );
   //console.log('rest.userLogin.ret:', ret);
   //Taro.setStorage({ key: "roleName", data: roleName });
@@ -145,37 +221,39 @@ async function taroRequest<T>(url: string, method, data, header) {
   let ret;
   if (DEBUGGING) {
     //console.log('DEBUGGING.taroRequest.SERVER_URL:', url);
-    if (url === '/logistics/login') {
+    if (url === "/logistics/login") {
       ret = await loginRequest(data);
-    } else if (url.startsWith('/order/code/')) {
+    } else if (url.startsWith("/order/code/")) {
       ret = await waybillRequest(url);
-    } else if (url.startsWith('/photos/bywb/')) {
+    } else if (url.startsWith("/photos/bywb/")) {
       ret = await photosRequest(url);
-    } else if (url === '/driver/confirm') {
+    } else if (url === "/driver/confirm") {
       ret = await wbcRequest(data);
-    } else if (url.startsWith('/message/arrive')) {
+    } else if (url.startsWith("/message/arrive")) {
       ret = await arriveMsgRequest(url);
-    } else if (url.startsWith('/message/upload')) {
+    } else if (url.startsWith("/message/upload")) {
       ret = await uploadMsgRequest(url);
-    } else if (url.startsWith('/message/reject')) {
+    } else if (url.startsWith("/message/reject")) {
       ret = await rejectMsgRequest(url);
-    } else if (url === '/logistics/confirm') {
+    } else if (url === "/logistics/confirm") {
       ret = await verifyRequest(data);
-    } else if (url === '/order/search') {
+    } else if (url === "/order/search") {
       ret = await queryRequest(data);
-    } else if (url === '/message/query') {
+    } else if (url === "/message/query") {
       ret = await queryMsgRequest(data);
-    } else if (url.startsWith('/message/mark')) {
+    } else if (url.startsWith("/message/mark")) {
       ret = await markMsgRequest(url);
-    } else if (url.startsWith('/order/status')) {
+    } else if (url.startsWith("/order/status")) {
       ret = await wbStatusRequest(url);
+    } else if (url.startsWith("/photos/unverify")) {
+      ret = await unVerifiedRequest(url);
     }
   } else {
     ret = await Taro.request<T>({
       url: SERVER_URL + url,
-      method: method || 'GET',
+      method: method || "GET",
       data: data || {},
-      header: header || { 'content-type': 'application/json' },
+      header: header || { "content-type": "application/json" },
     });
   }
   return ret;
@@ -189,12 +267,13 @@ export {
   queryWaybill,
   queryWbStatus,
   getWbPhotos,
+  verifyPhoto,
+  queryUnVerified,
   saveUserInfo,
   userLogin,
   sendArriveMessage,
   sendUploadMessage,
   sendRejectMessage,
-  verifyPhoto,
   queryMessage,
   markMessage,
 };

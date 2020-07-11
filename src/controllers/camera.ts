@@ -1,12 +1,16 @@
 import Taro from "@tarojs/taro";
-import { SERVER_URL, verifyPhoto } from "./rest";
+import { SERVER_URL, verifyPhoto, queryUnVerified } from "./rest";
 import {
   TimsResponse,
   uploadResult,
   verifyParams,
   verifyResult,
   verifyData,
-} from "src/types/ars";
+  PhotosResult,
+  photoListData,
+  uvPhotoResult,
+  uvPhotoListData,
+} from "../types/ars";
 
 function scanBarcode(cbBarcode) {
   Taro.scanCode({
@@ -65,6 +69,37 @@ function uploadPicture(
       ret.result = "error";
       reject(ret);
     });
+  });
+}
+
+async function queryUnVerifiedPhotos(openid: string): Promise<uvPhotoResult> {
+  let uvResult: TimsResponse<uvPhotoListData>;
+  let success = true;
+  const ret: uvPhotoResult = {
+    result: "success",
+    photos: null,
+  };
+  try {
+    uvResult = await queryUnVerified(openid);
+  } catch (e) {
+    uvResult = e;
+    success = false;
+  }
+  if (uvResult.code === "0000") {
+    if (uvResult.data) {
+      ret.photos = uvResult.data.photos;
+    }
+  } else {
+    ret.result = "error";
+    ret.photos = null;
+    success = false;
+  }
+  return new Promise((res, rej) => {
+    if (success) {
+      res(ret);
+    } else {
+      rej(ret);
+    }
   });
 }
 
@@ -150,4 +185,5 @@ export {
   uploadPicture,
   approvePicture,
   rejectPicture,
+  queryUnVerifiedPhotos,
 };

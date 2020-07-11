@@ -189,7 +189,27 @@ export interface photoListData {
 }
 
 export interface PhotosResult extends Result {
-  photos: Array<photoData>;
+  photos: Array<photoData> | null;
+}
+
+//待验证回执查询参数,返回的列表是status==0
+//暂缓，只用openid作为参数
+export interface unVerifiedPhotoParams {
+  openid: string; //当前中心工作人员openid
+  roleName: string; //当前中心工作人员角色
+}
+export interface uvPhotoData {
+  url: string;
+  ordNo: string;
+  shpToCd: string;
+  cdcName: string;
+  state: number; //0:待审核 1: 通过 2：驳回
+}
+export interface uvPhotoListData {
+  photos: Array<uvPhotoData> | null;
+}
+export interface uvPhotoResult extends Result {
+  photos: Array<uvPhotoData> | null;
 }
 
 //回执上传

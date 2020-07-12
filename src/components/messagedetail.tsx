@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import { AtButton } from "taro-ui";
-import { MessageDetailProps } from "src/types/ars";
+import { MessageDetailProps } from "../types/ars";
 export default function MessageDetail(props: MessageDetailProps) {
   return (
     <View style=" padding:0.5rem; margin-top:0.1rem; margin-left:1.2rem; margin-right:1.2rem;">

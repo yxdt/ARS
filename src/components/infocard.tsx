@@ -1,7 +1,7 @@
 import Taro from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import { AtButton } from "taro-ui";
-import { InfoCardProps } from "src/types/ars";
+import { InfoCardProps } from "../types/ars";
 export default function InfoCard(props: InfoCardProps) {
   return (
     <View style="margin-top:3rem; margin-left:1.5rem; margin-right:1.5rem;margin-bottom:4.5rem;">

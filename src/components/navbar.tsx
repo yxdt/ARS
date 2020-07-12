@@ -1,4 +1,4 @@
-import Taro, { useState } from "@tarojs/taro";
+import Taro from "@tarojs/taro";
 import { AtNavBar } from "taro-ui";
 
 export default function NavBar(props) {

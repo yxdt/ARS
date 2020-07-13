@@ -105,73 +105,76 @@ export default function Verify() {
             <Button
               className="preview-confirm-button"
               onClick={() => {
+                console.log('verify.confirmreject:', confirmReject);
                 setConfirmReject(true);
               }}>
               退回
             </Button>
           </View>
-          <AtModal isOpened={confirmReject}>
-            <AtModalHeader>退回操作</AtModalHeader>
-            <AtModalContent>
-              <View className="toast-main">
-                <View className="confirm-info">请给出退回原因</View>
-                <AtInput
-                  key={'reject-reason'}
-                  type="text"
-                  className="modal-input"
-                  title="原因："
-                  value={remark}
-                  name="remark"
-                  placeholder="写出退回原因"
-                  onChange={(theval) => {
-                    console.log('remark:', theval);
-                    setRemark(theval);
-                  }}></AtInput>
-              </View>
-            </AtModalContent>
-            <AtModalAction>
-              <Button
-                className="home-input-semi-left"
-                onClick={() => {
-                  //Taro.navigateBack();
-                  setConfirmReject(false);
-                }}>
-                取消
-              </Button>
-              <Button
-                className="home-input-semi-right"
-                onClick={() => {
-                  rejectPicture(curWbno, curImgid, remark, Taro.getStorageSync('userOpenId'))
-                    .then((ret) => {
-                      console.log('rejectPicture.result:', ret);
-                      if (ret.result === 'reject') {
-                        curPhoto.state = 2;
-                        Taro.atMessage({
-                          message: '照片审核退回成功',
-                          type: 'success',
-                        });
-                      } else {
+          {confirmReject ? (
+            <AtModal isOpened={confirmReject}>
+              <AtModalHeader>退回操作</AtModalHeader>
+              <AtModalContent>
+                <View className="toast-main">
+                  <View className="confirm-info">请给出退回原因</View>
+                  <AtInput
+                    key={'reject-reason'}
+                    type="text"
+                    className="modal-input"
+                    title="原因："
+                    value={remark}
+                    name="remark"
+                    placeholder="写出退回原因"
+                    onChange={(theval) => {
+                      console.log('remark:', theval);
+                      setRemark(theval);
+                    }}></AtInput>
+                </View>
+              </AtModalContent>
+              <AtModalAction>
+                <Button
+                  className="home-input-semi-left"
+                  onClick={() => {
+                    //Taro.navigateBack();
+                    setConfirmReject(false);
+                  }}>
+                  取消
+                </Button>
+                <Button
+                  className="home-input-semi-right"
+                  onClick={() => {
+                    rejectPicture(curWbno, curImgid, remark, Taro.getStorageSync('userOpenId'))
+                      .then((ret) => {
+                        console.log('rejectPicture.result:', ret);
+                        if (ret.result === 'reject') {
+                          curPhoto.state = 2;
+                          Taro.atMessage({
+                            message: '照片审核退回成功',
+                            type: 'success',
+                          });
+                        } else {
+                          Taro.atMessage({
+                            message: '照片审核操作失败，请重试',
+                            type: 'error',
+                          });
+                        }
+                      })
+                      .catch(() => {
                         Taro.atMessage({
                           message: '照片审核操作失败，请重试',
                           type: 'error',
                         });
-                      }
-                    })
-                    .catch(() => {
-                      Taro.atMessage({
-                        message: '照片审核操作失败，请重试',
-                        type: 'error',
+                      })
+                      .finally(() => {
+                        setPreview(false);
+                        console.log('rejected!');
                       });
-                    })
-                    .finally(() => {
-                      setPreview(false);
-                      console.log('rejected!');
-                    });
-                }}>
-                确认退回
-              </Button>
-            </AtModalAction>
-          </AtModal>
+                  }}>
+                  确认退回
+                </Button>
+              </AtModalAction>
+            </AtModal>
+          ) : null}
         </View>
       ) : (
         <View className="sheet-info-span">

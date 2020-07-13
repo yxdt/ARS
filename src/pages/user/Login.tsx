@@ -77,6 +77,7 @@ export default function Login() {
             name="cellphone"
             title="手机号"
             type="text"
+            value={cellphone}
             onChange={(val: string) => {
               //console.log(val);
               setCellphone(val);
@@ -88,8 +89,9 @@ export default function Login() {
           <AtInput
             className="home-input"
             name="password"
-            title="密 码"
+            title="密 码*"
             type="password"
+            value={password}
             onChange={(val: string) => {
               //console.log(val);
               setPassword(val);

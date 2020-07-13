@@ -1,4 +1,5 @@
-import Taro, { Component, Config } from '@tarojs/taro';
+import Taro from '@tarojs/taro';
+import React, { Component } from 'react';
 import { View, Text, Image, Button, Camera } from '@tarojs/components';
 import { AtFab, AtMessage } from 'taro-ui';
 import './camera.scss';
@@ -66,9 +67,6 @@ export default class Index extends Component<CameraProps, CameraStates> {
    * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
-  config: Config = {
-    navigationBarTitleText: '回执上传',
-  };
 
   handleClick() {
     console.log('you clicked me.');
@@ -117,7 +115,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
   }
 
   render() {
-    console.log('props, router:', this.props, this.$router.params);
+    //console.log('props, router:', this.props, this.$router.params);
 
     //const isScan = this.$router.params.isScan;
     const { curwbno, uploaded, openid } = this.state;

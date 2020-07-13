@@ -1,48 +1,52 @@
-import Taro, { useState } from "@tarojs/taro";
-import { View, Text, Image, Button } from "@tarojs/components";
-import { AtInput, AtIcon } from "taro-ui";
-import "./index.scss";
+import Taro, { getCurrentInstance } from '@tarojs/taro';
+import React, { useState } from 'react';
+import { View, Text, Image } from '@tarojs/components';
+import { AtInput, AtIcon, AtButton } from 'taro-ui';
+import './index.scss';
 
-import NavBar from "../../components/navbar";
-import ArsTabBar from "../../components/tabbar";
-import { scanBarcode } from "../../controllers/camera";
-import { getWxOpenId } from "../../controllers/users";
-
+import NavBar from '../../components/navbar';
+import ArsTabBar from '../../components/tabbar';
+import { scanBarcode } from '../../controllers/camera';
+//import { getWxOpenId } from '../../controllers/users';
+const current = getCurrentInstance();
 export default function Index() {
   //const [manual, setManual] = useState(true);
-  const [waybillNum, setWaybillNum] = useState("");
-  const [rdcNum, setRdcNum] = useState("");
-  const [cellphone, setCellphone] = useState("");
-  const [isScan, setIsScan] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [waybillNum, setWaybillNum] = useState(Taro.getStorageSync('waybill'));
+  //const [rdcNum, setRdcNum] = useState('');
+  //const [cellphone, setCellphone] = useState('');
+  //const [isScan, setIsScan] = useState(false);
+  //const [loggedIn, setLoggedIn] = useState(false);
 
-  console.log("$router.params:", this.$router.params);
+  //const current = getCurrentInstance();
 
-  if (this.$router.params.wbno) {
-    setIsScan(true);
-    setWaybillNum(this.$router.params.wbno);
+  console.log('current.router.params:', current.router.params);
+
+  if (current.router.params.wbno && waybillNum !== current.router.params.wbno) {
+    //setIsScan(true);
+    setWaybillNum(current.router.params.wbno);
     //setManual(true);
   } else {
-    let curwbno = Taro.getStorageSync("waybill");
-    const wbnodate: number =
-      Taro.getStorageSync("waybilldate") || new Date().valueOf();
+    let curwbno = Taro.getStorageSync('waybill');
+    const wbnodate: number = Taro.getStorageSync('waybilldate') || new Date().valueOf();
 
     const today = new Date();
-    console.log("localcurwbno, wbnodate:", curwbno, wbnodate);
+    console.log('localcurwbno, wbnodate:', curwbno, wbnodate);
     if (wbnodate && today.valueOf() - wbnodate > 24 * 60 * 60 * 1000) {
       //本地运单信息超过一天自动清除
-      curwbno = "";
-      Taro.removeStorage("waybill");
-      Taro.removeStorage("waybilldate");
+      curwbno = '';
+      Taro.removeStorageSync('waybill');
+      Taro.removeStorageSync('waybilldate');
     }
-    setWaybillNum(curwbno);
+    if (curwbno !== waybillNum) {
+      setWaybillNum(curwbno);
+    }
   }
 
   function gotBarcode(bcVal: string) {
     //bcVal = waybillNum + rdcNum
-    console.log("index.index.gotBarcode:", bcVal);
+    console.log('index.index.gotBarcode:', bcVal);
     Taro.navigateTo({
-      url: "/pages/sheet/index?wbno=" + bcVal.result,
+      url: '/pages/sheet/index?wbno=' + bcVal,
     });
   }
 
@@ -53,7 +57,7 @@ export default function Index() {
     //console.log("openSheet.waybillNum:", waybillNum);
 
     Taro.navigateTo({
-      url: "/pages/sheet/index?wbno=" + waybillNum,
+      url: '/pages/sheet/index?wbno=' + waybillNum,
       //+
       //"&rdc=" +
       //rdcNum, //+
@@ -68,13 +72,17 @@ export default function Index() {
       <NavBar />
       <View className="home-title-span">
         <Text className="home-title">
-          欢迎使用 <Text className="home-title-hilite">TIMS</Text>\n
-          <Text className="home-title-sub">配送信息管理系统</Text>
+          <Text style="flex:1">
+            欢迎使用 <Text className="home-title-hilite">TIMS</Text>
+          </Text>
+          <Text className="home-title-sub" style="flex:1">
+            配送信息管理系统
+          </Text>
         </Text>
       </View>
       <View className="home-button-span">
         <View>
-          <View style={{ flexDirection: "row", display: "flex" }}>
+          <View style={{ flexDirection: 'row', display: 'flex' }}>
             <AtInput
               className="home-input"
               name="waybillNum"
@@ -84,42 +92,28 @@ export default function Index() {
               onChange={(val: string) => {
                 //console.log("new wbNum:", val);
                 setWaybillNum(val);
-                Taro.setStorage({ key: "waybill", data: val });
+                Taro.setStorage({ key: 'waybill', data: val });
                 Taro.setStorage({
-                  key: "waybilldate",
+                  key: 'waybilldate',
                   data: new Date().valueOf(),
                 });
               }}
               placeholder="扫码或手工输入装车号及验证码"
               placeholderStyle="font-size:0.8rem;"
             />
-            <Button
+            <AtButton
               onClick={() => {
                 scanBarcode(gotBarcode);
               }}
-              className="cam-button"
-            >
-              <AtIcon
-                prefixClass="fa"
-                value="qrcode"
-                size="26"
-                color="#ffffff"
-              ></AtIcon>
-            </Button>
+              className="cam-button">
+              <AtIcon prefixClass="fa" value="qrcode" size="26" color="#ffffff"></AtIcon>
+            </AtButton>
           </View>
         </View>
-        <Button className="home-button" onClick={openSheet}>
-          <div>
-            <AtIcon
-              prefixClass="fa"
-              value="search"
-              size="20"
-              color="#ffffff"
-              customStyle="margin-right:10px;"
-            ></AtIcon>
-            获取交货单信息
-          </div>
-        </Button>
+        <AtButton className="home-button" onClick={openSheet}>
+          <AtIcon prefixClass="fa" value="search" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
+          获取交货单信息
+        </AtButton>
         <View className="home-prompt-span">
           <Text>您可以扫描往来表上的二维码，或输入装车序列号及验证码。</Text>
         </View>

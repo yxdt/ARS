@@ -1,15 +1,9 @@
-import Taro from "@tarojs/taro";
+import Taro from '@tarojs/taro';
+import React from 'react';
 
-import { AtActivityIndicator } from "taro-ui";
+import { AtActivityIndicator } from 'taro-ui';
 
 export default function Loading() {
   //return <div />;
-  return (
-    <AtActivityIndicator
-      mode="center"
-      size={60}
-      color="#a50034"
-      content="数据加载中..."
-    />
-  );
+  return <AtActivityIndicator mode="center" size={60} color="#a50034" content="数据加载中..." />;
 }

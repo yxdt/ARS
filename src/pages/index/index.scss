@@ -22,19 +22,26 @@ $color-bg: #a50034;
   margin-top: 5rem;
   margin-left: 2rem;
   .home-title {
+    white-space: pre-wrap;
     color: #6b6b6b;
     font-size: 1.8rem;
     font-weight: bold;
     font-family: 'Teko' sans-serif;
+    display: flex;
+    flex-direction: column;
     .home-title-hilite {
       color: $color-bg;
       font-size: 3.2rem;
       font-weight: bolder;
       text-shadow: 2px 2px 2px #ffffff;
+      display: inline-block;
+      flex: 1;
     }
     .home-title-sub {
       color: #6b6b6b;
       font-size: 2rem;
+      display: inline-block;
+      flex: 1;
     }
   }
 }
@@ -46,7 +53,9 @@ $color-bg: #a50034;
   .home-button {
     background-color: $color-bg;
     color: #ffffff;
-    margin: 2rem;
+    margin-top: 1rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
     height: 3.5rem;
     line-height: 3.5rem;
   }

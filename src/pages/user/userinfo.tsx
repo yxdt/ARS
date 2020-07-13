@@ -1,57 +1,37 @@
-import Taro, { useState } from "@tarojs/taro";
-import { View, Text, Image, Picker, Button } from "@tarojs/components";
-import {
-  AtAvatar,
-  AtGrid,
-  AtList,
-  AtListItem,
-  AtFloatLayout,
-  AtMessage,
-  AtSwitch,
-  AtSteps,
-} from "taro-ui";
+import Taro from '@tarojs/taro';
+import React, { useState } from 'react';
+import { View, Text, Image, Picker, Button } from '@tarojs/components';
+import { AtAvatar, AtGrid, AtList, AtListItem, AtFloatLayout, AtMessage, AtSwitch, AtSteps } from 'taro-ui';
 
-import "./index.scss";
-import NavBar from "../../components/navbar";
-import ArsTabBar from "../../components/tabbar";
-import {
-  WxUserInfo,
-  message,
-  msgQueryParams,
-  wbStatus,
-  msgQueryResult,
-} from "../../types/ars";
-import { SERVER_URL } from "../../controllers/rest";
-import { queryMessages, markRead } from "../../controllers/message";
-import { queryWaybillStatus } from "../../controllers/waybill";
-import userpng from "../../assets/img/user.png";
-import MessageDetail from "../../components/messagedetail";
-import { Item } from "taro-ui/types/steps";
+import './index.scss';
+import NavBar from '../../components/navbar';
+import ArsTabBar from '../../components/tabbar';
+import { WxUserInfo, message, msgQueryParams, wbStatus, msgQueryResult } from '../../types/ars';
+import { SERVER_URL } from '../../controllers/rest';
+import { queryMessages, markRead } from '../../controllers/message';
+import { queryWaybillStatus } from '../../controllers/waybill';
+import userpng from '../../assets/img/user.png';
+import MessageDetail from '../../components/messagedetail';
+import { Item } from 'taro-ui/types/steps';
 export default function UserInfo() {
-  const [curAvatar, setAvatar] = useState(
-    Taro.getStorageSync("avatar") || userpng
-  );
-  const [nickName, setNickName] = useState(
-    Taro.getStorageSync("nickName") || ""
-  );
-  const [cellphone] = useState(Taro.getStorageSync("cellphone") || "");
-  const [userName, setUserName] = useState(
-    Taro.getStorageSync("userName") || ""
-  );
-  const [roleName] = useState(Taro.getStorageSync("roleName") || "");
+  const [curAvatar, setAvatar] = useState(Taro.getStorageSync('avatar') || userpng);
+  const [nickName, setNickName] = useState(Taro.getStorageSync('nickName') || '');
+  const [cellphone] = useState(Taro.getStorageSync('cellphone') || '');
+  const [userName, setUserName] = useState(Taro.getStorageSync('userName') || '');
+  const [roleName] = useState(Taro.getStorageSync('roleName') || '');
   const [openDetail, setOpenDetail] = useState(false);
   const [msgCount, setMsgCount] = useState(0);
   const [curMessage, setCurMessage] = useState({});
   const [messages, setMessages] = useState<msgQueryResult>({
-    result: "",
+    result: '',
     count: 0,
     messages: [],
   });
   const [init, setInit] = useState(true);
   const [ShowAll, setShowAll] = useState(false);
-  const userAuth: boolean = Taro.getStorageSync("userAuth");
-  const loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
-  const curWb = Taro.getStorageSync("waybill");
+  const userAuth: boolean = Taro.getStorageSync('userAuth');
+  const loggedIn = Taro.getStorageSync('roleName').toString().length > 0;
+  const curWb = Taro.getStorageSync('waybill');
   const [wbStatus, setWbStatus] = useState<Item[]>([]);
 
   //console.log("UserInfo:", this);
@@ -59,15 +39,15 @@ export default function UserInfo() {
   const msgQuery: msgQueryParams = {
     beginDate: new Date(new Date().valueOf() - 7 * 24 * 60 * 60 * 1000),
     endDate: new Date(),
-    toOpenid: Taro.getStorageSync("userOpenId"),
-    ordNo: "",
-    cdcCode: "",
+    toOpenid: Taro.getStorageSync('userOpenId'),
+    ordNo: '',
+    cdcCode: '',
     status: 0,
   };
   if (init) {
     setInit(false);
     queryMessages(msgQuery).then((ret) => {
-      console.log("userinfo.queryMessages.ret:", ret);
+      console.log('userinfo.queryMessages.ret:', ret);
       if (ret.count > 0) {
         setMessages(ret);
         setMsgCount(ret.count);
@@ -75,7 +55,7 @@ export default function UserInfo() {
     });
     if (curWb && curWb.length > 0) {
       queryWaybillStatus(curWb).then((ret) => {
-        if (ret.result === "success") {
+        if (ret.result === 'success') {
           setWbStatus(
             ret.statusList.map((item) => {
               const ret: Item = {
@@ -83,12 +63,8 @@ export default function UserInfo() {
                 desc: item.comment,
               };
               if (item.doneDate) {
-                ret.status = "success";
-                ret.title =
-                  ret.title +
-                  "[" +
-                  item.doneDate.toLocaleDateString().substr(5) +
-                  "]";
+                ret.status = 'success';
+                ret.title = ret.title + '[' + item.doneDate.toLocaleDateString().substr(5) + ']';
               }
               return ret;
             })
@@ -100,24 +76,24 @@ export default function UserInfo() {
 
   function getUserInfo() {
     let curUserInfo = {};
-    let userInfoStr = "scope.userInfo";
-    const userOpenId = Taro.getStorageSync("userOpenId") || "";
+    let userInfoStr = 'scope.userInfo';
+    const userOpenId = Taro.getStorageSync('userOpenId') || '';
     Taro.getSetting()
       .then((res) => {
         if (res.authSetting[userInfoStr]) {
-          console.log("userSettings:", res);
+          console.log('userSettings:', res);
         }
       })
       .catch((err) => {
-        console.log("error in getSetting():", err.errMsg);
+        console.log('error in getSetting():', err.errMsg);
       });
 
     Taro.getUserInfo()
       .then((ret) => {
-        console.log("getUserInfo.ret:", ret);
+        console.log('getUserInfo.ret:', ret);
         //if (isWx) {
-        Taro.setStorage({ key: "nickName", data: ret.userInfo.nickName });
-        Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
+        Taro.setStorage({ key: 'nickName', data: ret.userInfo.nickName });
+        Taro.setStorage({ key: 'avatar', data: ret.userInfo.avatarUrl });
         setNickName(ret.userInfo.nickName);
         setAvatar(ret.userInfo.avatarUrl);
         //}T
@@ -126,39 +102,39 @@ export default function UserInfo() {
         //get open id
         Taro.login({
           fail: (err) => {
-            console.log("error in login:", err);
+            console.log('error in login:', err);
           },
           success: (res) => {
             let code = res.code;
             Taro.request({
-              url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
+              url: 'https://api.hanyukj.cn/tims/getwxopenid/' + code,
               data: {},
-              header: { "content-type": "json" },
+              header: { 'content-type': 'json' },
               fail: (err) => {
-                console.log("err in get openid:", err);
+                console.log('err in get openid:', err);
               },
               success: (resp) => {
                 let openId = JSON.parse(resp.data).openid;
                 const snKey = JSON.parse(resp.data).session_key;
 
-                console.log("response:", resp);
-                console.log("response.data:", ret.encryptedData);
-                console.log("openID:", openId);
-                console.log("resp:", resp);
+                console.log('response:', resp);
+                console.log('response.data:', ret.encryptedData);
+                console.log('openID:', openId);
+                console.log('resp:', resp);
 
                 Taro.request({
-                  url: SERVER_URL + "/users/userInfo",
-                  method: "POST",
+                  url: SERVER_URL + '/users/userInfo',
+                  method: 'POST',
                   data: {
                     session_key: snKey,
                     iv: ret.iv,
                     data: ret.encryptedData,
                   },
                   header: {
-                    "content-type": "application/x-www-form-urlencoded",
+                    'content-type': 'application/x-www-form-urlencoded',
                   },
                 }).then((ret) => {
-                  console.log("client_post_response:", ret);
+                  console.log('client_post_response:', ret);
                 });
               },
             });
@@ -166,22 +142,22 @@ export default function UserInfo() {
         });
       })
       .catch((err) => {
-        console.log("err in getUserInfo:", err);
+        console.log('err in getUserInfo:', err);
       });
   }
 
   function setUserInfo(userInfo: WxUserInfo) {
-    console.log("setUserInfo:", userInfo);
+    console.log('setUserInfo:', userInfo);
     setAvatar(userInfo.avatarUrl || userpng);
-    setNickName(userInfo.nickName || "匿名用户");
-    setUserName(userInfo.nickName || "匿名用户");
+    setNickName(userInfo.nickName || '匿名用户');
+    setUserName(userInfo.nickName || '匿名用户');
   }
 
   function onGotUserInfo(res) {
     //const {isWx, isBd, isTt} = this.state;
-    console.log("user info got return:", res);
+    console.log('user info got return:', res);
     const isWx = true;
-    Taro.setStorage({ key: "userAuth", data: true });
+    Taro.setStorage({ key: 'userAuth', data: true });
     if (isWx) {
       getUserInfo();
     }
@@ -195,7 +171,7 @@ export default function UserInfo() {
   //   }
   // }
   function onOpenDetail() {
-    console.log("onOpenDetail:", openDetail);
+    console.log('onOpenDetail:', openDetail);
     setOpenDetail(!openDetail);
     //setMsgCount(messages.count);
   }
@@ -211,16 +187,12 @@ export default function UserInfo() {
           {userAuth ? (
             <View className="user-detail">
               <View className="user-detail-1">
-                {userName || nickName}（{roleName || "未登录"}）
+                {userName || nickName}（{roleName || '未登录'}）
               </View>
               <View className="user-detail-2">手机：{cellphone}</View>
             </View>
           ) : (
-            <Button
-              openType="getUserInfo"
-              onGetUserInfo={onGotUserInfo}
-              className="login-button"
-            >
+            <Button openType="getUserInfo" onGetUserInfo={onGotUserInfo} className="login-button">
               微信授权
             </Button>
           )}
@@ -228,82 +200,75 @@ export default function UserInfo() {
       </View>
 
       <View className="list-span">
-        <Text className="list-title">
-          最新运单{curWb.length > 0 ? "【" + curWb + "】" : ""}处理进度
-        </Text>
-        {curWb.length <= 0 ? (
-          <Text>没有运单</Text>
-        ) : (
-          <AtSteps items={wbStatus} current={2} onChange={() => {}} />
-        )}
+        <Text className="list-title">最新运单{curWb.length > 0 ? '【' + curWb + '】' : ''}处理进度</Text>
+        {curWb.length <= 0 ? <Text>没有运单</Text> : <AtSteps items={wbStatus} current={2} onChange={() => {}} />}
       </View>
-      <View style={{ fontSize: "0.8rem", color: "#ff0000" }}>
+      <View style={{ fontSize: '0.8rem', color: '#ff0000' }}>
         <AtGrid
           onClick={(item, index) => {
-            console.log("atgrid:", item, index);
+            console.log('atgrid:', item, index);
             switch (index) {
               case 0:
                 //Taro.navigateTo({url: "/pages/user/Register",});
                 Taro.requestSubscribeMessage({
-                  tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
+                  tmplIds: ['JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls'],
                   success: (res) => {
-                    console.log("subscribe message success:", res);
+                    console.log('subscribe message success:', res);
                   },
                 });
                 break;
               case 1:
                 //getUserInfo();
                 loggedIn
-                  ? Taro.navigateTo({ url: "/pages/camera/verify" })
+                  ? Taro.navigateTo({ url: '/pages/camera/verify' })
                   : Taro.atMessage({
-                      message: "请先登录到系统",
-                      type: "error",
+                      message: '请先登录到系统',
+                      type: 'error',
                     });
                 break;
               case 2:
                 loggedIn
-                  ? Taro.navigateTo({ url: "/pages/sheet/query" })
+                  ? Taro.navigateTo({ url: '/pages/sheet/query' })
                   : Taro.atMessage({
-                      message: "请先登录到系统",
-                      type: "error",
+                      message: '请先登录到系统',
+                      type: 'error',
                     });
 
                 break;
               default:
-                console.log("wait...");
+                console.log('wait...');
                 break;
             }
           }}
           data={[
             {
               iconInfo: {
-                prefixClass: "fa",
-                value: "comments",
+                prefixClass: 'fa',
+                value: 'comments',
                 size: 40,
-                color: "#62a60a",
+                color: '#62a60a',
               },
-              value: "消息订阅",
+              value: '消息订阅',
             },
             {
               iconInfo: {
-                prefixClass: "fa",
-                value: "wpforms",
+                prefixClass: 'fa',
+                value: 'wpforms',
                 size: 40,
-                color: loggedIn ? "#ce007c" : "#d6d6d6",
+                color: loggedIn ? '#ce007c' : '#d6d6d6',
               },
-              value: "回执审核",
+              value: '回执审核',
             },
             {
               iconInfo: {
-                prefixClass: "fa",
-                value: "pencil-square-o",
+                prefixClass: 'fa',
+                value: 'pencil-square-o',
                 size: 40,
-                color: loggedIn ? "#d15805" : "#d6d6d6",
+                color: loggedIn ? '#d15805' : '#d6d6d6',
               },
-              value: "运单查询",
+              value: '运单查询',
             },
-          ]}
-        ></AtGrid>
+          ]}></AtGrid>
       </View>
       <View className="list-span">
         <View className="list-head">
@@ -315,8 +280,7 @@ export default function UserInfo() {
             checked={ShowAll}
             onChange={() => {
               setShowAll(!ShowAll);
-            }}
-          ></AtSwitch>
+            }}></AtSwitch>
         </View>
         {msgCount <= 0 ? (
           <Text>没有新消息</Text>
@@ -327,11 +291,11 @@ export default function UserInfo() {
               .map((item) => {
                 return (
                   <AtListItem
-                    key={"user-message-" + item.msgId}
+                    key={'user-message-' + item.msgId}
                     className="list-items"
                     title={item.title}
                     note={item.content}
-                    extraText={item.status === 3 ? "已读" : ""}
+                    extraText={item.status === 3 ? '已读' : ''}
                     onClick={() => {
                       setCurMessage(item);
                       onOpenDetail();
@@ -343,11 +307,7 @@ export default function UserInfo() {
           </AtList>
         )}
       </View>
-      <AtFloatLayout
-        isOpened={openDetail}
-        title={curMessage.title}
-        onClose={onOpenDetail}
-      >
+      <AtFloatLayout isOpened={openDetail} title={curMessage.title} onClose={onOpenDetail}>
         <MessageDetail
           title={curMessage.title}
           content={curMessage.content}
@@ -356,9 +316,9 @@ export default function UserInfo() {
           sentTime={curMessage.sentTime}
           msgId={curMessage.msgId}
           markFunc={(msgid) => {
-            console.log("mark read:", msgid);
+            console.log('mark read:', msgid);
             markRead(msgid).then((res) => {
-              if (res.result === "success") {
+              if (res.result === 'success') {
                 for (var i = 0; i < messages.messages.length; i++) {
                   if (messages.messages[i].msgId === msgid) {
                     messages.messages[i].status = 3;
@@ -368,8 +328,8 @@ export default function UserInfo() {
                   }
                 }
                 Taro.atMessage({
-                  message: "操作成功",
-                  type: "success",
+                  message: '操作成功',
+                  type: 'success',
                 });
                 onOpenDetail();
               }

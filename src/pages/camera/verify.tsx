@@ -1,50 +1,38 @@
-import Taro, { useState } from "@tarojs/taro";
-import { View, Text, Button, Image } from "@tarojs/components";
-import {
-  AtMessage,
-  AtList,
-  AtListItem,
-  AtModal,
-  AtModalHeader,
-  AtModalContent,
-  AtInput,
-  AtModalAction,
-} from "taro-ui";
-import "./camera.scss";
+import Taro from '@tarojs/taro';
+import React, { useState } from 'react';
+import { View, Text, Button, Image } from '@tarojs/components';
+import { AtMessage, AtList, AtListItem, AtModal, AtModalHeader, AtModalContent, AtInput, AtModalAction } from 'taro-ui';
+import './camera.scss';
 
-import ArsTabBar from "../../components/tabbar";
-import { SERVER_URL } from "../../controllers/rest";
+import ArsTabBar from '../../components/tabbar';
+import { SERVER_URL } from '../../controllers/rest';
 
-import {
-  queryUnVerifiedPhotos,
-  approvePicture,
-  rejectPicture,
-} from "../../controllers/camera";
-import { photoData, uvPhotoData } from "../../types/ars";
+import { queryUnVerifiedPhotos, approvePicture, rejectPicture } from '../../controllers/camera';
+import { photoData, uvPhotoData } from '../../types/ars';
 
 export default function Verify() {
-  const [selPic, setSelPic] = useState("");
+  const [selPic, setSelPic] = useState('');
   const [preview, setPreview] = useState(false);
   const [days, setDays] = useState(1);
 
   const [photos, setPhotos] = useState<Array<uvPhotoData> | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [confirmReject, setConfirmReject] = useState(false);
-  const [remark, setRemark] = useState("");
-  const [curWbno, setCurWbno] = useState("");
-  const [curImgid, setCurImgid] = useState("");
+  const [remark, setRemark] = useState('');
+  const [curWbno, setCurWbno] = useState('');
+  const [curImgid, setCurImgid] = useState('');
   const [curPhoto, setCurPhoto] = useState<uvPhotoData>({
-    url: "",
-    ordNo: "",
-    shpToCd: "",
-    cdcName: "",
+    url: '',
+    ordNo: '',
+    shpToCd: '',
+    cdcName: '',
     state: 0,
   });
 
   if (!loaded) {
-    queryUnVerifiedPhotos(Taro.getStorageSync("userOpenId"))
+    queryUnVerifiedPhotos(Taro.getStorageSync('userOpenId'))
       .then((res) => {
-        if (res.result === "success" && res.photos) {
+        if (res.result === 'success' && res.photos) {
           setPhotos(res.photos);
         }
       })
@@ -54,7 +42,7 @@ export default function Verify() {
   }
 
   function handleClick(url) {
-    console.log("handleClick:", url);
+    console.log('handleClick:', url);
     setSelPic(url);
     setPreview(true);
   }
@@ -74,58 +62,51 @@ export default function Verify() {
               Taro.previewImage({
                 urls: [selPic],
                 success: () => {
-                  console.log("success");
+                  console.log('success');
                 },
                 fail: () => {
-                  console.log("fail");
+                  console.log('fail');
                 },
               });
-            }}
-          ></Image>
+            }}></Image>
           <View style="display:flex; flex-direction:row">
             <Button
               className="preview-confirm-button"
               onClick={() => {
-                approvePicture(
-                  curWbno,
-                  curImgid,
-                  Taro.getStorageSync("userOpenId")
-                )
+                approvePicture(curWbno, curImgid, Taro.getStorageSync('userOpenId'))
                   .then((ret) => {
-                    if (ret.result === "approve") {
+                    if (ret.result === 'approve') {
                       curPhoto.state = 1;
                       Taro.atMessage({
-                        message: "照片审核通过",
-                        type: "success",
+                        message: '照片审核通过',
+                        type: 'success',
                       });
                     } else {
                       Taro.atMessage({
-                        message: "照片审核操作失败，请重试",
-                        type: "error",
+                        message: '照片审核操作失败，请重试',
+                        type: 'error',
                       });
                     }
-                    console.log("approvePicture.result:", ret);
+                    console.log('approvePicture.result:', ret);
                   })
                   .catch(() => {
                     Taro.atMessage({
-                      message: "照片审核操作失败，请重试",
-                      type: "error",
+                      message: '照片审核操作失败，请重试',
+                      type: 'error',
                     });
                   })
                   .finally(() => {
                     setPreview(false);
-                    console.log("confirmed!");
+                    console.log('confirmed!');
                   });
-              }}
-            >
+              }}>
               通过
             </Button>
             <Button
               className="preview-confirm-button"
               onClick={() => {
                 setConfirmReject(true);
-              }}
-            >
+              }}>
               退回
             </Button>
           </View>
@@ -135,7 +116,7 @@ export default function Verify() {
               <View className="toast-main">
                 <View className="confirm-info">请给出退回原因</View>
                 <AtInput
-                  key={"reject-reason"}
+                  key={'reject-reason'}
                   type="text"
                   className="modal-input"
                   title="原因："
@@ -143,10 +124,9 @@ export default function Verify() {
                   name="remark"
                   placeholder="写出退回原因"
                   onChange={(theval) => {
-                    console.log("remark:", theval);
+                    console.log('remark:', theval);
                     setRemark(theval);
-                  }}
-                ></AtInput>
+                  }}></AtInput>
               </View>
             </AtModalContent>
             <AtModalAction>
@@ -155,46 +135,39 @@ export default function Verify() {
                 onClick={() => {
                   //Taro.navigateBack();
                   setConfirmReject(false);
-                }}
-              >
+                }}>
                 取消
               </Button>
               <Button
                 className="home-input-semi-right"
                 onClick={() => {
-                  rejectPicture(
-                    curWbno,
-                    curImgid,
-                    remark,
-                    Taro.getStorageSync("userOpenId")
-                  )
+                  rejectPicture(curWbno, curImgid, remark, Taro.getStorageSync('userOpenId'))
                     .then((ret) => {
-                      console.log("rejectPicture.result:", ret);
-                      if (ret.result === "reject") {
+                      console.log('rejectPicture.result:', ret);
+                      if (ret.result === 'reject') {
                         curPhoto.state = 2;
                         Taro.atMessage({
-                          message: "照片审核退回成功",
-                          type: "success",
+                          message: '照片审核退回成功',
+                          type: 'success',
                         });
                       } else {
                         Taro.atMessage({
-                          message: "照片审核操作失败，请重试",
-                          type: "error",
+                          message: '照片审核操作失败，请重试',
+                          type: 'error',
                         });
                       }
                     })
                     .catch(() => {
                       Taro.atMessage({
-                        message: "照片审核操作失败，请重试",
-                        type: "error",
+                        message: '照片审核操作失败，请重试',
+                        type: 'error',
                       });
                     })
                     .finally(() => {
                       setPreview(false);
-                      console.log("rejected!");
+                      console.log('rejected!');
                     });
-                }}
-              >
+                }}>
                 确认退回
               </Button>
             </AtModalAction>
@@ -210,18 +183,17 @@ export default function Verify() {
                   return (
                     <AtListItem
                       title={item.ordNo}
-                      note={item.shpToCd + "(" + item.cdcName + ")"}
-                      extraText={"第" + index + "项"}
+                      note={item.shpToCd + '(' + item.cdcName + ')'}
+                      extraText={'第' + index + '项'}
                       arrow="right"
                       thumb={SERVER_URL + item.url}
-                      key={SERVER_URL + item.url + "_1"}
+                      key={SERVER_URL + item.url + '_1'}
                       onClick={(val) => {
                         setCurImgid(item.url);
                         setCurWbno(item.ordNo + item.shpToCd);
                         setCurPhoto(item);
                         handleClick(SERVER_URL + item.url);
-                      }}
-                    ></AtListItem>
+                      }}></AtListItem>
                   );
                 })
             ) : (

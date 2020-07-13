@@ -1,4 +1,5 @@
-import Taro, { useState } from '@tarojs/taro';
+import Taro from '@tarojs/taro';
+import React, { useState } from 'react';
 import { AtTabs, AtTabsPane, AtList, AtListItem } from 'taro-ui';
 import { View } from '@tarojs/components';
 import { TabItem } from 'taro-ui/types/tabs';

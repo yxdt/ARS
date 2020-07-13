@@ -1,5 +1,6 @@
-import Taro, { useState } from '@tarojs/taro';
-import { View, Text, Button, Picker } from '@tarojs/components';
+import Taro from '@tarojs/taro';
+import React, { useState } from 'react';
+import { View, Text, Picker } from '@tarojs/components';
 import { AtInput, AtMessage, AtList, AtListItem, AtRadio, AtButton } from 'taro-ui';
 import './index.scss';
 
@@ -16,7 +17,7 @@ export default function Query() {
   const [wbNum, setWbNum] = useState('');
   const [waybills, setWaybills] = useState<Array<Waybill> | null>([]);
   const [queryed, setQueryed] = useState(false);
-  function doLogin() {}
+  //function doLogin() {}
 
   return (
     <View className="index">

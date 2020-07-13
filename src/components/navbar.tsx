@@ -1,42 +1,44 @@
-import Taro from "@tarojs/taro";
-import { AtNavBar } from "taro-ui";
+import Taro from '@tarojs/taro';
+import React from 'react';
+
+import { AtNavBar } from 'taro-ui';
 
 export default function NavBar(props) {
-  let loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
+  let loggedIn = Taro.getStorageSync('roleName').toString().length > 0;
   return (
     <AtNavBar
       customStyle={{
-        backgroundColor: "#ababab",
+        backgroundColor: '#ababab',
       }}
       onClickRgIconSt={() => {
-        console.log("onClickRgIconSt");
+        console.log('onClickRgIconSt');
         if (loggedIn) {
           Taro.removeStorage({
-            key: "roleName",
+            key: 'roleName',
             success: () => {
-              Taro.redirectTo({ url: "/pages/index/index" });
+              Taro.redirectTo({ url: '/pages/index/index' });
             },
           });
-          Taro.removeStorage({ key: "userName" });
+          Taro.removeStorage({ key: 'userName' });
         } else {
           //not logged in yet
-          Taro.redirectTo({ url: "/pages/user/Login" });
+          Taro.redirectTo({ url: '/pages/user/Login' });
         }
       }}
       //onClickRgIconNd={this.props.handleClick}
       //onClickLeftIcon={this.props.handleClick}
-      title={props.title || (loggedIn ? "点击退出" : "配送中心人员登录")}
+      title={props.title || (loggedIn ? '点击退出' : '配送中心人员登录')}
       color="#ffffff"
       leftText=""
       fixed={true}
       rightFirstIconType={
         props.hideRightIcon
-          ? ""
+          ? ''
           : {
-              prefixClass: "fa",
-              value: props.ricon || (loggedIn ? "sign-out" : "id-badge"),
-              size: "24",
-              color: "#ffffff",
+              prefixClass: 'fa',
+              value: props.ricon || (loggedIn ? 'sign-out' : 'id-badge'),
+              size: '24',
+              color: '#ffffff',
             }
       }
       rightSecondIconType=""

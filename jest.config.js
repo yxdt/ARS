@@ -18,5 +18,7 @@ module.exports = {
     //"^.+\\.jsx?$": "babel-jest", // Adding this line solved the issue
     //"^.+\\.tsx?$": "ts-jest",
   },
-  transformIgnorePatterns: ["<rootDir>/node_modules/"],
+  transformIgnorePatterns: [
+    "<rootDir>/node_modules/(?!(taro-ui|@tarojs" + ")/)",
+  ],
 };

@@ -95,6 +95,8 @@
     "stylelint": "9.3.0",
     "stylelint-config-taro-rn": "2.2.3",
     "stylelint-taro-rn": "2.2.3",
+    "terser": "^4.8.0",
+    "terser-webpack-plugin": "^3.0.6",
     "ts-jest": "^26.1.1",
     "typescript": "^3.0.1",
     "webpack": "^4.43.0",

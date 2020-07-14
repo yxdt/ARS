@@ -16,10 +16,9 @@ import NavBar from "../../components/navbar";
 import ArsTabBar from "../../components/tabbar";
 import {
   WxUserInfo,
-  message,
   msgQueryParams,
-  wbStatus,
   msgQueryResult,
+  message,
 } from "../../types/ars";
 import { SERVER_URL } from "../../controllers/rest";
 import { queryMessages, markRead } from "../../controllers/message";
@@ -41,7 +40,16 @@ export default function UserInfo() {
   const [roleName] = useState(Taro.getStorageSync("roleName") || "");
   const [openDetail, setOpenDetail] = useState(false);
   const [msgCount, setMsgCount] = useState(0);
-  const [curMessage, setCurMessage] = useState({});
+  const [curMessage, setCurMessage] = useState<message>({
+    msgId: 0,
+    title: "",
+    content: "",
+    ordNo: "",
+    cdc: "",
+    sentTime: "",
+    status: 0,
+    toOpenid: "",
+  });
   const [messages, setMessages] = useState<msgQueryResult>({
     result: "",
     count: 0,
@@ -54,7 +62,7 @@ export default function UserInfo() {
   const curWb = Taro.getStorageSync("waybill");
   const [wbStatus, setWbStatus] = useState<Item[]>([]);
 
-  //console.log("UserInfo:", this);
+  ////consolelog("UserInfo:", this);
   //let msgList: Array<message>;
   const msgQuery: msgQueryParams = {
     beginDate: new Date(new Date().valueOf() - 7 * 24 * 60 * 60 * 1000),
@@ -67,7 +75,7 @@ export default function UserInfo() {
   if (init) {
     setInit(false);
     queryMessages(msgQuery).then((ret) => {
-      console.log("userinfo.queryMessages.ret:", ret);
+      //consolelog("userinfo.queryMessages.ret:", ret);
       if (ret.count > 0) {
         setMessages(ret);
         setMsgCount(ret.count);
@@ -105,16 +113,16 @@ export default function UserInfo() {
     Taro.getSetting()
       .then((res) => {
         if (res.authSetting[userInfoStr]) {
-          console.log("userSettings:", res);
+          //consolelog("userSettings:", res);
         }
       })
       .catch((err) => {
-        console.log("error in getSetting():", err.errMsg);
+        //consolelog("error in getSetting():", err.errMsg);
       });
 
     Taro.getUserInfo()
       .then((ret) => {
-        console.log("getUserInfo.ret:", ret);
+        //consolelog("getUserInfo.ret:", ret);
         //if (isWx) {
         Taro.setStorage({ key: "nickName", data: ret.userInfo.nickName });
         Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
@@ -126,7 +134,7 @@ export default function UserInfo() {
         //get open id
         Taro.login({
           fail: (err) => {
-            console.log("error in login:", err);
+            //consolelog("error in login:", err);
           },
           success: (res) => {
             let code = res.code;
@@ -135,16 +143,16 @@ export default function UserInfo() {
               data: {},
               header: { "content-type": "json" },
               fail: (err) => {
-                console.log("err in get openid:", err);
+                //consolelog("err in get openid:", err);
               },
               success: (resp) => {
                 let openId = JSON.parse(resp.data).openid;
                 const snKey = JSON.parse(resp.data).session_key;
 
-                console.log("response:", resp);
-                console.log("response.data:", ret.encryptedData);
-                console.log("openID:", openId);
-                console.log("resp:", resp);
+                //consolelog("response:", resp);
+                //consolelog("response.data:", ret.encryptedData);
+                //consolelog("openID:", openId);
+                //consolelog("resp:", resp);
 
                 Taro.request({
                   url: SERVER_URL + "/users/userInfo",
@@ -158,7 +166,7 @@ export default function UserInfo() {
                     "content-type": "application/x-www-form-urlencoded",
                   },
                 }).then((ret) => {
-                  console.log("client_post_response:", ret);
+                  //consolelog("client_post_response:", ret);
                 });
               },
             });
@@ -166,12 +174,12 @@ export default function UserInfo() {
         });
       })
       .catch((err) => {
-        console.log("err in getUserInfo:", err);
+        //consolelog("err in getUserInfo:", err);
       });
   }
 
   function setUserInfo(userInfo: WxUserInfo) {
-    console.log("setUserInfo:", userInfo);
+    //consolelog("setUserInfo:", userInfo);
     setAvatar(userInfo.avatarUrl || userpng);
     setNickName(userInfo.nickName || "匿名用户");
     setUserName(userInfo.nickName || "匿名用户");
@@ -179,7 +187,7 @@ export default function UserInfo() {
 
   function onGotUserInfo(res) {
     //const {isWx, isBd, isTt} = this.state;
-    console.log("user info got return:", res);
+    //consolelog("user info got return:", res);
     const isWx = true;
     Taro.setStorage({ key: "userAuth", data: true });
     if (isWx) {
@@ -188,14 +196,14 @@ export default function UserInfo() {
   }
   // if (init) {
   //   setInit(false);
-  //   console.log(this.$router.params);
+  //   //consolelog(this.$router.params);
 
   //   if (this.$router.params) {
   //     setUserInfo(this.$router.params);
   //   }
   // }
   function onOpenDetail() {
-    console.log("onOpenDetail:", openDetail);
+    //consolelog("onOpenDetail:", openDetail);
     setOpenDetail(!openDetail);
     //setMsgCount(messages.count);
   }
@@ -240,14 +248,14 @@ export default function UserInfo() {
       <View style={{ fontSize: "0.8rem", color: "#ff0000" }}>
         <AtGrid
           onClick={(item, index) => {
-            console.log("atgrid:", item, index);
+            //consolelog("atgrid:", item, index);
             switch (index) {
               case 0:
                 //Taro.navigateTo({url: "/pages/user/Register",});
                 Taro.requestSubscribeMessage({
                   tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
                   success: (res) => {
-                    console.log("subscribe message success:", res);
+                    //consolelog("subscribe message success:", res);
                   },
                 });
                 break;
@@ -270,7 +278,7 @@ export default function UserInfo() {
 
                 break;
               default:
-                console.log("wait...");
+                //consolelog("wait...");
                 break;
             }
           }}
@@ -305,7 +313,7 @@ export default function UserInfo() {
           ]}
         ></AtGrid>
       </View>
-      <View className="list-span">
+      <View className="list-span last-span">
         <View className="list-head">
           <Text className="list-title">系统消息</Text>
           <AtSwitch
@@ -354,13 +362,13 @@ export default function UserInfo() {
           ordNo={curMessage.ordNo}
           cdc={curMessage.cdc}
           sentTime={curMessage.sentTime}
-          msgId={curMessage.msgId}
-          markFunc={(msgid) => {
+          msgId={curMessage.msgId + ""}
+          markFunc={(msgid: number) => {
             console.log("mark read:", msgid);
             markRead(msgid).then((res) => {
               if (res.result === "success") {
                 for (var i = 0; i < messages.messages.length; i++) {
-                  if (messages.messages[i].msgId === msgid) {
+                  if (messages.messages[i].msgId == msgid) {
                     messages.messages[i].status = 3;
                     messages.count--;
                     setMsgCount(messages.count);

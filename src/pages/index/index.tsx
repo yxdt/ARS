@@ -16,7 +16,7 @@ export default function Index() {
   const [isScan, setIsScan] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  console.log("$router.params:", this.$router.params);
+  //consolelog("$router.params:", this.$router.params);
 
   if (this.$router.params.wbno) {
     setIsScan(true);
@@ -28,7 +28,7 @@ export default function Index() {
       Taro.getStorageSync("waybilldate") || new Date().valueOf();
 
     const today = new Date();
-    console.log("localcurwbno, wbnodate:", curwbno, wbnodate);
+    //consolelog("localcurwbno, wbnodate:", curwbno, wbnodate);
     if (wbnodate && today.valueOf() - wbnodate > 24 * 60 * 60 * 1000) {
       //本地运单信息超过一天自动清除
       curwbno = "";
@@ -40,7 +40,7 @@ export default function Index() {
 
   function gotBarcode(bcVal: string) {
     //bcVal = waybillNum + rdcNum
-    console.log("index.index.gotBarcode:", bcVal);
+    //consolelog("index.index.gotBarcode:", bcVal);
     Taro.navigateTo({
       url: "/pages/sheet/index?wbno=" + bcVal.result,
     });
@@ -50,7 +50,7 @@ export default function Index() {
     //if (!manual) {
     //  setManual(true);
     //} else {
-    //console.log("openSheet.waybillNum:", waybillNum);
+    ////consolelog("openSheet.waybillNum:", waybillNum);
 
     Taro.navigateTo({
       url: "/pages/sheet/index?wbno=" + waybillNum,
@@ -82,7 +82,7 @@ export default function Index() {
               type="text"
               value={waybillNum}
               onChange={(val: string) => {
-                //console.log("new wbNum:", val);
+                ////consolelog("new wbNum:", val);
                 setWaybillNum(val);
                 Taro.setStorage({ key: "waybill", data: val });
                 Taro.setStorage({

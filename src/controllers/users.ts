@@ -21,7 +21,7 @@ function getDriverInfo(phone: string): Promise<DriverInfo> {
         driverInfo.address = "北京市东城区长安街1号";
         driverInfo.openid = "123abcdefg9887";
 
-        //console.log("getDriverInfo.driverInfo:", driverInfo);
+        ////consolelog("getDriverInfo.driverInfo:", driverInfo);
         res(driverInfo);
       }, 1000);
     } else {
@@ -31,7 +31,7 @@ function getDriverInfo(phone: string): Promise<DriverInfo> {
           driverInfo.latitude = ret.latitude;
           driverInfo.longitude = ret.longitude;
           driverInfo.address = ret.address;
-          //console.log("getDriverInfo.driverInfo:", driverInfo);
+          ////consolelog("getDriverInfo.driverInfo:", driverInfo);
           res(driverInfo);
         });
       });
@@ -40,7 +40,7 @@ function getDriverInfo(phone: string): Promise<DriverInfo> {
 }
 
 function getDriverLocation(resolve: Function) {
-  //console.log("wbno:", wbno);
+  ////consolelog("wbno:", wbno);
 
   Taro.getLocation({
     type: "wgs84",
@@ -49,11 +49,11 @@ function getDriverLocation(resolve: Function) {
         key: "HV2BZ-HMTC6-IICS7-ESS5M-BFX2E-V6B5B",
       });
       const loc = { latitude: res.latitude, longitude: res.longitude };
-      //console.log("cur position:", loc);
+      ////consolelog("cur position:", loc);
       qqmapsdk.reverseGeocoder({
         location: loc || "",
         success: (resLoc) => {
-          //console.log("resLoc:", resLoc);
+          ////consolelog("resLoc:", resLoc);
           resolve({
             latitude: res.latitude,
             longitude: res.longitude,
@@ -61,7 +61,7 @@ function getDriverLocation(resolve: Function) {
           });
         },
         fail: (err) => {
-          console.log("error when find address:", err);
+          //consolelog("error when find address:", err);
         },
       });
       //成功获取司机位置信息可以做一些服务器端操作，比如存储位置信息。
@@ -93,8 +93,8 @@ function getWxOpenId(cbOpenId: Function) {
           success: (resp) => {
             let openId = JSON.parse(resp.data).openid;
             Taro.setStorage({ key: "userOpenId", data: openId });
-            //console.log("controllers.users.getWxOpenId.openID:", openId);
-            //console.log("resp:", resp);
+            ////consolelog("controllers.users.getWxOpenId.openID:", openId);
+            ////consolelog("resp:", resp);
             cbOpenId(openId);
           },
         });
@@ -106,10 +106,10 @@ function getWxOpenId(cbOpenId: Function) {
 async function getUserInfo() {
   try {
     const ui = await Taro.getUserInfo();
-    //console.log("Taro.getUserInfo:", ui);
+    ////consolelog("Taro.getUserInfo:", ui);
     return ui.userInfo;
   } catch (err) {
-    //console.log("err in controllers/users/getUserInfo:", err);
+    ////consolelog("err in controllers/users/getUserInfo:", err);
   }
 }
 
@@ -138,7 +138,7 @@ async function getUserInfo() {
 // }
 
 async function doLogin(cellphone, password): Promise<loginResult> {
-  //console.log('controllers.user.doLogin:', cellphone, password);
+  ////consolelog('controllers.user.doLogin:', cellphone, password);
   let success = false;
   let ret: loginResult = {
     result: "success",
@@ -148,10 +148,10 @@ async function doLogin(cellphone, password): Promise<loginResult> {
   try {
     restRet = await userLogin(cellphone, password);
   } catch (err) {
-    //console.log("login error:", err);
+    ////consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  //console.log("controllers.users.doLogin.res:", restRet);
+  ////consolelog("controllers.users.doLogin.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.userName) {
       ret.user = restRet.data;
@@ -166,7 +166,7 @@ async function doLogin(cellphone, password): Promise<loginResult> {
     if (success) {
       res(ret);
     } else {
-      //console.log('controllers.users.doLogin.res.rej:', restRet);
+      ////consolelog('controllers.users.doLogin.res.rej:', restRet);
       rej(ret);
     }
   });

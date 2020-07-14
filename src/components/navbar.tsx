@@ -9,7 +9,7 @@ export default function NavBar(props) {
         backgroundColor: "#ababab",
       }}
       onClickRgIconSt={() => {
-        console.log("onClickRgIconSt");
+        //consolelog("onClickRgIconSt");
         if (loggedIn) {
           Taro.removeStorage({
             key: "roleName",

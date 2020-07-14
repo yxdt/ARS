@@ -42,7 +42,7 @@ const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 //   if (DEBUGGING) {
 //     return new Promise((res, rej) => {
 //       setTimeout(() => {
-//         console.log("user.saveDriverLocation.timeout");
+//         //consolelog("user.saveDriverLocation.timeout");
 //         res({
 //           shtteNum: wbNum,
 //           location: loc,
@@ -51,7 +51,7 @@ const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 //       }, 1000);
 //     });
 //   } else {
-//     console.log("!!1not implemented yet!!!");
+//     //consolelog("!!1not implemented yet!!!");
 //   }
 // }
 async function sendArriveMessage(
@@ -181,7 +181,7 @@ async function getWbPhotos(wbNum: string) {
       {},
       null
     );
-    //console.log("getWbPhotos:", photos);
+    ////consolelog("getWbPhotos:", photos);
     return photos;
   }
 }
@@ -210,7 +210,7 @@ async function userLogin(
     },
     { "content-type": "application/x-www-form-urlencoded" }
   );
-  //console.log('rest.userLogin.ret:', ret);
+  ////consolelog('rest.userLogin.ret:', ret);
   //Taro.setStorage({ key: "roleName", data: roleName });
   //Taro.setStorage({ key: "userName", data: userName });
 
@@ -220,7 +220,7 @@ async function userLogin(
 async function taroRequest<T>(url: string, method, data, header) {
   let ret;
   if (DEBUGGING) {
-    //console.log('DEBUGGING.taroRequest.SERVER_URL:', url);
+    ////consolelog('DEBUGGING.taroRequest.SERVER_URL:', url);
     if (url === "/logistics/login") {
       ret = await loginRequest(data);
     } else if (url.startsWith("/order/code/")) {

@@ -9,7 +9,7 @@ describe("Load Waybill Test", () => {
   it("should load an arrived waybill successfully", () => {
     expect.assertions(5);
     return loadWaybill("1").then((res) => {
-      //console.log("test.loadWaybill.res:", res);
+      ////consolelog("test.loadWaybill.res:", res);
       expect(res.result).toBe("success");
       expect(res.waybill.wbNum).toBe("1");
       expect(res.waybill.status).toBe("arrived");
@@ -20,7 +20,7 @@ describe("Load Waybill Test", () => {
   it("should load an confirmed waybill successfully", () => {
     expect.assertions(3);
     return loadWaybill("2").then((res) => {
-      //console.log("test.loadWaybill.res:", res);
+      ////consolelog("test.loadWaybill.res:", res);
       expect(res.result).toBe("success");
       expect(res.waybill.wbNum).toBe("2");
       expect(res.waybill.status).toBe("confirmed");
@@ -29,7 +29,7 @@ describe("Load Waybill Test", () => {
   it("should load an loaded waybill successfully", () => {
     expect.assertions(4);
     return loadWaybill("3342").then((res) => {
-      //console.log("test.loadWaybill3342.res:", res);
+      ////consolelog("test.loadWaybill3342.res:", res);
       expect(res.result).toBe("success");
       expect(res.waybill.wbNum).toBe("3342");
       expect(res.waybill.status).toBe("loaded");
@@ -39,7 +39,7 @@ describe("Load Waybill Test", () => {
   it("should load an loaded waybill but no photos successfully", () => {
     expect.assertions(4);
     return loadWaybill("9999").then((res) => {
-      //console.log("test.loadWaybill9999.res:", res);
+      ////consolelog("test.loadWaybill9999.res:", res);
       expect(res.result).toBe("success");
       expect(res.waybill.wbNum).toBe("9999");
       expect(res.waybill.status).toBe("loaded");
@@ -49,7 +49,7 @@ describe("Load Waybill Test", () => {
   it("should not find a waybill", () => {
     expect.assertions(2);
     return loadWaybill("000").catch((res) => {
-      //console.log("test.loadWaybill.000.res:", res);
+      ////consolelog("test.loadWaybill.000.res:", res);
       expect(res.result).toBe("fail");
       expect(res.waybill).toBeNull();
     });
@@ -57,7 +57,7 @@ describe("Load Waybill Test", () => {
   it("should reject an error ", () => {
     expect.assertions(2);
     return loadWaybill("999").catch((res) => {
-      //console.log("test.loadWaybill.999.reject.res:", res);
+      ////consolelog("test.loadWaybill.999.reject.res:", res);
       expect(res.result).toBe("fail");
       expect(res.waybill).toBeNull();
     });
@@ -125,7 +125,7 @@ describe("Query Waybills Test", () => {
   it("should return waybills", () => {
     expect.assertions(2);
     return queryWaybills(query).then((res) => {
-      //console.log("test.waybill.queryWaybills.success.res:", res);
+      ////consolelog("test.waybill.queryWaybills.success.res:", res);
       expect(res.result).toBe("success");
       expect(res.waybills.length).toBe(res.count);
     });
@@ -134,7 +134,7 @@ describe("Query Waybills Test", () => {
     query.ordNo = "000";
     expect.assertions(3);
     return queryWaybills(query).then((res) => {
-      //console.log("test.waybill.queryWaybills.fail.res:", res);
+      ////consolelog("test.waybill.queryWaybills.fail.res:", res);
       expect(res.result).toBe("fail");
       expect(res.waybills).toBeNull();
       expect(res.count).toBe(0);
@@ -144,7 +144,7 @@ describe("Query Waybills Test", () => {
     query.ordNo = "999";
     expect.assertions(3);
     return queryWaybills(query).catch((res) => {
-      //console.log("test.waybill.queryWaybills.error.res:", res);
+      ////consolelog("test.waybill.queryWaybills.error.res:", res);
       expect(res.result).toBe("error");
       expect(res.waybills).toBeNull();
       expect(res.count).toBe(0);

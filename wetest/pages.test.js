@@ -7,7 +7,7 @@ let page;
 
 beforeAll(async () => {
   jest.setTimeout(800000);
-  //console.log("beforeAll:begin:", mPrg);
+  ////consolelog("beforeAll:begin:", mPrg);
   // mPrg = await automator.connect({
   //   wsEndpoint: 'ws://localhost:33979',
   // });
@@ -25,10 +25,10 @@ beforeAll(async () => {
     //wsEndpoint: 'ws://localhost:9420',
     //projectPath: '\\Users\\terry\\Desktop\\works2020\\ARS\\dist',
   });
-  //console.log("miniprogram:", mPrg);
+  ////consolelog("miniprogram:", mPrg);
 }, 35000);
 afterAll(async () => {
-  console.log("!!!All Test Passed!!!");
+  //consolelog("!!!All Test Passed!!!");
   await page.waitFor(1000);
   await mPrg.close();
 });
@@ -125,11 +125,11 @@ describe("Index page test", () => {
 
     page = await mPrg.currentPage();
     const retBtn = await page.$(".at-button__wxbutton");
-    //console.log("retBtn:", retBtn);
+    ////consolelog("retBtn:", retBtn);
     const retBtnCap = await page.$(".at-button__text");
 
     const retBtnText = await retBtnCap.text();
-    //console.log("new ret button caption:", retBtnText);
+    ////consolelog("new ret button caption:", retBtnText);
     expect(retBtnText).toBe("返回");
     retBtn.tap();
     await page.waitFor(100);
@@ -145,7 +145,7 @@ describe("Index page test", () => {
     await page.waitFor(200);
 
     page = await mPrg.currentPage();
-    //console.log("the page after wbno input:", page);
+    ////consolelog("the page after wbno input:", page);
 
     //应为运单详情页
     const page1 = await mPrg.redirectTo("/pages/sheet/index?wbno=1");
@@ -171,12 +171,12 @@ describe("receipt photo page test", () => {
     page = await mPrg.redirectTo("/pages/camera/camera");
     await page.waitFor(500);
     const texts = await page.$$("text");
-    //console.log("camera.texts:", texts);
+    ////consolelog("camera.texts:", texts);
     expect(texts.length).toBe(3);
     const text0 = await texts[0].text();
     const text1 = await texts[1].text();
     const text2 = await texts[2].text();
-    //console.log("text 0,1,2:", text0, text1, text2);
+    ////consolelog("text 0,1,2:", text0, text1, text2);
     expect(text0).toBe("请先确认运单");
     expect(text1).toBe(
       "您还没有输入运单信息，不能上传回执扫描，请先扫描运单二维码或手工输入运单号。"
@@ -195,7 +195,7 @@ describe("receipt photo page test", () => {
     const camBtn = await page.$("at-fab");
     const camIcon = await camBtn.$("text");
     const camClass = await camIcon.attribute("class");
-    //console.log("camBtn, camIcon:", camBtn, camIcon, camClass);
+    ////consolelog("camBtn, camIcon:", camBtn, camIcon, camClass);
     expect(camIcon.class).not.toBeNull();
     expect(camBtn).not.toBeNull();
     expect(camClass).toBe("at-fab__icon at-icon at-icon-camera");
@@ -234,11 +234,11 @@ describe("userinfo page test", () => {
     await page.waitFor(500);
     const verifyIcon = await page.$(".fa-wpforms");
     const queryIcon = await page.$(".fa-pencil-square-o");
-    //console.log("vIcon, qIcon:", verifyIcon, queryIcon);
+    ////consolelog("vIcon, qIcon:", verifyIcon, queryIcon);
 
     const vIconStyle = await verifyIcon.attribute("style");
     const qIconStyle = await queryIcon.attribute("style");
-    //console.log("vIconStyle, qIconStyle:", vIconStyle, qIconStyle);
+    ////consolelog("vIconStyle, qIconStyle:", vIconStyle, qIconStyle);
     expect(vIconStyle).toBe(qIconStyle);
 
     verifyIcon.tap();
@@ -265,11 +265,11 @@ describe("userinfo page test", () => {
     page = await mPrg.redirectTo("/pages/user/Login");
     await page.waitFor(500);
     const frmView = await page.$(".user-reg-span");
-    //console.log("form View :", frmView);
+    ////consolelog("form View :", frmView);
 
     const frmCap = await page.$(".form-caption");
     const frmCapText = await frmCap.text();
-    //console.log("caption text:", frmCapText);
+    ////consolelog("caption text:", frmCapText);
     expect(frmCapText).toContain("欢迎登录到");
     expect(frmCapText).toContain("TIMS");
     expect(frmCapText).toContain("配送信息管理系统");
@@ -298,11 +298,11 @@ describe("userinfo page test", () => {
     //登录成功后，有相应权限
     const verifyIcon = await page.$(".fa-wpforms");
     const queryIcon = await page.$(".fa-pencil-square-o");
-    //console.log("vIcon, qIcon:", verifyIcon, queryIcon);
+    ////consolelog("vIcon, qIcon:", verifyIcon, queryIcon);
 
     const vIconStyle = await verifyIcon.attribute("style");
     const qIconStyle = await queryIcon.attribute("style");
-    //console.log("vIconStyle, qIconStyle:", vIconStyle, qIconStyle);
+    ////consolelog("vIconStyle, qIconStyle:", vIconStyle, qIconStyle);
     expect(vIconStyle).toBe("color:#ce007c;font-size:40px;");
     expect(qIconStyle).toBe("color:#d15805;font-size:40px;");
 
@@ -452,7 +452,7 @@ describe("verify uploaded receipts test", () => {
     expect(dates.length).toBe(2);
     const dates1 = await dates[0].value();
     const dates2 = await dates[1].value();
-    //console.log("dates1, dates2:", dates1, dates2);
+    ////consolelog("dates1, dates2:", dates1, dates2);
     expect(dates1).toBe(
       new Date(new Date().valueOf() - 7 * 24 * 60 * 60 * 1000)
         .toLocaleDateString()

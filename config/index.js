@@ -10,6 +10,10 @@ const config = {
   sourceRoot: "src",
   outputRoot: "dist",
   plugins: ["@tarojs/plugin-sass"],
+  terser: {
+    enable: true,
+    config: {},
+  },
   babel: {
     sourceMap: true,
     presets: [

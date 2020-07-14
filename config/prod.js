@@ -3,6 +3,7 @@ module.exports = {
     NODE_ENV: '"production"',
   },
   defineConstants: {},
+
   //小程序端专用配置
   weapp: {
     module: {
@@ -18,7 +19,21 @@ module.exports = {
       },
     },
   },
-  mini: {},
+  mini: {
+    webpackChain(chain, webpack) {
+      chain.merge({
+        optimization: {
+          minimize: true,
+          minimizer: [
+            (compiler) => {
+              const TerserPlugin = require("terser-webpack-plugin");
+              new TerserPlugin().apply(compiler);
+            },
+          ],
+        },
+      });
+    },
+  },
   h5: {
     /**
      * 如果h5端编译后体积过大，可以使用webpack-bundle-analyzer插件对打包体积进行分析。

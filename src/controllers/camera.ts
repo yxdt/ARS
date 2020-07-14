@@ -29,7 +29,7 @@ function uploadPicture(
   filePath: string,
   openid: string
 ): Promise<uploadResult> {
-  //console.log("uploadPicture:", wbno, filePath);
+  ////consolelog("uploadPicture:", wbno, filePath);
   const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
   const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
   let ret: uploadResult = {
@@ -109,7 +109,7 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
     remark: vrf.remark,
     filename: vrf.imgid,
   };
-  //console.log("camera.verifyPicture.vrf:", vrf);
+  ////consolelog("camera.verifyPicture.vrf:", vrf);
   try {
     vrfResult = await verifyPhoto(vrf);
   } catch (e) {
@@ -123,7 +123,7 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
     };
     success = false;
   }
-  //console.log("camera.verifyPicture.verifyPhoto.result:", vrfResult);
+  ////consolelog("camera.verifyPicture.verifyPhoto.result:", vrfResult);
   if (vrfResult.code === "0000" && vrfResult.data) {
     ret.result = vrfResult.data.result || "";
   } else {

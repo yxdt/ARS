@@ -27,7 +27,7 @@ export default function Verify() {
   const [preview, setPreview] = useState(false);
   const [days, setDays] = useState(1);
 
-  const [photos, setPhotos] = useState<Array<uvPhotoData> | null>(null);
+  const [photos, setPhotos] = useState<Array<uvPhotoData>>([]);
   const [loaded, setLoaded] = useState(false);
   const [confirmReject, setConfirmReject] = useState(false);
   const [remark, setRemark] = useState("");
@@ -46,6 +46,7 @@ export default function Verify() {
       .then((res) => {
         if (res.result === "success" && res.photos) {
           setPhotos(res.photos);
+          setLoaded(true);
         }
       })
       .finally(() => {
@@ -54,7 +55,7 @@ export default function Verify() {
   }
 
   function handleClick(url) {
-    console.log("handleClick:", url);
+    //consolelog("handleClick:", url);
     setSelPic(url);
     setPreview(true);
   }
@@ -74,10 +75,10 @@ export default function Verify() {
               Taro.previewImage({
                 urls: [selPic],
                 success: () => {
-                  console.log("success");
+                  //consolelog("success");
                 },
                 fail: () => {
-                  console.log("fail");
+                  //consolelog("fail");
                 },
               });
             }}
@@ -98,13 +99,14 @@ export default function Verify() {
                         message: "照片审核通过",
                         type: "success",
                       });
+                      setPreview(false);
                     } else {
                       Taro.atMessage({
                         message: "照片审核操作失败，请重试",
                         type: "error",
                       });
                     }
-                    console.log("approvePicture.result:", ret);
+                    //consolelog("approvePicture.result:", ret);
                   })
                   .catch(() => {
                     Taro.atMessage({
@@ -114,7 +116,7 @@ export default function Verify() {
                   })
                   .finally(() => {
                     setPreview(false);
-                    console.log("confirmed!");
+                    //consolelog("confirmed!");
                   });
               }}
             >
@@ -141,9 +143,9 @@ export default function Verify() {
                   title="原因："
                   value={remark}
                   name="remark"
-                  placeholder="写出退回原因"
+                  placeholder=""
                   onChange={(theval) => {
-                    console.log("remark:", theval);
+                    //consolelog("remark:", theval);
                     setRemark(theval);
                   }}
                 ></AtInput>
@@ -169,13 +171,14 @@ export default function Verify() {
                     Taro.getStorageSync("userOpenId")
                   )
                     .then((ret) => {
-                      console.log("rejectPicture.result:", ret);
+                      //consolelog("rejectPicture.result:", ret);
                       if (ret.result === "reject") {
                         curPhoto.state = 2;
                         Taro.atMessage({
                           message: "照片审核退回成功",
                           type: "success",
                         });
+                        setPreview(false);
                       } else {
                         Taro.atMessage({
                           message: "照片审核操作失败，请重试",
@@ -191,7 +194,7 @@ export default function Verify() {
                     })
                     .finally(() => {
                       setPreview(false);
-                      console.log("rejected!");
+                      //consolelog("rejected!");
                     });
                 }}
               >

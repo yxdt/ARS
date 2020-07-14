@@ -12,7 +12,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [openId, setOpenId] = useState("");
   const [loging, setLoging] = useState(false);
-  //console.log("$router.params:", props, this.$router);
+  ////consolelog("$router.params:", props, this.$router);
 
   if (this.$router.params.cellphone) {
     setCellphone(this.$router.params.cellphone);
@@ -24,7 +24,7 @@ export default function Login() {
     doLogin(cellphone, password)
       .then((ret) => {
         let message, type;
-        console.log("login result:", ret);
+        //consolelog("login result:", ret);
         if (ret.result === "success") {
           type = "success";
           message = "登录成功！";
@@ -51,6 +51,7 @@ export default function Login() {
           type,
           duration: 6000,
         });
+        setLoging(false);
       })
       .finally(() => {
         setLoging(false);
@@ -73,7 +74,7 @@ export default function Login() {
             title="手机号"
             type="text"
             onChange={(val: string) => {
-              //console.log(val);
+              ////consolelog(val);
               setCellphone(val);
             }}
             placeholder="请输入您的手机号"
@@ -86,7 +87,7 @@ export default function Login() {
             title="密 码"
             type="password"
             onChange={(val: string) => {
-              //console.log(val);
+              ////consolelog(val);
               setPassword(val);
             }}
             placeholder="请输入您的密码"

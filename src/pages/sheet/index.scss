@@ -140,6 +140,10 @@ hr {
   padding-top: 10px;
   text-align: center;
 }
+.sheet-detail-index {
+  display: "flex";
+  flex-direction: row;
+}
 .sheet-info-span {
   margin: 1rem;
   padding-top: 5rem;
@@ -152,6 +156,8 @@ hr {
   padding-left: 1.2rem;
   padding-right: 1.2rem;
   padding-bottom: 2.2rem;
+  display: "flex";
+  flex-direction: "row";
 
   .form-userinfo {
     background-color: #f5f5f5;

@@ -14,7 +14,7 @@ import userpng from "../../assets/img/user.png";
 // ];
 
 export default function Register() {
-  console.log("");
+  //consolelog("");
   let userInfo: WxUserInfo = {
     nickName: "匿名用户",
     avatarUrl: userpng,
@@ -31,28 +31,28 @@ export default function Register() {
   const [avatar, setAvatar] = useState("");
 
   getUserInfo().then((res: WxUserInfo) => {
-    console.log("Register.getUserInfo.res:", res);
+    //consolelog("Register.getUserInfo.res:", res);
     //userInfo = res || {};
     if (res) {
       userInfo = res;
       Taro.setStorage({ key: "nickName", data: res.nickName });
       Taro.setStorage({ key: "avatar", data: res.avatarUrl });
     }
-    console.log("userInfo:", userInfo);
+    //consolelog("userInfo:", userInfo);
     setUserName(userInfo.nickName || "匿名用户");
     setAvatar(userInfo.avatarUrl || userpng);
   });
 
   getWxOpenId((openid) => {
-    console.log("Register.getWxOpenId.openId:", openid);
+    //consolelog("Register.getWxOpenId.openId:", openid);
   });
 
   function handleChange(target: string, newVal) {
-    console.log("handleChange:", target, newVal);
+    //consolelog("handleChange:", target, newVal);
     switch (target) {
       case "userName":
         setUserName(newVal);
-        console.log("userName:", userName);
+        //consolelog("userName:", userName);
         break;
       case "cellphone":
         setCellphone(newVal);
@@ -64,17 +64,17 @@ export default function Register() {
         setTruckType(parseInt(newVal.detail.value));
         break;
       default:
-        console.log("something has been changed:", target, newVal);
+        //consolelog("something has been changed:", target, newVal);
         break;
     }
   }
 
   function onFormSubmit(event) {
-    console.log("submit:", event);
-    console.log("userName:", userName);
-    console.log("cellphone:", cellphone);
-    console.log("plateNum:", plateNum);
-    //console.log("truckType:", truckType, TruckTypes[truckType]);
+    //consolelog("submit:", event);
+    //consolelog("userName:", userName);
+    //consolelog("cellphone:", cellphone);
+    //consolelog("plateNum:", plateNum);
+    ////consolelog("truckType:", truckType, TruckTypes[truckType]);
   }
 
   return (

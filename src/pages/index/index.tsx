@@ -128,3 +128,6 @@ export default function Index() {
     </View>
   );
 }
+Index.config = {
+  navigationBarTitleText: "TIMS-首页",
+};

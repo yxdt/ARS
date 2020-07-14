@@ -162,18 +162,18 @@ export default class Index extends Component<null, SheetState> {
   }
 
   driverConfirmArrive() {
-    console.log("confirm arrive");
-    console.log("sheetNum:", this.state.waybill.wbNum);
-    console.log("rdcNum:", this.state.rdcNum, this.state.waybill.rdcCode);
+    //console.log("confirm arrive");
+    //console.log("sheetNum:", this.state.waybill.wbNum);
+    //console.log("rdcNum:", this.state.rdcNum, this.state.waybill.rdcCode);
     //dirver position address openid
     const openid = Taro.getStorageSync("userOpenId");
-    console.log("sheet.index.driverConfirmArrive.openid:", openid);
+    //console.log("sheet.index.driverConfirmArrive.openid:", openid);
     if (this.state.cellphone) {
       Taro.setStorage({ key: "cellphone", data: this.state.cellphone });
     }
     if (this.state.rdcNum === this.state.waybill.rdcCode) {
       //you can confirm with the waybill
-      this.setState({ confirming: true });
+      this.setState({ confirming: true, confirmArrive: false });
 
       confirmArrive(
         this.state.waybill.wbNum,
@@ -187,7 +187,7 @@ export default class Index extends Component<null, SheetState> {
               arrived: true,
               loading: false,
               confirmArrive: false,
-              confirming: false,
+
               waybill: {
                 ...this.state.waybill,
                 status: "arrived",
@@ -209,6 +209,9 @@ export default class Index extends Component<null, SheetState> {
             type: "error",
             duration: 8000,
           });
+        })
+        .finally(() => {
+          this.setState({ confirming: false });
         });
     } else {
       //wrong rdcNumber input
@@ -228,11 +231,12 @@ export default class Index extends Component<null, SheetState> {
       confirmTime,
       arrived,
       confirmed,
+      confirming,
       valid,
       failed,
     } = this.state;
     console.log("loading:", loading);
-    if (loading) {
+    if (loading || confirming) {
       return (
         <View>
           <AtMessage />
@@ -287,60 +291,62 @@ export default class Index extends Component<null, SheetState> {
             >
               {waybill.statusCaption}
             </Text>
-            <AtModal isOpened={confirmArrive}>
-              <AtModalHeader>
-                时间：{confirmTime.toLocaleString("zh-CN")}
-              </AtModalHeader>
-              <AtModalContent>
-                <View className="toast-main">
-                  <View className="confirm-info">{confirmString2}</View>
-                  <View className="confirm-info">{confirmString3}</View>
-                  <AtInput
-                    key={"confirm-arrive-ara-code"}
-                    type="text"
-                    className="modal-input"
-                    title="验证码*"
-                    name="arsCode"
-                    placeholder="四位验证码"
-                    onChange={(val) => {
-                      console.log("arscode:", val);
-                      this.setState({ rdcNum: val.toString() });
+            {!confirmArrive ? null : (
+              <AtModal isOpened={confirmArrive}>
+                <AtModalHeader>
+                  时间：{confirmTime.toLocaleString("zh-CN")}
+                </AtModalHeader>
+                <AtModalContent>
+                  <View className="toast-main">
+                    <View className="confirm-info">{confirmString2}</View>
+                    <View className="confirm-info">{confirmString3}</View>
+                    <AtInput
+                      key={"confirm-arrive-ara-code"}
+                      type="text"
+                      className="modal-input"
+                      title="验证码*"
+                      name="arsCode"
+                      placeholder="四位验证码"
+                      onChange={(val) => {
+                        console.log("arscode:", val);
+                        this.setState({ rdcNum: val.toString() });
+                      }}
+                    ></AtInput>
+                    <AtInput
+                      key={"confirm-arrive-cell-phone"}
+                      type="number"
+                      name="cellphone"
+                      className="modal-input"
+                      title="手机号"
+                      placeholder="您的手机号"
+                      onChange={(val) => {
+                        console.log("changed:", val);
+                        this.setState({ cellphone: val.toString() });
+                      }}
+                    ></AtInput>
+                  </View>
+                </AtModalContent>
+                <AtModalAction>
+                  <Button
+                    className="home-input-semi-left"
+                    onClick={() => {
+                      //Taro.navigateBack();
+                      this.setState({ confirmArrive: false });
                     }}
-                  ></AtInput>
-                  <AtInput
-                    key={"confirm-arrive-cell-phone"}
-                    type="number"
-                    name="cellphone"
-                    className="modal-input"
-                    title="手机号"
-                    placeholder="您的手机号"
-                    onChange={(val) => {
-                      console.log("changed:", val);
-                      this.setState({ cellphone: val.toString() });
+                  >
+                    取消
+                  </Button>
+                  <Button
+                    className="home-input-semi-right"
+                    onClick={() => {
+                      this.driverConfirmArrive();
                     }}
-                  ></AtInput>
-                </View>
-              </AtModalContent>
-              <AtModalAction>
-                <Button
-                  className="home-input-semi-left"
-                  onClick={() => {
-                    //Taro.navigateBack();
-                    this.setState({ confirmArrive: false });
-                  }}
-                >
-                  取消
-                </Button>
-                <Button
-                  className="home-input-semi-right"
-                  onClick={() => {
-                    this.driverConfirmArrive();
-                  }}
-                >
-                  确认到达
-                </Button>
-              </AtModalAction>
-            </AtModal>
+                  >
+                    确认到达
+                  </Button>
+                </AtModalAction>
+              </AtModal>
+            )}
           </View>
           <Text className="form-caption"> 装 车 号：{waybill.wbNum}</Text>
           {arrived ? (

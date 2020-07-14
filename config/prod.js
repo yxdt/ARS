@@ -13,7 +13,7 @@ module.exports = {
       url: {
         enable: true,
         config: {
-          limit: 102400, //文件大小限制
+          limit: 10240, //文件大小限制
         },
       },
     },

@@ -60,6 +60,8 @@
     "@babel/preset-typescript": "^7.10.1",
     "@tarojs/mini-runner": "2.2.3",
     "@tarojs/plugin-babel": "^2.2.9",
+    "@tarojs/plugin-sass": "^2.2.10",
+    "@tarojs/plugin-terser": "^2.2.10",
     "@tarojs/webpack-runner": "2.2.3",
     "@types/jest": "^26.0.3",
     "@types/react": "^16.4.6",

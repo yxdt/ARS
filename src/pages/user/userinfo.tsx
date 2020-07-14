@@ -256,7 +256,21 @@ export default function UserInfo() {
                   tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
                   success: (res) => {
                     //consolelog("subscribe message success:", res);
+                    if (res.errMsg.indexOf(":ok") > 0) {
+                      Taro.atMessage({
+                        message: "系统消息订阅成功",
+                        type: "success",
+                      });
+                    }
                   },
+                }).then((res) => {
+                  //consolelog("success:", res);
+                  if (res.errMsg.indexOf(":ok") > 0) {
+                    Taro.atMessage({
+                      message: "系统消息订阅成功",
+                      type: "success",
+                    });
+                  }
                 });
                 break;
               case 1:

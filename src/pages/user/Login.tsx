@@ -10,7 +10,7 @@ export default function Login() {
   //const [manual, setManual] = useState(true);
   const [cellphone, setCellphone] = useState("");
   const [password, setPassword] = useState("");
-  const [openId, setOpenId] = useState("");
+  //const [openId, setOpenId] = useState("");
   const [loging, setLoging] = useState(false);
   ////consolelog("$router.params:", props, this.$router);
 

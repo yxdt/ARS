@@ -60,8 +60,13 @@ function getDriverLocation(resolve: Function) {
             address: resLoc.result.address,
           });
         },
-        fail: (err) => {
+        fail: () => {
           //consolelog("error when find address:", err);
+          resolve({
+            latitude: "",
+            longitude: "",
+            address: "",
+          });
         },
       });
       //成功获取司机位置信息可以做一些服务器端操作，比如存储位置信息。

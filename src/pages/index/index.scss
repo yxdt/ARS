@@ -25,7 +25,7 @@ $color-bg: #a50034;
     color: #6b6b6b;
     font-size: 1.8rem;
     font-weight: bold;
-    font-family: 'Teko' sans-serif;
+    font-family: "Teko" sans-serif;
     .home-title-hilite {
       color: $color-bg;
       font-size: 3.2rem;
@@ -57,8 +57,9 @@ $color-bg: #a50034;
     margin-left: -1.8rem;
     margin-right: 2rem;
     text-align: center;
-    line-height: 3rem;
+    line-height: 2.8rem;
     min-width: 100px;
+    padding-top: 8px;
     flex: 1;
   }
   .home-input {

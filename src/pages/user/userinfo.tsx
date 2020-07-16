@@ -1,5 +1,5 @@
 import Taro, { useState } from "@tarojs/taro";
-import { View, Text, Image, Picker, Button } from "@tarojs/components";
+import { View, Text, Button } from "@tarojs/components";
 import {
   AtAvatar,
   AtGrid,

@@ -20,12 +20,12 @@ import {
   approvePicture,
   rejectPicture,
 } from "../../controllers/camera";
-import { photoData, uvPhotoData } from "../../types/ars";
+import { uvPhotoData } from "../../types/ars";
 
 export default function Verify() {
   const [selPic, setSelPic] = useState("");
   const [preview, setPreview] = useState(false);
-  const [days, setDays] = useState(1);
+  //const [days, setDays] = useState(1);
 
   const [photos, setPhotos] = useState<Array<uvPhotoData>>([]);
   const [loaded, setLoaded] = useState(false);

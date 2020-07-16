@@ -1,5 +1,5 @@
 import Taro, { useState } from "@tarojs/taro";
-import { View, Text, Button, Picker } from "@tarojs/components";
+import { View, Text, Picker } from "@tarojs/components";
 import {
   AtInput,
   AtMessage,
@@ -29,7 +29,7 @@ export default function Query() {
   const [wbNum, setWbNum] = useState("");
   const [waybills, setWaybills] = useState<Array<Waybill> | null>([]);
   const [queryed, setQueryed] = useState(false);
-  function doLogin() {}
+  //function doLogin() {}
 
   return (
     <View className="index">

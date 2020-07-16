@@ -11,15 +11,15 @@ import { getWxOpenId } from "../../controllers/users";
 export default function Index() {
   //const [manual, setManual] = useState(true);
   const [waybillNum, setWaybillNum] = useState("");
-  const [rdcNum, setRdcNum] = useState("");
-  const [cellphone, setCellphone] = useState("");
-  const [isScan, setIsScan] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
+  //const [rdcNum, setRdcNum] = useState("");
+  //const [cellphone, setCellphone] = useState("");
+  //const [isScan, setIsScan] = useState(false);
+  //const [loggedIn, setLoggedIn] = useState(false);
 
   //consolelog("$router.params:", this.$router.params);
 
   if (this.$router.params.wbno) {
-    setIsScan(true);
+    //setIsScan(true);
     setWaybillNum(this.$router.params.wbno);
     //setManual(true);
   } else {
@@ -38,7 +38,7 @@ export default function Index() {
     setWaybillNum(curwbno);
   }
 
-  function gotBarcode(bcVal: string) {
+  function gotBarcode(bcVal) {
     //bcVal = waybillNum + rdcNum
     //consolelog("index.index.gotBarcode:", bcVal);
     Taro.navigateTo({

@@ -1,6 +1,6 @@
 import Taro, { useState } from "@tarojs/taro";
-import { View, Text, Image, Picker } from "@tarojs/components";
-import { AtForm, AtInput, AtButton, AtList, AtListItem } from "taro-ui";
+import { View, Text } from "@tarojs/components";
+import { AtForm, AtInput, AtButton } from "taro-ui";
 import "./index.scss";
 import { getUserInfo, getWxOpenId } from "../../controllers/users";
 import { WxUserInfo } from "src/types/ars";
@@ -60,9 +60,9 @@ export default function Register() {
       case "plateNum":
         setPlateNum(newVal);
         break;
-      case "truckType":
-        setTruckType(parseInt(newVal.detail.value));
-        break;
+      //case "truckType":
+      //setTruckType(parseInt(newVal.detail.value));
+      //break;
       default:
         //consolelog("something has been changed:", target, newVal);
         break;

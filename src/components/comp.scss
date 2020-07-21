@@ -1,0 +1,10 @@
+.at-nav-bar {
+  background-color: #ababab;
+  .at-nav-bar__title {
+    color: #ffffff;
+    font-size: 0.8rem;
+  }
+}
+.at-nav-bar:active {
+  background-color: #cecece;
+}

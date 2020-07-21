@@ -1,9 +1,13 @@
 $color-bg: #a50034;
 .at-nav-bar {
+  background-color: #ababab;
   .at-nav-bar__title {
     color: #ffffff;
     font-size: 0.8rem;
   }
+}
+.at-nav-bar:active {
+  background-color: #cecece;
 }
 .at-input__title {
   font-size: 0.8rem;

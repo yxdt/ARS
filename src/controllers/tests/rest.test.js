@@ -51,7 +51,7 @@ describe("Waybill Query", () => {
     return getWaybill("1").then((res) => {
       ////consolelog('test.getWaybill.res:', res);
       expect(res.code).toBe("0000");
-      expect(res.data.ordNo).toBe("1");
+      expect(res.data.carAllocNo).toBe("1");
       expect(res.data.status).toBe(1);
       expect(res.data.ordDetailList.length).toBe(8);
     });
@@ -61,10 +61,10 @@ describe("Waybill Query", () => {
     return getWaybill("2").then((res) => {
       ////consolelog("test.getWaybill.res:", res);
       expect(res.code).toBe("0000");
-      expect(res.data.ordNo).toBe("2");
+      expect(res.data.carAllocNo).toBe("2");
       expect(res.data.status).toBe(8);
       expect(res.data.ordDetailList.length).toBe(8);
-      expect(res.data.ordDetailList[7].id).toBe(27);
+      expect(res.data.ordDetailList[7].shpToCd).toBe("27");
       //expect(res.data.ordDetailList[7].ordNo).toBe('2');
     });
   });
@@ -73,7 +73,7 @@ describe("Waybill Query", () => {
     return getWaybill("3").then((res) => {
       ////consolelog('test.getWaybill.res:', res);
       expect(res.code).toBe("0000");
-      expect(res.data.ordNo).toBe("3");
+      expect(res.data.carAllocNo).toBe("3");
       expect(res.data.status).toBe(0);
       expect(res.data.ordDetailList.length).toBe(8);
     });

@@ -37,6 +37,7 @@ function uploadPicture(
     upload: {
       fileName: "",
       filePath: "",
+      id: "",
     },
   };
   return new Promise((response, reject) => {
@@ -45,9 +46,9 @@ function uploadPicture(
       filePath,
       name: "photo",
       formData: {
-        openid,
-        ordNo,
-        shpToCd,
+        openId: openid,
+        carAllocNo: ordNo,
+        shpToSeq: shpToCd,
       },
       timeout: 5000, //for testing purpose
       success: (res) => {
@@ -107,7 +108,7 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
   const ret: verifyResult = {
     result: "approve",
     remark: vrf.remark,
-    filename: vrf.imgid,
+    filename: vrf.imgId, //.imgid,
   };
   ////consolelog("camera.verifyPicture.vrf:", vrf);
   try {
@@ -148,12 +149,12 @@ function approvePicture(
   const status = 0; //approved
   const remark = "";
   const vrf: verifyParams = {
-    ordNo,
-    shpToCd,
+    carAllocNo: ordNo,
+    shpToSeq: shpToCd,
     status,
     remark,
-    imgid,
-    openid,
+    imgId: imgid,
+    openId: openid,
   };
   return verifyPicture(vrf);
 }
@@ -168,12 +169,12 @@ function rejectPicture(
   const status = 1; //rejected
 
   const vrf: verifyParams = {
-    ordNo,
-    shpToCd,
+    carAllocNo: ordNo,
+    shpToSeq: shpToCd,
     status,
     remark,
-    imgid,
-    openid,
+    imgId: imgid,
+    openId: openid,
   };
   return verifyPicture(vrf);
 }

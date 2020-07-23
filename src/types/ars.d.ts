@@ -66,10 +66,10 @@ export interface DriverInfo {
 
 //用于到达确认
 export interface WaybillConfirmParams {
-  openid: string; //司机小程序用户openid
+  openId: string; //openid: string; //司机小程序用户openid
   sysTime: Date; //到达时间
-  ordNo: string; //运单号
-  shpToCd: string; //四位验证码
+  carAllocNo: string; //ordNo: string; //运单号
+  shpToSeq: string; //shpToCd: string; //四位验证码
   latitude: string;
   longitude: string;
   address: string;
@@ -86,7 +86,7 @@ export interface WaybillResult extends Result {
 export interface TimsResponse<T> {
   messageId: string;
   data: T | null;
-  code: string;
+  code: string; //0000,0400,0500
   message: string;
   sentTime: Date;
   responseTime: Date;
@@ -96,6 +96,7 @@ export interface TimsResponse<T> {
 export interface loginParam {
   phone: string;
   pwd: string;
+  openId: string;
 }
 export interface loginData {
   //result: boolean;
@@ -122,11 +123,11 @@ export interface Waybill {
 }
 //api 查询返回值
 export interface wbData {
-  ordNo: string;
-  logCd: string;
-  logName: string;
+  carAllocNo: string; //ordNo
+  dcCd: string; //logCd: string;
+  dcName: string; //logName: string;
   totalPage: number;
-  shpToCd: string;
+  shpToSeq: string; //shpToCd: string;
   shpToName: string;
   arrivalTime: Date;
   ordDetailList: Array<wbdData>;
@@ -134,21 +135,21 @@ export interface wbData {
 }
 //运单详情项目
 export interface ShipItem {
-  id: number;
+  id: string;
   orderNum: string;
   model: string;
-  seq: number;
-  page: number;
+  seq: string;
+  page: string;
   qty: number;
 }
-//运单详情项目
+//运单详情项目返回值
 export interface wbdData {
-  id: number;
-  orderNum: string;
-  page: number;
-  seq: number;
-  model: string;
-  qty: number;
+  shpToCd: string; //id: number;
+  ordNo: string; //orderNum: string;
+  pageNo: string; //page: number;
+  ordSeqNo: string; //seq: number;
+  modelCd: string; //model: string;
+  ordQty: number; //qty: number;
 }
 //运单回执
 export interface wbPhoto {
@@ -221,6 +222,7 @@ export interface uploadParams {
 export interface uploadData {
   fileName: string;
   filePath: string;
+  id: string;
 }
 export interface uploadResult extends Result {
   upload: uploadData;
@@ -273,12 +275,12 @@ export interface msgQueryResult {
 
 //已上传回执核验
 export interface verifyParams {
-  ordNo: string;
-  shpToCd: string;
+  carAllocNo: string; //ordNo: string;
+  shpToSeq: string; //shpToCd: string;
   status: number;
   remark: string;
-  imgid: string;
-  openid: string;
+  imgId: string;
+  openId: string;
 }
 export interface verifyData {
   result: string;
@@ -291,11 +293,11 @@ export interface verifyResult extends Result {
 
 //运单查询
 export interface queryParams {
-  beginDate: Date;
-  endDate: Date;
-  cdcCode: string;
-  wbStatus: number;
-  ordNo: string;
+  pgYmdStart: string; //beginDate: Date;
+  pgYmdEnd: string; //endDate: Date;
+  shpToCd: string; //cdcCode: string;
+  status: number; //wbStatus: number;
+  carAllocNo: string; //ordNo: string;
 }
 export interface queryData {
   waybills: Array<wbData> | null;

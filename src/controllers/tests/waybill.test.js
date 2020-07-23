@@ -119,7 +119,7 @@ describe("Query Waybills Test", () => {
       endDate: new Date(),
       cdcCode: "0001",
       wbStatus: 0,
-      ordNo: "1",
+      carAllocNo: "1",
     };
   });
   it("should return waybills", () => {
@@ -131,7 +131,7 @@ describe("Query Waybills Test", () => {
     });
   });
   it("should return empty waybills", () => {
-    query.ordNo = "000";
+    query.carAllocNo = "000";
     expect.assertions(3);
     return queryWaybills(query).then((res) => {
       ////consolelog("test.waybill.queryWaybills.fail.res:", res);
@@ -141,7 +141,7 @@ describe("Query Waybills Test", () => {
     });
   });
   it("should return error", () => {
-    query.ordNo = "999";
+    query.carAllocNo = "999";
     expect.assertions(3);
     return queryWaybills(query).catch((res) => {
       ////consolelog("test.waybill.queryWaybills.error.res:", res);

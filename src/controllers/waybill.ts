@@ -115,21 +115,21 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
           break;
       }
       ret = {
-        wbNum: retData.ordNo,
-        rdcCode: retData.logCd,
-        rdcName: retData.logName,
+        wbNum: retData.carAllocNo,
+        rdcCode: retData.dcCd,
+        rdcName: retData.dcName,
         totalPages: retData.totalPage,
-        shiptoCode: retData.shpToCd,
+        shiptoCode: retData.shpToSeq,
         shiptoName: retData.shpToName,
         arriveTime: retData.arrivalTime,
         photos: [],
         shipItems: retData.ordDetailList.map((item) => ({
-          id: item.id,
-          orderNum: item.orderNum,
-          model: item.model,
-          seq: item.seq,
-          page: item.page,
-          qty: item.qty,
+          id: item.ordNo,
+          orderNum: item.ordNo,
+          model: item.modelCd,
+          seq: item.ordSeqNo,
+          page: item.pageNo,
+          qty: item.ordQty,
         })),
         status,
         statusCaption,
@@ -169,8 +169,9 @@ async function confirmArrive(
   const wbcParam: WaybillConfirmParams = {
     ...driverInfo,
     sysTime: arriveTime,
-    ordNo: wbno,
-    shpToCd: shiptoCode,
+    carAllocNo: wbno, //ordNo: wbno,
+    shpToSeq: shiptoCode, //shpToCd: shiptoCode,
+    openId: driverInfo.openid,
   };
   let result: TimsResponse<Result>;
   let success = false;
@@ -226,11 +227,11 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.waybills) {
       ret.waybills = restRet.data.waybills.map((item: wbData) => ({
-        wbNum: item.ordNo,
-        rdcCode: item.logCd,
-        rdcName: item.logName,
+        wbNum: item.carAllocNo, //.ordNo,
+        rdcCode: item.dcCd, //.logCd,
+        rdcName: item.dcName, //.logName,
         totalPages: item.totalPage,
-        shiptoCode: item.shpToCd,
+        shiptoCode: item.shpToSeq, //.shpToCd,
         shiptoName: item.shpToName,
         arriveTime: item.arrivalTime,
         status: item.status + "",

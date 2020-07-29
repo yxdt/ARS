@@ -1,14 +1,16 @@
+/**
+ * 项目：运单管理信息系统---小程序部分
+ * 描述：司机运单到达确认及回执上传，中心工作人员进行审核、查询
+ * 作者：杨晓东 Youngxiaodong@hotmail.com 13811085365
+ * 日期：2020年6月28日
+ *
+ */
+
 import Taro, { Component, Config } from "@tarojs/taro";
 import Index from "./pages/index";
 import "taro-ui/dist/style/index.scss";
 import "./app.scss";
 import "./icon.scss";
-
-// 如果需要在 h5 环境中开启 React Devtools
-// 取消以下注释：
-// if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
-//   require('nerv-devtools')
-// }
 
 class App extends Component {
   componentDidMount() {}

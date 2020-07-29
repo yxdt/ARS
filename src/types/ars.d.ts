@@ -1,7 +1,9 @@
-//命名规则：
-//xxxxParams: 向服务器发送的参数
-//xxxxData：从服务器返回的结果
-//xxxxResult：系统对从服务器返回的结果进行二次处理后的用于业务逻辑的结果
+/**
+ * 命名规则：
+ * xxxxParams: 向服务器发送的参数
+ * xxxxData：从服务器返回的结果
+ * xxxxResult：系统对从服务器返回的结果进行二次处理解耦后的用于业务逻辑的结果
+ */
 
 //司机不要求注册，中心人员需要后台手工确认绑定openid或手机
 export interface RegUser {
@@ -23,11 +25,9 @@ export interface WxUserInfo {
   nickName: string;
   avatarUrl: string;
   gender: number;
-
   city: string;
   province: string;
   country: string;
-
   language: string;
 }
 

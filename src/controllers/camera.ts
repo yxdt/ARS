@@ -10,12 +10,14 @@ import {
   uvPhotoListData,
 } from "../types/ars";
 
+//扫描运单二维码，返回二维码内含字符串
 function scanBarcode(cbBarcode) {
   Taro.scanCode({
     success: cbBarcode,
   });
 }
 
+//拍照功能
 function takePicture(resolve) {
   const ctx = Taro.createCameraContext();
   ctx.takePhoto({
@@ -24,6 +26,7 @@ function takePicture(resolve) {
   });
 }
 
+//照片上传功能
 function uploadPicture(
   wbno: string,
   filePath: string,
@@ -71,6 +74,7 @@ function uploadPicture(
   });
 }
 
+//查询尚未审核的已上传回执列表
 async function queryUnVerifiedPhotos(openid: string): Promise<uvPhotoResult> {
   let uvResult: TimsResponse<uvPhotoListData>;
   let success = true;
@@ -102,6 +106,7 @@ async function queryUnVerifiedPhotos(openid: string): Promise<uvPhotoResult> {
   });
 }
 
+//回执核验功能
 async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
   let vrfResult: TimsResponse<verifyData>;
   let success = true;
@@ -139,6 +144,8 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
     }
   });
 }
+
+//回执审核通过
 function approvePicture(
   wbno: string,
   imgid: string,
@@ -158,6 +165,8 @@ function approvePicture(
   };
   return verifyPicture(vrf);
 }
+
+//回执驳回
 function rejectPicture(
   wbno: string,
   imgid: string,

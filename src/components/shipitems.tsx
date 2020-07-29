@@ -2,20 +2,27 @@ import Taro, { useState } from "@tarojs/taro";
 import { AtTabs, AtTabsPane, AtList, AtListItem } from "taro-ui";
 import { View } from "@tarojs/components";
 import { TabItem } from "taro-ui/types/tabs";
+import { ShipItem } from "../types/ars";
 
-export default function ShipItems(props) {
-  const [pages, setPages] = useState(props.pageCount);
+export interface ShipItemProps {
+  current: number;
+  pageCount: number;
+  shipItems: ShipItem[];
+}
+
+export default function ShipItems(props: ShipItemProps) {
+  // const [pages, setPages] = useState(props.pageCount);
   const [shipItems, setShipItems] = useState(props.shipItems || []);
   const [current, setCurrent] = useState(props.current);
 
-  const arrPages: number[] = new Array(pages);
-  const pageInds: TabItem[] = new Array(pages);
+  const arrPages: Array<number> = new Array(props.pageCount || 1);
+  const pageInds: Array<TabItem> = new Array(props.pageCount || 1);
 
-  for (let i = 0; i < pages; i++) {
+  for (let i = 0; i < props.pageCount; i++) {
     arrPages[i] = i;
     pageInds[i] = { title: "【" + (i + 1) + "】" };
   }
-  const pagedItems = shipItems.filter((item) => item.page === current + 1);
+  const pagedItems = shipItems.filter((item) => item.page === 1 + current + "");
 
   //consolelog('arrPages.current:', current, pages, arrPages, pagedItems);
 

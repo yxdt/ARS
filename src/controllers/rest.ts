@@ -38,22 +38,7 @@ const devUrl = "http://192.168.0.100:8765";
 const prodUrl = "https://tims.lg.com.cn"; //"https://www.hanyukj.cn";
 const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 
-// async function saveDriverLocation(wbNum: string, loc: string) {
-//   if (DEBUGGING) {
-//     return new Promise((res, rej) => {
-//       setTimeout(() => {
-//         //consolelog("user.saveDriverLocation.timeout");
-//         res({
-//           shtteNum: wbNum,
-//           location: loc,
-//           result: "success",
-//         });
-//       }, 1000);
-//     });
-//   } else {
-//     //consolelog("!!1not implemented yet!!!");
-//   }
-// }
+//发送司机确认到达提示消息
 async function sendArriveMessage(
   wbno: string, //shipCode + rdcCode
   openid: string
@@ -66,6 +51,7 @@ async function sendArriveMessage(
   );
   return ret;
 }
+//发送回执已上传消息
 async function sendUploadMessage(wbno: string, openid: string) {
   const ret = await taroRequest<TimsResponse<msgSentData>>(
     "/message/upload?wbno=" + wbno + "&openid=" + openid,
@@ -75,7 +61,7 @@ async function sendUploadMessage(wbno: string, openid: string) {
   );
   return ret;
 }
-
+//发送回执已驳回消息
 async function sendRejectMessage(wbno: string, openid: string) {
   const ret = await taroRequest<TimsResponse<msgSentData>>(
     "/message/reject?wbno=" + wbno + "&openid=" + openid,
@@ -85,6 +71,7 @@ async function sendRejectMessage(wbno: string, openid: string) {
   );
   return ret;
 }
+//标记消息已读
 async function markMessage(
   msgid: number,
   mark: number //2: read, 3:hide
@@ -97,6 +84,7 @@ async function markMessage(
   );
   return ret;
 }
+//消息列表查询
 async function queryMessage(
   query: msgQueryParams
 ): Promise<TimsResponse<msgQueryData>> {
@@ -108,7 +96,7 @@ async function queryMessage(
   );
   return ret;
 }
-
+//查询未审核回执--中心人员功能
 async function queryUnVerified(
   openid: string
 ): Promise<TimsResponse<uvPhotoListData>> {
@@ -120,7 +108,7 @@ async function queryUnVerified(
   );
   return ret;
 }
-
+//审核回执
 async function verifyPhoto(
   verifydata: verifyParams
 ): Promise<TimsResponse<verifyData>> {
@@ -132,7 +120,7 @@ async function verifyPhoto(
   );
   return ret;
 }
-
+//确认运单到达
 async function confirmWaybill(wbInfo: WaybillConfirmParams) {
   const ret = await taroRequest<TimsResponse<WaybillConfirmData>>(
     "/driver/confirm",
@@ -142,7 +130,7 @@ async function confirmWaybill(wbInfo: WaybillConfirmParams) {
   );
   return ret;
 }
-
+//获取运单详情
 async function getWaybill(wbNum: string) {
   const ret = await taroRequest<TimsResponse<wbData>>(
     "/order/code/" + wbNum,
@@ -152,7 +140,7 @@ async function getWaybill(wbNum: string) {
   );
   return ret;
 }
-
+//运单查询功能
 async function queryWaybill(query: queryParams) {
   const ret = await taroRequest<TimsResponse<queryData>>(
     "/order/search",
@@ -162,6 +150,7 @@ async function queryWaybill(query: queryParams) {
   );
   return ret;
 }
+//查询运单状态进度
 async function queryWbStatus(wbNum: string) {
   const ret = await taroRequest<TimsResponse<wbStatusData>>(
     "/order/status?wbno=" + wbNum,
@@ -172,7 +161,7 @@ async function queryWbStatus(wbNum: string) {
   return ret;
 }
 //async function uploadPhoto() {}
-
+//获取运单已上传回执列表
 async function getWbPhotos(wbNum: string) {
   if (DEBUGGING) {
     const photos = await taroRequest<TimsResponse<photoListData>>(
@@ -185,7 +174,7 @@ async function getWbPhotos(wbNum: string) {
     return photos;
   }
 }
-
+//保存用户信息
 async function saveUserInfo(userInfo: RegUser) {
   const url = "/users/save";
   const ret = await Taro.request({
@@ -196,7 +185,7 @@ async function saveUserInfo(userInfo: RegUser) {
   });
   return ret;
 }
-
+//用户登录
 async function userLogin(
   cellphone: string,
   password: string
@@ -216,7 +205,7 @@ async function userLogin(
 
   return ret;
 }
-
+//虚拟API
 async function taroRequest<T>(url: string, method, data, header) {
   let ret;
   if (DEBUGGING) {

@@ -106,7 +106,8 @@ export default function Login() {
           className="home-button preview-confirm-button"
           onClick={() => {
             setLoging(false);
-            Taro.navigateBack();
+            //Taro.navigateBack();
+            Taro.redirectTo({ url: "/pages/index/index" });
           }}
           disabled={loging}
         >

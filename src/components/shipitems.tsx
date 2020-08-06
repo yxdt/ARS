@@ -12,7 +12,9 @@ export interface ShipItemProps {
 
 export default function ShipItems(props: ShipItemProps) {
   // const [pages, setPages] = useState(props.pageCount);
-  const [shipItems, setShipItems] = useState(props.shipItems || []);
+  //const [shipItems, setShipItems] = useState(props.shipItems || []);
+  const shipItems = props.shipItems || [];
+
   const [current, setCurrent] = useState(props.current);
 
   const arrPages: Array<number> = new Array(props.pageCount || 1);

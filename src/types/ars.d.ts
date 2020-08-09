@@ -130,7 +130,7 @@ export interface wbData {
   shpToSeq: string; //shpToCd: string;
   shpToName: string;
   arrivalTime: Date;
-  ordDetailList: Array<wbdData>;
+  ordDetailList: Array<pWbdData>;
   status: number;
 }
 //运单详情项目
@@ -142,14 +142,24 @@ export interface ShipItem {
   page: string;
   qty: number;
 }
+export interface PagedShipItem {
+  pageNo: string; //"01"
+  shipItems: ShipItem[]; //
+}
 //运单详情项目返回值
 export interface wbdData {
-  shpToCd: string; //id: number;
-  ordNo: string; //orderNum: string;
-  pageNo: string; //page: number;
-  ordSeqNo: string; //seq: number;
-  modelCd: string; //model: string;
-  ordQty: number; //qty: number;
+  modelCd: string; //model: string;   "GR-B2471JKS.CSWPLGE"
+  ordNo: string; //orderNum: string;  "CRB19122100037-1-10"
+  ordQty: number; //qty: number;      3
+  ordSeqNo: string; //seq: number;    "01"
+  pageNo: string; //page: number;     "01"
+  setYn: string; //ignore:string      "N"
+  shpToCd: string; //id: number;      "03272661-S"
+}
+//运单详情返回列表
+export interface pWbdData {
+  pageNo: string; //所在页
+  ordList: wbdData[]; //当前页详细列表
 }
 //运单回执
 export interface wbPhoto {

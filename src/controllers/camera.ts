@@ -32,7 +32,7 @@ function uploadPicture(
   filePath: string,
   openid: string
 ): Promise<uploadResult> {
-  ////consolelog("uploadPicture:", wbno, filePath);
+  console.log("uploadPicture:", wbno, filePath);
   const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
   const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
   let ret: uploadResult = {
@@ -44,8 +44,9 @@ function uploadPicture(
     },
   };
   return new Promise((response, reject) => {
+    console.log("file_upload:url:", SERVER_URL + "/driver/photo");
     Taro.uploadFile({
-      url: SERVER_URL + "/photos/upload",
+      url: SERVER_URL + "/driver/photo", //"/photos/upload",
       filePath,
       name: "photo",
       formData: {
@@ -53,7 +54,7 @@ function uploadPicture(
         carAllocNo: ordNo,
         shpToSeq: shpToCd,
       },
-      timeout: 5000, //for testing purpose
+      timeout: 15000, //for testing purpose
       success: (res) => {
         if (res.statusCode === 200 && res.data) {
           ret.upload = JSON.parse(res.data);
@@ -66,8 +67,9 @@ function uploadPicture(
         ret.result = "fail";
         response(ret);
       },
-    }).catch(() => {
+    }).catch((err) => {
       //ret = { filePath: "", fileName: "" };
+      console.log("upload photo fail:", err);
       ret.result = "error";
       reject(ret);
     });

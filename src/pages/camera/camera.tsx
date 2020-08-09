@@ -83,11 +83,11 @@ export default class Index extends Component<CameraProps, CameraStates> {
     });
   }
   uploadPic() {
-    ////consolelog("camera.uploadPic:", this.state.curwbno, this.state.src);
+    console.log("camera.uploadPic:", this.state.curwbno, this.state.src);
     this.setState({ uploading: true, uploaded: false });
     uploadPicture(this.state.curwbno, this.state.src, this.state.openid)
       .then((res: uploadResult) => {
-        ////consolelog("upload-result:", res);
+        console.log("upload-result:", res);
         this.setState({ uploading: false });
         let isSuccess = false;
         //成功上传

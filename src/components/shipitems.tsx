@@ -24,9 +24,11 @@ export default function ShipItems(props: ShipItemProps) {
     arrPages[i] = i;
     pageInds[i] = { title: "【" + (i + 1) + "】" };
   }
-  const pagedItems = shipItems.filter((item) => item.page === 1 + current + "");
+  const pagedItems = shipItems.filter(
+    (item) => parseInt(item.page) === 1 + current
+  );
 
-  //consolelog('arrPages.current:', current, pages, arrPages, pagedItems);
+  console.log("arrPages.current:", current, arrPages, pagedItems);
 
   return (
     <AtTabs
@@ -39,7 +41,7 @@ export default function ShipItems(props: ShipItemProps) {
       }}
     >
       {arrPages.map((pageNo) => {
-        //consolelog('tabpanes:', pageNo, shipItems);
+        console.log("tabpanes:", pageNo, shipItems);
         return (
           <AtTabsPane
             current={current}

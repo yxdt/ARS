@@ -33,7 +33,7 @@ import {
   unVerifiedRequest,
 } from "../mock/api";
 
-const DEBUGGING = true;
+const DEBUGGING = false;
 const devUrl = "http://192.168.0.100:8765";
 const prodUrl = "https://tims.lg.com.cn"; //"https://www.hanyukj.cn";
 const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
@@ -138,13 +138,14 @@ async function getWaybill(wbNum: string) {
     null,
     null
   );
+  console.log("rest.getWaybill.ret:", ret);
   return ret;
 }
 //运单查询功能
 async function queryWaybill(query: queryParams) {
   const ret = await taroRequest<TimsResponse<queryData>>(
     "/order/search",
-    "POST",
+    "GET",
     query,
     { "content-type": "application/x-www-form-urlencoded" }
   );
@@ -152,8 +153,9 @@ async function queryWaybill(query: queryParams) {
 }
 //查询运单状态进度
 async function queryWbStatus(wbNum: string) {
+  console.log("rest.queryWbStatus:", wbNum);
   const ret = await taroRequest<TimsResponse<wbStatusData>>(
-    "/order/status?wbno=" + wbNum,
+    "/order/code/" + wbNum,
     "GET",
     null,
     null
@@ -191,11 +193,12 @@ async function userLogin(
   password: string
 ): Promise<TimsResponse<loginData>> {
   const ret = await taroRequest<TimsResponse<loginData>>(
-    "/logistics/login",
+    "/logistics/phoneLogin",
     "POST",
     {
       pwd: password,
       phone: cellphone,
+      openId: Taro.getStorageSync("userOpenId"),
     },
     { "content-type": "application/x-www-form-urlencoded" }
   );
@@ -208,6 +211,7 @@ async function userLogin(
 //虚拟API
 async function taroRequest<T>(url: string, method, data, header) {
   let ret;
+  console.log("taroRequest:", url, method, data, header);
   if (DEBUGGING) {
     ////consolelog('DEBUGGING.taroRequest.SERVER_URL:', url);
     if (url === "/logistics/login") {
@@ -238,12 +242,19 @@ async function taroRequest<T>(url: string, method, data, header) {
       ret = await unVerifiedRequest(url);
     }
   } else {
+    console.log("url:", SERVER_URL + url);
     ret = await Taro.request<T>({
       url: SERVER_URL + url,
       method: method || "GET",
       data: data || {},
       header: header || { "content-type": "application/json" },
     });
+    console.log("toraRequest.ret:", ret);
+    if (ret && ret.statusCode === 200) {
+      ret = ret.data;
+    } else {
+      ret = { code: "5000", message: "网络访问错误" };
+    }
   }
   return ret;
 }

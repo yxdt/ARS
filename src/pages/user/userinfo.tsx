@@ -92,11 +92,7 @@ export default function UserInfo() {
               };
               if (item.doneDate) {
                 ret.status = "success";
-                ret.title =
-                  ret.title +
-                  "[" +
-                  item.doneDate.toLocaleDateString().substr(5) +
-                  "]";
+                ret.title;
               }
               return ret;
             })

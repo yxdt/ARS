@@ -76,10 +76,13 @@ export default class Index extends Component<null, SheetState> {
     const wbno = this.$router.params.wbno;
     //const rdcno = this.$router.params.rdc;
     //const cell = this.$router.params.cell;
-    const isSuper = this.$router.params.super === "1";
+    let isSuper = this.$router.params.super === "1";
+    if (!isSuper) {
+      isSuper = Taro.getStorageSync("roleName").toString().length > 0;
+    }
     loadWaybill(wbno)
       .then((ret: WaybillResult) => {
-        //consolelog("getWaybill.ret:", ret);
+        console.log("getWaybill.ret:", ret);
         if (ret.result === "success") {
           const iCnt = ret.waybill.shipItems.length;
           //ret.waybill.rdcCode = rdcno;
@@ -110,13 +113,14 @@ export default class Index extends Component<null, SheetState> {
         this.setState({
           loading: false,
           valid: false,
-          failed: true,
+          failed: err.code === "5000" ? true : false,
           itemCount: 0,
           arrived: false,
           confirmedArrive: false,
           isSuper,
         });
-        //consolelog("Error:", err);
+
+        console.log("Error:", err);
         Taro.atMessage({
           message: "运单信息获取失败，请重试！",
           type: "error",
@@ -159,21 +163,26 @@ export default class Index extends Component<null, SheetState> {
 
   driverConfirmArrive() {
     console.log("driver confirm arrive");
-    ////consolelog("sheetNum:", this.state.waybill.wbNum);
-    ////consolelog("rdcNum:", this.state.rdcNum, this.state.waybill.rdcCode);
+    console.log("sheetNum:", this.state.waybill.wbNum);
+    console.log(
+      "rdcNum, shipToCode, rdcCode:",
+      this.state.rdcNum,
+      this.state.waybill.shiptoCode,
+      this.state.waybill.rdcCode
+    );
     //dirver position address openid
     const openid = Taro.getStorageSync("userOpenId");
-    ////consolelog("sheet.index.driverConfirmArrive.openid:", openid);
+    console.log("sheet.index.driverConfirmArrive.openid:", openid);
     if (this.state.cellphone) {
       Taro.setStorage({ key: "cellphone", data: this.state.cellphone });
     }
-    if (this.state.rdcNum === this.state.waybill.rdcCode) {
+    if (this.state.rdcNum === this.state.waybill.shiptoCode) {
       //you can confirm with the waybill
       this.setState({ confirming: true, confirmedArrive: false });
 
       confirmArrive(
         this.state.waybill.wbNum,
-        this.state.waybill.rdcCode,
+        this.state.waybill.shiptoCode,
         this.state.cellphone,
         this.state.confirmTime
       )
@@ -232,6 +241,7 @@ export default class Index extends Component<null, SheetState> {
       confirming,
       valid,
       failed,
+      isSuper,
     } = this.state;
     //consolelog("loading:", loading);
     if (loading) {
@@ -316,7 +326,7 @@ export default class Index extends Component<null, SheetState> {
                           Taro.redirectTo({ url: "/pages/camera/camera" });
                         }}
                       >
-                        点击上传回执
+                        {isSuper ? "替司机上传回执" : "点击上传回执"}
                       </AtButton>
                     ) : null}
                   </View>

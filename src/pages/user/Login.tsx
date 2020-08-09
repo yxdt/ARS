@@ -24,7 +24,7 @@ export default function Login() {
     doLogin(cellphone, password)
       .then((ret) => {
         let message, type;
-        //consolelog("login result:", ret);
+        console.log("login result:", ret);
         if (ret.result === "success") {
           type = "success";
           message = "登录成功！";

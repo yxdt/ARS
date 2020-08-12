@@ -24,12 +24,14 @@ export default function Login() {
     doLogin(cellphone, password)
       .then((ret) => {
         let message, type;
-        console.log("login result:", ret);
+        //consolelog("login result:", ret);
         if (ret.result === "success") {
           type = "success";
           message = "登录成功！";
           Taro.setStorageSync("roleName", ret.user.roleName);
           Taro.setStorageSync("userName", ret.user.userName);
+          Taro.setStorageSync("token", ret.user.token);
+          Taro.setStorageSync("tokendate", new Date().valueOf());
           Taro.setStorage({ key: "cellphone", data: cellphone });
           Taro.redirectTo({ url: "/pages/user/userinfo" });
           //Taro.navigateBack();
@@ -39,12 +41,14 @@ export default function Login() {
           message = "网络访问或服务器错误，请重试。";
           Taro.removeStorage({ key: "roleName" });
           Taro.removeStorage({ key: "userName" });
+          Taro.removeStorage({ key: "token" });
         } else {
           //登录失败
           type = "error";
           message = "手机或密码错误，登录失败，请重试。";
           Taro.removeStorage({ key: "roleName" });
           Taro.removeStorage({ key: "userName" });
+          Taro.removeStorage({ key: "token" });
         }
         Taro.atMessage({
           message,

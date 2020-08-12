@@ -1,5 +1,5 @@
 import Taro from "@tarojs/taro";
-import { SERVER_URL, verifyPhoto, queryUnVerified } from "./rest";
+import { SERVER_URL, verifyPhoto, queryUnVerified, photoComplete } from "./rest";
 import {
   TimsResponse,
   uploadResult,
@@ -8,6 +8,7 @@ import {
   verifyData,
   uvPhotoResult,
   uvPhotoListData,
+  photoDoneParam,
 } from "../types/ars";
 
 //扫描运单二维码，返回二维码内含字符串
@@ -26,13 +27,15 @@ function takePicture(resolve) {
   });
 }
 
+
+
 //照片上传功能
 function uploadPicture(
   wbno: string,
   filePath: string,
   openid: string
 ): Promise<uploadResult> {
-  console.log("uploadPicture:", wbno, filePath);
+  //consolelog("uploadPicture.wbno, filePath:", wbno, filePath);
   const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
   const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
   let ret: uploadResult = {
@@ -44,11 +47,11 @@ function uploadPicture(
     },
   };
   return new Promise((response, reject) => {
-    console.log("file_upload:url:", SERVER_URL + "/driver/photo");
+    //consolelog("file_upload:url:", SERVER_URL + "/driver/photo");
     Taro.uploadFile({
       url: SERVER_URL + "/driver/photo", //"/photos/upload",
       filePath,
-      name: "photo",
+      name: "multipartFile",
       formData: {
         openId: openid,
         carAllocNo: ordNo,
@@ -56,26 +59,57 @@ function uploadPicture(
       },
       timeout: 15000, //for testing purpose
       success: (res) => {
+        //result: "success"
+        //upload:
+        //code: "0000"
+        //data: {fileName: "tmp_3de83ae4651de55995413adbdf0c6f68_1597062731841.jpg", filePath: "/BJZI20010100033788/tmp_3de83ae4651de55995413adbdf0c6f68_1597062731841.jpg", id: "e679f7d4feaeccfd4f54f61ec998c65e"}
+        //message: "操作成功！"
+        //messageId: "4b14c0e373d824190173d85b584f0012"
+        //responseTime: "2020-08-10 20:32:11.855"
+        //sentTime: "2020-08-10 20:32:11.836"
+        //consolelog("success.res:", res);
         if (res.statusCode === 200 && res.data) {
-          ret.upload = JSON.parse(res.data);
-          ret.result = "success";
+          const upResult = JSON.parse(res.data);
+          if (upResult.code === "0000" && upResult.data) {
+            ret.upload = upResult.data;
+            ret.result = "success";
+          } else {
+            ret.result = "fail";
+            ret.upload = upResult;
+          }
         }
         response(ret);
       },
-      fail: () => {
+      fail: (errr) => {
+        //consolelog("upload fail:", errr);
         //ret = { filePath: "", fileName: "" };
         ret.result = "fail";
         response(ret);
       },
     }).catch((err) => {
       //ret = { filePath: "", fileName: "" };
-      console.log("upload photo fail:", err);
+      //consolelog("upload photo fail:", err);
       ret.result = "error";
       reject(ret);
     });
   });
 }
-
+//确定回执已完成上传
+async function confirmPhotoComplete(
+  wbno: string,  
+  openid: string
+): Promise<any> {
+  //consolelog("uploadPicture.wbno, filePath:", wbno, filePath);
+  const comParam: photoDoneParam = {
+    openId:openid,
+    carAllocNo: wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno,
+    shpToSeq : wbno.length > 4 ? wbno.substr(wbno.length - 4) : "",
+  }
+  try{
+    const ret = await photoComplete(comParam);
+    //consolelog(ret);
+  }
+}
 //查询尚未审核的已上传回执列表
 async function queryUnVerifiedPhotos(openid: string): Promise<uvPhotoResult> {
   let uvResult: TimsResponse<uvPhotoListData>;
@@ -90,9 +124,10 @@ async function queryUnVerifiedPhotos(openid: string): Promise<uvPhotoResult> {
     uvResult = e;
     success = false;
   }
+  //consolelog("queryUnVerified:", uvResult);
   if (uvResult.code === "0000") {
     if (uvResult.data) {
-      ret.photos = uvResult.data.photos;
+      ret.photos = uvResult.data.orderImageList;
     }
   } else {
     ret.result = "error";
@@ -115,9 +150,9 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
   const ret: verifyResult = {
     result: "approve",
     remark: vrf.remark,
-    filename: vrf.imgId, //.imgid,
+    imgIds: vrf.imgId, //.imgid,
   };
-  ////consolelog("camera.verifyPicture.vrf:", vrf);
+  //consolelog("camera.verifyPicture.vrf:", vrf);
   try {
     vrfResult = await verifyPhoto(vrf);
   } catch (e) {
@@ -131,13 +166,14 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
     };
     success = false;
   }
-  ////consolelog("camera.verifyPicture.verifyPhoto.result:", vrfResult);
+  //consolelog("camera.verifyPicture.verifyPhoto.result:", vrfResult);
   if (vrfResult.code === "0000" && vrfResult.data) {
-    ret.result = vrfResult.data.result || "";
+    ret.result = "success"//vrfResult.data.result || "";
   } else {
     ret.result = "error";
     success = false;
   }
+  //consolelog('verifyPicture:', ret);
   return new Promise((res, rej) => {
     if (success) {
       res(ret);
@@ -155,14 +191,14 @@ function approvePicture(
 ): Promise<verifyResult> {
   const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
   const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
-  const status = 0; //approved
-  const remark = "";
+  const status = 1; //approved
+  const remark = "通过";
   const vrf: verifyParams = {
     carAllocNo: ordNo,
     shpToSeq: shpToCd,
     status,
     remark,
-    imgId: imgid,
+    imgIds: imgid,
     openId: openid,
   };
   return verifyPicture(vrf);
@@ -177,14 +213,14 @@ function rejectPicture(
 ): Promise<verifyResult> {
   const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
   const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
-  const status = 1; //rejected
+  const status = 0; //rejected
 
   const vrf: verifyParams = {
     carAllocNo: ordNo,
     shpToSeq: shpToCd,
     status,
     remark,
-    imgId: imgid,
+    imgIds: imgid,
     openId: openid,
   };
   return verifyPicture(vrf);
@@ -196,4 +232,5 @@ export {
   approvePicture,
   rejectPicture,
   queryUnVerifiedPhotos,
+  confirmPhotoComplete
 };

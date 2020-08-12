@@ -34,16 +34,25 @@ export default function Verify() {
   const [curWbno, setCurWbno] = useState("");
   const [curImgid, setCurImgid] = useState("");
   const [curPhoto, setCurPhoto] = useState<uvPhotoData>({
-    url: "",
-    ordNo: "",
-    shpToCd: "",
-    cdcName: "",
-    state: 0,
+    carAllocNo: "",
+    createBy: "",
+    createTime: "",
+    delFlag: 0,
+    fileName: "",
+    filePath: "",
+    id: "",
+    openId: "",
+    remark: "",
+    shptoSeq: "",
+    status: 0,
+    updateBy: "",
+    updateTime: "",
   });
 
   if (!loaded) {
     queryUnVerifiedPhotos(Taro.getStorageSync("userOpenId"))
       .then((res) => {
+        //consolelog("queryUnVerifiedPhotos.res:", res);
         if (res.result === "success" && res.photos) {
           setPhotos(res.photos);
           setLoaded(true);
@@ -93,8 +102,8 @@ export default function Verify() {
                   Taro.getStorageSync("userOpenId")
                 )
                   .then((ret) => {
-                    if (ret.result === "approve") {
-                      curPhoto.state = 1;
+                    if (ret.result === "success") {
+                      curPhoto.status = 1;
                       Taro.atMessage({
                         message: "照片审核通过",
                         type: "success",
@@ -128,14 +137,14 @@ export default function Verify() {
                 setConfirmReject(true);
               }}
             >
-              退回
+              驳回
             </Button>
           </View>
           <AtModal isOpened={confirmReject}>
-            <AtModalHeader>退回操作</AtModalHeader>
+            <AtModalHeader>驳回操作</AtModalHeader>
             <AtModalContent>
               <View className="toast-main">
-                <View className="confirm-info">请给出退回原因</View>
+                <View className="confirm-info">请给出驳回原因</View>
                 <AtInput
                   key={"reject-reason"}
                   type="text"
@@ -172,10 +181,10 @@ export default function Verify() {
                   )
                     .then((ret) => {
                       //consolelog("rejectPicture.result:", ret);
-                      if (ret.result === "reject") {
-                        curPhoto.state = 2;
+                      if (ret.result === "success") {
+                        curPhoto.status = 0;
                         Taro.atMessage({
-                          message: "照片审核退回成功",
+                          message: "照片审核驳回成功",
                           type: "success",
                         });
                         setPreview(false);
@@ -198,7 +207,7 @@ export default function Verify() {
                     });
                 }}
               >
-                确认退回
+                确认驳回
               </Button>
             </AtModalAction>
           </AtModal>
@@ -208,21 +217,21 @@ export default function Verify() {
           <AtList>
             {photos && photos.length > 0 ? (
               photos
-                .filter((item) => item.state === 0)
+                .filter((item) => !item.status && item.status !== 0)
                 .map((item, index) => {
                   return (
                     <AtListItem
-                      title={item.ordNo}
-                      note={item.shpToCd + "(" + item.cdcName + ")"}
+                      title={item.carAllocNo}
+                      note={item.fileName}
                       extraText={"第" + index + "项"}
                       arrow="right"
-                      thumb={SERVER_URL + item.url}
-                      key={SERVER_URL + item.url + "_1"}
+                      thumb={SERVER_URL + item.filePath}
+                      key={SERVER_URL + item.filePath + "_1"}
                       onClick={(val) => {
-                        setCurImgid(item.url);
-                        setCurWbno(item.ordNo + item.shpToCd);
+                        setCurImgid(item.id);
+                        setCurWbno(item.carAllocNo + item.shptoSeq);
                         setCurPhoto(item);
-                        handleClick(SERVER_URL + item.url);
+                        handleClick(SERVER_URL + item.filePath);
                       }}
                     ></AtListItem>
                   );

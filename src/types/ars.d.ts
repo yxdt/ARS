@@ -102,6 +102,7 @@ export interface loginData {
   //result: boolean;
   userName: string;
   roleName: string;
+  token: string;
 }
 export interface loginResult extends Result {
   user: loginData;
@@ -118,6 +119,7 @@ export interface Waybill {
   arriveTime: Date;
   status: string;
   statusCaption: string;
+  statusNum: number;
   shipItems: ShipItem[];
   photos: wbPhoto[];
 }
@@ -131,6 +133,31 @@ export interface wbData {
   shpToName: string;
   arrivalTime: Date;
   ordDetailList: Array<pWbdData>;
+  orderImageList: Array<photoData>;
+  status: number;
+}
+//api 订单综合查询返回值
+export interface wbqData {
+  address: string;
+  arsCode: string;
+  carAllocNo: string;
+  dcCd: string;
+  dcFullNm: string;
+  dcIdt: string;
+  dcNm: string;
+  dcOpenId: string;
+  dcType: string;
+  driverIdt: string;
+  driverOpenId: string;
+  insertDate: string;
+  iodFlag: string;
+  latitude: string;
+  longtitude: string;
+  phone: string;
+  remark: string;
+  shpToCd: string;
+  shpToNm: string;
+  shpToSeq: string;
   status: number;
 }
 //运单详情项目
@@ -161,12 +188,21 @@ export interface pWbdData {
   pageNo: string; //所在页
   ordList: wbdData[]; //当前页详细列表
 }
+
+//回执上传完成
+export interface photoDoneParam {
+  carAllocNo: string;
+  openId: string;
+  shpToSeq: string;
+}
+
 //运单回执
 export interface wbPhoto {
   url: string;
   caption: string;
   wbNum: string;
   status: number;
+  id: string;
 }
 
 //运单状态及日期
@@ -191,9 +227,19 @@ export interface wbStatusResult extends Result {
 // }
 //回执照片查询返回值
 export interface photoData {
-  url: string;
-  status: number; //0:上传， 1：通过， 2：驳回
+  carAllocNo: string;
+  createBy: string;
+  createTime: string;
+  delFlag: number;
+  fileName: string;
+  filePath: string;
+  id: string;
+  openId: string;
   remark: string;
+  shptoSeq: string;
+  updateBy: string;
+  updateTime: string;
+  status: number; //0:上传， 1：通过， 2：驳回
 }
 export interface photoListData {
   photos: photoData[];
@@ -210,14 +256,22 @@ export interface unVerifiedPhotoParams {
   roleName: string; //当前中心工作人员角色
 }
 export interface uvPhotoData {
-  url: string;
-  ordNo: string;
-  shpToCd: string;
-  cdcName: string;
-  state: number; //0:待审核 1: 通过 2：驳回
+  carAllocNo: string;
+  createBy: string;
+  createTime: string;
+  delFlag: number;
+  fileName: string;
+  filePath: string;
+  id: string;
+  openId: string;
+  remark: string;
+  shptoSeq: string;
+  status: number;
+  updateBy: string;
+  updateTime: string;
 }
 export interface uvPhotoListData {
-  photos: Array<uvPhotoData> | null;
+  orderImageList: Array<uvPhotoData> | null;
 }
 export interface uvPhotoResult extends Result {
   photos: Array<uvPhotoData> | null;
@@ -289,7 +343,7 @@ export interface verifyParams {
   shpToSeq: string; //shpToCd: string;
   status: number;
   remark: string;
-  imgId: string;
+  imgIds: string;
   openId: string;
 }
 export interface verifyData {
@@ -308,9 +362,10 @@ export interface queryParams {
   shpToCd: string; //cdcCode: string;
   status: number; //wbStatus: number;
   carAllocNo: string; //ordNo: string;
+  openId: string;
 }
 export interface queryData {
-  waybills: Array<wbData> | null;
+  orderList: Array<wbData> | null;
 }
 export interface queryResult extends Result {
   count: number;

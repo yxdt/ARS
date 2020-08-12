@@ -2,7 +2,11 @@ import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text, Image, Button, Camera } from "@tarojs/components";
 import { AtFab, AtMessage } from "taro-ui";
 import "./camera.scss";
-import { takePicture, uploadPicture } from "../../controllers/camera";
+import {
+  takePicture,
+  uploadPicture,
+  confirmPhotoComplete,
+} from "../../controllers/camera";
 import ArsTabBar from "../../components/tabbar";
 import NavBar from "../../components/navbar";
 import InfoCard from "../../components/infocard";
@@ -33,6 +37,16 @@ export default class Index extends Component<CameraProps, CameraStates> {
       curwbno = "";
       Taro.removeStorageSync("waybill");
       Taro.removeStorageSync("waybilldate");
+    }
+
+    const loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
+    if (loggedIn) {
+      const logindate: Date = new Date(Taro.getStorageSync("tokendate"));
+      if (today.valueOf() - logindate.valueOf() > 24 * 60 * 60 * 1000) {
+        Taro.removeStorageSync("userName");
+        Taro.removeStorageSync("roleName");
+        Taro.removeStorageSync("token");
+      }
     }
 
     this.state = {
@@ -83,11 +97,11 @@ export default class Index extends Component<CameraProps, CameraStates> {
     });
   }
   uploadPic() {
-    console.log("camera.uploadPic:", this.state.curwbno, this.state.src);
+    //consolelog("camera.uploadPic:", this.state.curwbno, this.state.src);
     this.setState({ uploading: true, uploaded: false });
     uploadPicture(this.state.curwbno, this.state.src, this.state.openid)
       .then((res: uploadResult) => {
-        console.log("upload-result:", res);
+        //consolelog("upload-result:", res);
         this.setState({ uploading: false });
         let isSuccess = false;
         //成功上传
@@ -159,6 +173,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
             onClick={() => {
               this.setState({ preview: false });
               sendUploadMessage(curwbno, openid);
+              confirmPhotoComplete(curwbno, openid);
               Taro.redirectTo({ url: "/pages/index/index" });
             }}
           >

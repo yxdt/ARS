@@ -91,6 +91,7 @@ function getWxOpenId(cbOpenId: Function) {
     Taro.login({
       success: (res) => {
         let code = res.code;
+        console.log("the code:", code);
         Taro.request({
           url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
           data: {},
@@ -143,30 +144,34 @@ async function getUserInfo() {
 // }
 
 async function doLogin(cellphone, password): Promise<loginResult> {
-  console.log("controllers.user.doLogin:", cellphone, password);
-  console.log("userOpenId:", Taro.getStorageSync("userOpenId"));
+  //consolelog("controllers.user.doLogin:", cellphone, password);
+  //consolelog("userOpenId:", Taro.getStorageSync("userOpenId"));
   const locOpenId = Taro.getStorageSync("userOpenId");
 
   let success = false;
   let ret: loginResult = {
     result: "success",
-    user: { userName: "", roleName: "" },
+    user: { userName: "", roleName: "", token: "" },
   };
   let restRet;
   try {
     restRet = await userLogin(cellphone, password);
   } catch (err) {
-    console.log("login error:", err);
+    //consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  console.log("controllers.users.doLogin.res:", restRet);
+  //consolelog("controllers.users.doLogin.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.data && restRet.data.data.username) {
       const roleName =
         restRet.data.departs && restRet.data.departs.length > 0
           ? restRet.data.departs[0].departName
           : restRet.data.data.realname;
-      ret.user = { userName: restRet.data.data.username, roleName };
+      ret.user = {
+        userName: restRet.data.data.username,
+        roleName,
+        token: restRet.data.token,
+      };
     } else {
       ret.result = "fail";
     }

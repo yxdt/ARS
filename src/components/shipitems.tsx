@@ -28,7 +28,7 @@ export default function ShipItems(props: ShipItemProps) {
     (item) => parseInt(item.page) === 1 + current
   );
 
-  console.log("arrPages.current:", current, arrPages, pagedItems);
+  //consolelog("arrPages.current:", current, arrPages, pagedItems);
 
   return (
     <AtTabs
@@ -41,7 +41,7 @@ export default function ShipItems(props: ShipItemProps) {
       }}
     >
       {arrPages.map((pageNo) => {
-        console.log("tabpanes:", pageNo, shipItems);
+        //consolelog("tabpanes:", pageNo, shipItems);
         return (
           <AtTabsPane
             current={current}

@@ -134,6 +134,7 @@ export default function UserInfo() {
           },
           success: (res) => {
             let code = res.code;
+            console.log("code:", code);
             Taro.request({
               url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
               data: {},
@@ -374,7 +375,7 @@ export default function UserInfo() {
           sentTime={curMessage.sentTime}
           msgId={curMessage.msgId + ""}
           markFunc={(msgid: number) => {
-            console.log("mark read:", msgid);
+            //consolelog("mark read:", msgid);
             markRead(msgid).then((res) => {
               if (res.result === "success") {
                 for (var i = 0; i < messages.messages.length; i++) {

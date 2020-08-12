@@ -539,6 +539,7 @@ function loginRequest(data: loginParam) {
   const retVal: loginData = {
     userName: "",
     roleName: "",
+    token: "",
   };
   let success = true;
 

@@ -41,6 +41,11 @@ export default function Index() {
   function gotBarcode(bcVal) {
     //bcVal = waybillNum + rdcNum
     //consolelog("index.index.gotBarcode:", bcVal);
+    Taro.setStorage({ key: "waybill", data: bcVal.result });
+    Taro.setStorage({
+      key: "waybilldate",
+      data: new Date().valueOf(),
+    });
     Taro.navigateTo({
       url: "/pages/sheet/index?wbno=" + bcVal.result,
     });

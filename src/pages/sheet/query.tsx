@@ -15,13 +15,21 @@ import { queryParams, Waybill } from "../../types/ars";
 import { queryWaybills } from "../../controllers/waybill";
 
 export default function Query() {
+  const start = new Date(new Date().valueOf() - 7 * 24 * 60 * 60 * 1000);
+  const today = new Date();
   const [startDate, setStartDatetime] = useState(
-    new Date(new Date().valueOf() - 7 * 24 * 60 * 60 * 1000).toLocaleDateString(
-      "zh-CN"
-    )
+    start.getFullYear() +
+      "-" +
+      String(1 + start.getMonth()).padStart(2, "0") +
+      "-" +
+      String(start.getDate()).padStart(2, "0")
   );
   const [endDate, setEndDatetime] = useState(
-    new Date().toLocaleDateString("zh-CN")
+    today.getFullYear() +
+      "-" +
+      String(1 + today.getMonth()).padStart(2, "0") +
+      "-" +
+      String(today.getDate()).padStart(2, "0")
   );
   const [rdcCode, setRdcCode] = useState("");
   const [wbStatus, setWbStatus] = useState(0);
@@ -44,7 +52,7 @@ export default function Query() {
                 <Picker
                   mode="date"
                   onChange={(dateVal) => {
-                    //consolelog('start date:', dateVal);
+                    console.log("start date:", dateVal);
                     setStartDatetime(dateVal.detail.value);
                   }}
                   value={startDate}
@@ -160,18 +168,19 @@ export default function Query() {
                 if (queryed) {
                   setQueryed(false);
                 } else {
-                  //consolelog('query the waybills');
+                  //consolelog("query the waybills");
                   const query: queryParams = {
-                    beginDate: new Date(startDate),
-                    endDate: new Date(endDate),
-                    ordNo: wbNum,
-                    cdcCode: rdcCode,
-                    wbStatus,
+                    pgYmdStart: startDate,
+                    pgYmdEnd: endDate,
+                    shpToCd: rdcCode,
+                    status: wbStatus,
+                    carAllocNo: wbNum,
+                    openId: Taro.getStorageSync("userOpenId"),
                   };
-                  //consolelog('queryParams:', query);
+                  //consolelog("queryParams:", query);
                   queryWaybills(query)
                     .then((ret) => {
-                      //consolelog('querywaybills.ret:', ret);
+                      console.log("querywaybills.ret:", ret);
                       if (ret.result === "success" && ret.count > 0) {
                         setWaybills(ret.waybills);
                       }

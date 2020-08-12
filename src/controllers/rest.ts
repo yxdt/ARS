@@ -16,6 +16,7 @@ import {
   msgQueryData,
   wbStatusData,
   uvPhotoListData,
+  photoDoneParam,
 } from "../types/ars";
 import {
   loginRequest,
@@ -36,6 +37,7 @@ import {
 const DEBUGGING = false;
 const devUrl = "http://192.168.0.100:8765";
 const prodUrl = "https://tims.lg.com.cn"; //"https://www.hanyukj.cn";
+const hyUrl = "https://";
 const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 
 //发送司机确认到达提示消息
@@ -101,10 +103,12 @@ async function queryUnVerified(
   openid: string
 ): Promise<TimsResponse<uvPhotoListData>> {
   const ret = await taroRequest<TimsResponse<uvPhotoListData>>(
-    "/photos/unverify/" + openid,
+    "/logistics/check",
     "GET",
-    null,
-    null
+    { openId: openid },
+    {
+      "X-Access-Token": Taro.getStorageSync("token"),
+    }
   );
   return ret;
 }
@@ -116,8 +120,15 @@ async function verifyPhoto(
     "/logistics/confirm",
     "POST",
     verifydata,
-    { "content-type": "application/x-www-form-urlencoded" }
+    {
+      "content-type": "application/x-www-form-urlencoded",
+      "X-Access-Token": Taro.getStorageSync("token"),
+    }
   );
+  //consolelog("rest.verifyPhoto.ret", ret);
+  //if (ret.data) {
+  //  return ret.data;
+  //}
   return ret;
 }
 //确认运单到达
@@ -138,22 +149,25 @@ async function getWaybill(wbNum: string) {
     null,
     null
   );
-  console.log("rest.getWaybill.ret:", ret);
+  //consolelog("rest.getWaybill.ret:", ret);
   return ret;
 }
 //运单查询功能
 async function queryWaybill(query: queryParams) {
+  //consolelog("queryWaybill:", query);
   const ret = await taroRequest<TimsResponse<queryData>>(
-    "/order/search",
+    "/logistics/search",
     "GET",
     query,
-    { "content-type": "application/x-www-form-urlencoded" }
+    {
+      "X-Access-Token": Taro.getStorageSync("token"),
+    }
   );
   return ret;
 }
 //查询运单状态进度
 async function queryWbStatus(wbNum: string) {
-  console.log("rest.queryWbStatus:", wbNum);
+  //consolelog("rest.queryWbStatus:", wbNum);
   const ret = await taroRequest<TimsResponse<wbStatusData>>(
     "/order/code/" + wbNum,
     "GET",
@@ -162,6 +176,19 @@ async function queryWbStatus(wbNum: string) {
   );
   return ret;
 }
+
+//标记当前运单回执已上传完成
+async function photoComplete(wbInfo: photoDoneParam) {
+  const ret = await taroRequest<TimsResponse<any>>(
+    "/driver/complete",
+    "POST",
+    wbInfo,
+    { "content-type": "application/x-www-form-urlencoded" }
+  );
+  //consolelog("rest.photoComplete.ret:", ret);
+  return ret;
+}
+
 //async function uploadPhoto() {}
 //获取运单已上传回执列表
 async function getWbPhotos(wbNum: string) {
@@ -172,7 +199,7 @@ async function getWbPhotos(wbNum: string) {
       {},
       null
     );
-    ////consolelog("getWbPhotos:", photos);
+    //consolelog("getWbPhotos:", photos);
     return photos;
   }
 }
@@ -202,7 +229,7 @@ async function userLogin(
     },
     { "content-type": "application/x-www-form-urlencoded" }
   );
-  ////consolelog('rest.userLogin.ret:', ret);
+  //consolelog("rest.userLogin.ret:", ret);
   //Taro.setStorage({ key: "roleName", data: roleName });
   //Taro.setStorage({ key: "userName", data: userName });
 
@@ -211,9 +238,9 @@ async function userLogin(
 //虚拟API
 async function taroRequest<T>(url: string, method, data, header) {
   let ret;
-  console.log("taroRequest:", url, method, data, header);
+  //consolelog("taroRequest:", url, method, data, header);
   if (DEBUGGING) {
-    ////consolelog('DEBUGGING.taroRequest.SERVER_URL:', url);
+    //consolelog("DEBUGGING.taroRequest.SERVER_URL:", url);
     if (url === "/logistics/login") {
       ret = await loginRequest(data);
     } else if (url.startsWith("/order/code/")) {
@@ -242,14 +269,14 @@ async function taroRequest<T>(url: string, method, data, header) {
       ret = await unVerifiedRequest(url);
     }
   } else {
-    console.log("url:", SERVER_URL + url);
+    //consolelog("url:", SERVER_URL + url);
     ret = await Taro.request<T>({
       url: SERVER_URL + url,
       method: method || "GET",
       data: data || {},
       header: header || { "content-type": "application/json" },
     });
-    console.log("toraRequest.ret:", ret);
+    //consolelog("toraRequest.ret:", ret);
     if (ret && ret.statusCode === 200) {
       ret = ret.data;
     } else {
@@ -268,6 +295,7 @@ export {
   queryWbStatus,
   getWbPhotos,
   verifyPhoto,
+  photoComplete,
   queryUnVerified,
   saveUserInfo,
   userLogin,

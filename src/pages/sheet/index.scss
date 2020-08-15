@@ -51,6 +51,12 @@ $color-lg-lred: #ffa3b2;
   margin: 0 auto;
   line-height: 1.2rem;
 }
+.disabled-semi-right {
+  color: #666666 !important;
+  font-weight: normal;
+  margin: 0 auto;
+  line-height: 1.2rem;
+}
 .confirm-info {
   line-height: 1.2rem;
   color: #666666 !important;
@@ -58,6 +64,14 @@ $color-lg-lred: #ffa3b2;
   display: block;
   text-align: center;
 }
+.confirm-info-1 {
+  line-height: 1.6rem;
+  color: #666666 !important;
+  word-wrap: break-word;
+  display: block;
+  text-align: left;
+}
+
 .form-title {
   color: #666666;
   font-size: 1.2rem;
@@ -103,9 +117,19 @@ $color-lg-lred: #ffa3b2;
 }
 .form-caption {
   color: #666666;
+  font-size: 0.8rem;
+  line-height: 1.8rem;
+  display: block;
+  min-width: 80px;
+  flex: 2;
+  text-align: right;
+}
+.form-item {
+  color: #666666;
   font-size: 1rem;
   line-height: 1.8rem;
   display: block;
+  flex: 4;
 }
 .form-caption-split {
   color: #666666;
@@ -223,7 +247,7 @@ hr {
 
 .query-input {
   margin-left: 0 !important;
-
+  text-align: right;
   padding: 24rpx 24rpx;
 }
 

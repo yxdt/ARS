@@ -7,7 +7,7 @@ import {
 import { queryMessage, markMessage } from "./rest";
 
 async function markRead(msgId: number): Promise<Result> {
-  return markTheMessage(msgId, 2);
+  return markTheMessage(msgId, 1);
 }
 async function markHide(msgId: number): Promise<Result> {
   return markTheMessage(msgId, 3);
@@ -23,9 +23,9 @@ async function markTheMessage(msgid: number, mark: number): Promise<Result> {
   } catch (e) {
     restRet = e;
   }
-  ////consolelog('controllers.message.restRet:', restRet);
+  //consolelog("controllers.message.restRet:", restRet);
   if (restRet.code === "0000") {
-    ret.result = restRet.data || "fail";
+    ret.result = "success";
     success = true;
   } else {
     ret.result = "error";
@@ -57,11 +57,11 @@ async function queryMessages(query: msgQueryParams): Promise<msgQueryResult> {
     ////consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  ////consolelog('controllers.message.queryMessages.res:', restRet);
+  console.log("controllers.message.queryMessages.res:", query, restRet);
   if (restRet.code === "0000") {
-    if (restRet.data && restRet.data.messages) {
-      ret.messages = restRet.data.messages;
-      ret.count = restRet.data.messages.length;
+    if (restRet.data && restRet.data.sms && restRet.data.sms.records) {
+      ret.messages = restRet.data.sms.records;
+      ret.count = restRet.data.sms.records.length;
     } else {
       ret.result = "fail";
       ret.count = 0;

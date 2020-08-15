@@ -5,6 +5,8 @@
  * xxxxResult：系统对从服务器返回的结果进行二次处理解耦后的用于业务逻辑的结果
  */
 
+import { waybillRequest } from "src/mock/api";
+
 //司机不要求注册，中心人员需要后台手工确认绑定openid或手机
 export interface RegUser {
   userName: string; //default is wx.nickName
@@ -43,11 +45,11 @@ export interface InfoCardProps {
 export interface MessageDetailProps {
   title: string;
   content: string;
-  ordNo: string;
-  cdc: string;
   sentTime: string;
   markFunc: Function;
   msgId: string;
+  isRead: boolean;
+  closeMe: Function;
 }
 
 //返回结果的基础接口
@@ -64,10 +66,24 @@ export interface DriverInfo {
   longitude: string;
 }
 
+//用于中心人员确认运单
+export interface WaybillCompleteParams {
+  carAllocNo: string;
+  openId: string;
+  shpToSeq: string;
+  remark: string;
+}
+export interface WaybillCompleteData {
+  result: string;
+}
+export interface WaybillCompleteResult extends Result {
+  message: string;
+}
+
 //用于到达确认
 export interface WaybillConfirmParams {
   openId: string; //openid: string; //司机小程序用户openid
-  sysTime: Date; //到达时间
+  sysTime: string; //到达时间
   carAllocNo: string; //ordNo: string; //运单号
   shpToSeq: string; //shpToCd: string; //四位验证码
   latitude: string;
@@ -106,6 +122,7 @@ export interface loginData {
 }
 export interface loginResult extends Result {
   user: loginData;
+  message: string;
 }
 
 //运单相关
@@ -122,12 +139,24 @@ export interface Waybill {
   statusNum: number;
   shipItems: ShipItem[];
   photos: wbPhoto[];
+  arsCode: string;
+  address: string;
+  latitude: string;
+  longitude: string;
+  phone: string;
+  remark: string;
 }
-//api 查询返回值
+//api 订单详情查询返回值
 export interface wbData {
   carAllocNo: string; //ordNo
   dcCd: string; //logCd: string;
   dcName: string; //logName: string;
+  dcNm: string;
+  address: string;
+  latitude: string;
+  longitude: string;
+  phone: string;
+  remark: string;
   totalPage: number;
   shpToSeq: string; //shpToCd: string;
   shpToName: string;
@@ -135,6 +164,7 @@ export interface wbData {
   ordDetailList: Array<pWbdData>;
   orderImageList: Array<photoData>;
   status: number;
+  arsCode: string;
 }
 //api 订单综合查询返回值
 export interface wbqData {
@@ -305,14 +335,22 @@ export interface msgSentResult extends Result {
 }
 
 export interface message {
-  msgId: number;
-  title: string;
-  content: string;
-  ordNo: string;
-  cdc: string;
-  sentTime: string;
-  status: number; //0:新生成, 1:已接收, 2:用户已拒收，3:用户标记已读
-  toOpenid: string; //接收者openid
+  id: number;
+  esTitle: string;
+  esContent: string;
+  createBy: string;
+  createTime: string;
+  esParam: string;
+  esReceiver: number; //0:新生成, 1:已接收, 2:用户已拒收，3:用户标记已读
+  esResult: string; //接收者openid
+  esSendNum: number;
+  esSendStatus: string;
+  esSendTime: string;
+  esType: string;
+  remark: string;
+  status: number;
+  updateBy: string;
+  updateTime: string;
 }
 
 export interface messages {
@@ -320,12 +358,10 @@ export interface messages {
 }
 
 export interface msgQueryParams {
-  beginDate: Date;
-  endDate: Date;
-  toOpenid: string;
-  ordNo: string;
-  cdcCode: string;
-  status: number;
+  openid: string;
+  pageNo: number | null;
+  pageSize: number | null;
+  status: number | null;
 }
 
 export interface msgQueryData {
@@ -337,6 +373,19 @@ export interface msgQueryResult {
   count: number;
 }
 
+//回执删除参数
+export interface delParams {
+  carAllocNo: string;
+  id: string;
+  openId: string;
+  shpToSeq: string;
+}
+export interface delData {
+  result: string;
+}
+export interface delResult extends Result {
+  remark: string;
+}
 //已上传回执核验
 export interface verifyParams {
   carAllocNo: string; //ordNo: string;
@@ -353,6 +402,7 @@ export interface verifyData {
 export interface verifyResult extends Result {
   filename: string;
   remark: string;
+  imgIds: string;
 }
 
 //运单查询

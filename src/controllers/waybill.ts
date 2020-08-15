@@ -1,6 +1,6 @@
 import {
   getWaybill,
-  getWbPhotos,
+  completeWaybill,
   confirmWaybill,
   queryWaybill,
   queryWbStatus,
@@ -18,6 +18,8 @@ import {
   queryResult,
   wbStatusResult,
   wbqData,
+  WaybillCompleteResult,
+  WaybillCompleteParams,
 } from "../types/ars";
 import { getDriverInfo } from "./users";
 
@@ -65,6 +67,12 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
     statusNum: 0,
     shipItems: [],
     photos: [],
+    arsCode: "",
+    address: "",
+    latitude: "",
+    longitude: "",
+    phone: "",
+    remark: "",
   };
   if (wbno && wbno.length > 0) {
     try {
@@ -76,7 +84,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
       //restRet = { code: "0500", data: null };
     }
 
-    //consolelog("controllers.waybill.loadWaybill.res:", restRet);
+    console.log("controllers.waybill.loadWaybill.res:", restRet);
 
     if (restRet && restRet.code === "0000" && restRet.data) {
       const retData = <wbData>restRet.data;
@@ -130,7 +138,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
           break;
         default:
           status = "loaded";
-          statusCaption = "已装车";
+          statusCaption = "未到达";
           retData.arrivalTime = restRet.responseTime;
           break;
       }
@@ -147,6 +155,13 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
         status,
         statusCaption,
         statusNum: retData.status,
+        arsCode: retData.arsCode,
+        address:
+          retData.address && retData.address !== "null" ? retData.address : "",
+        latitude: retData.latitude,
+        longitude: retData.longitude,
+        phone: retData.phone && retData.phone !== "null" ? retData.phone : "",
+        remark: retData.remark,
       };
       for (const pitem of retData.ordDetailList) {
         //consolelog("pitem:", pitem);
@@ -197,17 +212,59 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
   });
 }
 
+async function confirmComplete(
+  wbno: string,
+  shiptoCode: string,
+  remark: string,
+  openId: string
+): Promise<WaybillCompleteResult> {
+  const ccParam: WaybillCompleteParams = {
+    carAllocNo: wbno,
+    shpToSeq: shiptoCode,
+    remark,
+    openId,
+  };
+  let result: TimsResponse<WaybillCompleteResult>;
+  let success = false;
+  let ret: WaybillCompleteResult = { result: "success", wbno: wbno };
+  try {
+    result = await completeWaybill(ccParam);
+    console.log("confirmComplete.param,result:", ccParam, result);
+    if (result && result.code === "0000") {
+      success = true;
+      ret.result = "success"; //result.message;
+    } else {
+      success = false;
+      ret.result = "error";
+      ret.message = result.message;
+    }
+  } catch (e) {
+    console.log("waybill.confirmComplete.error.e:", e);
+    result = e;
+    ret.result = "error";
+    ret.message = "未知错误";
+  }
+
+  return new Promise((res, rej) => {
+    if (success) {
+      res(ret);
+    } else {
+      rej(ret);
+    }
+  });
+}
+
 async function confirmArrive(
   wbno: string,
   shiptoCode: string,
   cellphone: string,
-  arriveTime: Date
+  arriveTime: string
 ): Promise<Result> {
   const driverInfo = await getDriverInfo(cellphone);
   //consolelog("confirmArrive.wbno,ordNo,shpToCd:", wbno);
   const wbcParam: WaybillConfirmParams = {
     ...driverInfo,
-    sysTime: arriveTime,
+    sysTime: arriveTime, //arrTimeStr,
     carAllocNo: wbno, //ordNo: wbno,
     shpToSeq: shiptoCode, //shpToCd: shiptoCode,
     openId: driverInfo.openid,
@@ -217,7 +274,7 @@ async function confirmArrive(
   let ret: Result = { result: "success" };
   try {
     result = await confirmWaybill(wbcParam);
-    //consolelog("confirmArrive.result:", result);
+    console.log("confirmArrive.param,result:", wbcParam, result);
     if (result && result.code === "0000" && result.data) {
       success = true;
       ret.result = "success"; //result.message;
@@ -378,4 +435,10 @@ async function queryWaybillStatus(wbno: string): Promise<wbStatusResult> {
   });
 }
 
-export { loadWaybill, confirmArrive, queryWaybills, queryWaybillStatus };
+export {
+  loadWaybill,
+  confirmArrive,
+  confirmComplete,
+  queryWaybills,
+  queryWaybillStatus,
+};

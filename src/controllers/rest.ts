@@ -17,6 +17,10 @@ import {
   wbStatusData,
   uvPhotoListData,
   photoDoneParam,
+  delParams,
+  delData,
+  WaybillCompleteParams,
+  WaybillCompleteData,
 } from "../types/ars";
 import {
   loginRequest,
@@ -36,8 +40,8 @@ import {
 
 const DEBUGGING = false;
 const devUrl = "http://192.168.0.100:8765";
-const prodUrl = "https://tims.lg.com.cn"; //"https://www.hanyukj.cn";
-const hyUrl = "https://";
+const prodUrl = "https://tims.lg.com.cn";
+
 const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 
 //发送司机确认到达提示消息
@@ -79,7 +83,8 @@ async function markMessage(
   mark: number //2: read, 3:hide
 ): Promise<TimsResponse<string>> {
   const ret = await taroRequest<TimsResponse<string>>(
-    "/message/mark?msgid=" + msgid + "&mark=" + mark,
+    "/message/sysMessage/read?id=" + msgid,
+    //"/message/mark?msgid=" + msgid + "&mark=" + mark,
     "GET",
     null,
     null
@@ -91,11 +96,12 @@ async function queryMessage(
   query: msgQueryParams
 ): Promise<TimsResponse<msgQueryData>> {
   const ret = await taroRequest<TimsResponse<msgQueryData>>(
-    "/message/query",
-    "POST",
+    "/message/sysMessage/wx",
+    "GET",
     query,
     { "content-type": "application/x-www-form-urlencoded" }
   );
+  //consolelog("queryMessage:", query, ret);
   return ret;
 }
 //查询未审核回执--中心人员功能
@@ -110,6 +116,21 @@ async function queryUnVerified(
       "X-Access-Token": Taro.getStorageSync("token"),
     }
   );
+  return ret;
+}
+//删除回执照片
+async function deletePhoto(
+  delParam: delParams
+): Promise<TimsResponse<delData>> {
+  const ret = await taroRequest<TimsResponse<delData>>(
+    "/driver/delete",
+    "POST",
+    delParam,
+    {
+      "content-type": "application/x-www-form-urlencoded",
+    }
+  );
+  //consolelog("rest.deletePhoto.ret:", ret);
   return ret;
 }
 //审核回执
@@ -129,6 +150,20 @@ async function verifyPhoto(
   //if (ret.data) {
   //  return ret.data;
   //}
+  return ret;
+}
+
+//运单确认通过
+async function completeWaybill(wbInfo: WaybillCompleteParams) {
+  const ret = await taroRequest<TimsResponse<WaybillCompleteData>>(
+    "/logistics/confirmall",
+    "POST",
+    wbInfo,
+    {
+      "content-type": "application/x-www-form-urlencoded",
+      "X-Access-Token": Taro.getStorageSync("token"),
+    }
+  );
   return ret;
 }
 //确认运单到达
@@ -214,6 +249,18 @@ async function saveUserInfo(userInfo: RegUser) {
   });
   return ret;
 }
+//openId登录
+async function openidLogin(openid: string): Promise<TimsResponse<loginData>> {
+  const ret = await taroRequest<TimsResponse<loginData>>(
+    "/logistics/openIdLogin",
+    "POST",
+    {
+      openId: openid,
+    },
+    { "content-type": "application/x-www-form-urlencoded" }
+  );
+  return ret;
+}
 //用户登录
 async function userLogin(
   cellphone: string,
@@ -295,13 +342,16 @@ export {
   queryWbStatus,
   getWbPhotos,
   verifyPhoto,
+  deletePhoto,
   photoComplete,
   queryUnVerified,
   saveUserInfo,
   userLogin,
+  openidLogin,
   sendArriveMessage,
   sendUploadMessage,
   sendRejectMessage,
   queryMessage,
   markMessage,
+  completeWaybill,
 };

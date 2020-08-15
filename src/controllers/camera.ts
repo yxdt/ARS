@@ -1,5 +1,11 @@
 import Taro from "@tarojs/taro";
-import { SERVER_URL, verifyPhoto, queryUnVerified, photoComplete } from "./rest";
+import {
+  SERVER_URL,
+  verifyPhoto,
+  queryUnVerified,
+  photoComplete,
+  deletePhoto,
+} from "./rest";
 import {
   TimsResponse,
   uploadResult,
@@ -9,6 +15,9 @@ import {
   uvPhotoResult,
   uvPhotoListData,
   photoDoneParam,
+  delParams,
+  delResult,
+  delData,
 } from "../types/ars";
 
 //扫描运单二维码，返回二维码内含字符串
@@ -26,8 +35,6 @@ function takePicture(resolve) {
     success: resolve,
   });
 }
-
-
 
 //照片上传功能
 function uploadPicture(
@@ -96,19 +103,19 @@ function uploadPicture(
 }
 //确定回执已完成上传
 async function confirmPhotoComplete(
-  wbno: string,  
+  wbno: string,
   openid: string
 ): Promise<any> {
   //consolelog("uploadPicture.wbno, filePath:", wbno, filePath);
   const comParam: photoDoneParam = {
-    openId:openid,
+    openId: openid,
     carAllocNo: wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno,
-    shpToSeq : wbno.length > 4 ? wbno.substr(wbno.length - 4) : "",
-  }
-  try{
-    const ret = await photoComplete(comParam);
-    //consolelog(ret);
-  }
+    shpToSeq: wbno.length > 4 ? wbno.substr(wbno.length - 4) : "",
+  };
+
+  const ret = await photoComplete(comParam);
+  //consolelog(ret);
+  return ret;
 }
 //查询尚未审核的已上传回执列表
 async function queryUnVerifiedPhotos(openid: string): Promise<uvPhotoResult> {
@@ -143,6 +150,52 @@ async function queryUnVerifiedPhotos(openid: string): Promise<uvPhotoResult> {
   });
 }
 
+async function deletePicture(
+  wbno: string,
+  imgId: string,
+  openId: string
+): Promise<delResult> {
+  let delData: TimsResponse<delData>;
+  let success = true;
+  const param: delParams = {
+    carAllocNo: wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno,
+    shpToSeq: wbno.length > 4 ? wbno.substr(wbno.length - 4) : "",
+    id: imgId,
+    openId,
+  };
+  const ret: delResult = {
+    result: "success",
+    remark: "deleted",
+  };
+  try {
+    delData = await deletePhoto(param);
+  } catch (e) {
+    delData = {
+      code: "0500",
+      data: null,
+      message: "数据访问错误",
+      messageId: "0000000000",
+      sentTime: new Date(),
+      responseTime: new Date(),
+    };
+    success = false;
+  }
+  if (delData.code === "0000" && delData.data) {
+    ret.result = "success";
+  } else {
+    ret.result = "error";
+    success = false;
+  }
+  //consolelog("deletePicture:", delData, ret);
+  return new Promise((res, rej) => {
+    if (success) {
+      res(ret);
+    } else {
+      rej(ret);
+    }
+  });
+}
+
 //回执核验功能
 async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
   let vrfResult: TimsResponse<verifyData>;
@@ -150,8 +203,9 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
   const ret: verifyResult = {
     result: "approve",
     remark: vrf.remark,
-    imgIds: vrf.imgId, //.imgid,
+    imgIds: vrf.imgIds, //.imgid,
   };
+
   //consolelog("camera.verifyPicture.vrf:", vrf);
   try {
     vrfResult = await verifyPhoto(vrf);
@@ -168,7 +222,7 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
   }
   //consolelog("camera.verifyPicture.verifyPhoto.result:", vrfResult);
   if (vrfResult.code === "0000" && vrfResult.data) {
-    ret.result = "success"//vrfResult.data.result || "";
+    ret.result = "success"; //vrfResult.data.result || "";
   } else {
     ret.result = "error";
     success = false;
@@ -225,12 +279,14 @@ function rejectPicture(
   };
   return verifyPicture(vrf);
 }
+
 export {
   scanBarcode,
   takePicture,
   uploadPicture,
   approvePicture,
+  deletePicture,
   rejectPicture,
   queryUnVerifiedPhotos,
-  confirmPhotoComplete
+  confirmPhotoComplete,
 };

@@ -1,10 +1,15 @@
-import Taro, { useState, login } from "@tarojs/taro";
+import Taro, { useState } from "@tarojs/taro";
 import { View, Text, Button } from "@tarojs/components";
 import { AtInput, AtMessage } from "taro-ui";
 import "./index.scss";
 
 import ArsTabBar from "../../components/tabbar";
-import { doLogin } from "../../controllers/users";
+import {
+  doLogin,
+  doOpenidLogin,
+  getWxOpenId,
+  checkToken,
+} from "../../controllers/users";
 
 export default function Login() {
   //const [manual, setManual] = useState(true);
@@ -18,6 +23,27 @@ export default function Login() {
     setCellphone(this.$router.params.cellphone);
     //setManual(true);
   }
+  const needRefresh = checkToken();
+  getWxOpenId((openid) => {
+    //consolelog("getWxOpenId:", openid, needRefresh);
+    if (needRefresh > 0) {
+      setLoging(true);
+      doOpenidLogin(openid)
+        .then((ret) => {
+          //consolelog("openid login result:", ret);
+          if (ret.result === "success") {
+            Taro.setStorageSync("roleName", ret.user.roleName);
+            Taro.setStorageSync("userName", ret.user.userName);
+            Taro.setStorageSync("token", ret.user.token);
+            Taro.setStorageSync("tokendate", new Date().valueOf());
+            Taro.setStorage({ key: "cellphone", data: cellphone });
+          }
+        })
+        .catch((e) => {
+          console.log("openidLogin fail:", e);
+        });
+    }
+  });
 
   function login() {
     setLoging(true);
@@ -57,7 +83,7 @@ export default function Login() {
         });
         setLoging(false);
       })
-      .finally(() => {
+      .catch(() => {
         setLoging(false);
       });
   }

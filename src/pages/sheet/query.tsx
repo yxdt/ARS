@@ -37,6 +37,26 @@ export default function Query() {
   const [wbNum, setWbNum] = useState("");
   const [waybills, setWaybills] = useState<Array<Waybill> | null>([]);
   const [queryed, setQueryed] = useState(false);
+  const statusOptions = [
+    { label: "未到达", value: "0", desc: "未完成到达时间" },
+    { label: "已到达", value: "1", desc: "已完成到达时间" },
+    {
+      label: "已上传待确认",
+      value: "2",
+      desc: "司机已经回传回执等待确认",
+    },
+    { label: "回执驳回", value: "3", desc: "回执被驳回" },
+    {
+      label: "回执重传待确认",
+      value: "4",
+      desc: "司机重新上传回执",
+    },
+    {
+      label: "已确认IOD",
+      value: "8",
+      desc: "回执已经确认通过",
+    },
+  ];
   //function doLogin() {}
 
   return (
@@ -52,7 +72,6 @@ export default function Query() {
                 <Picker
                   mode="date"
                   onChange={(dateVal) => {
-                    console.log("start date:", dateVal);
                     setStartDatetime(dateVal.detail.value);
                   }}
                   value={startDate}
@@ -113,43 +132,25 @@ export default function Query() {
               <View>
                 <AtInput
                   className="query-input"
-                  editable={false}
                   name="wbStatus"
                   title="单据状态"
                   type="text"
-                  value={wbStatus + ""}
+                  value={
+                    (
+                      statusOptions.find(
+                        (item) => item.value === wbStatus + ""
+                      ) || { label: "未知" }
+                    ).label
+                  }
                   placeholder="请选择单据状态"
                   placeholderClass="small-ph"
-                  onChange={(val) => {
-                    //consolelog('单据状态：', val);
-                    //setWbStatus(val);
-                  }}
-                  onClick={() => {
+                  onFocus={() => {
                     setStsVisble(true);
                   }}
                 />
                 {stsVisble ? (
                   <AtRadio
-                    options={[
-                      { label: "未送达", value: "0", desc: "未完成到达时间" },
-                      { label: "已到达", value: "1", desc: "已完成到达时间" },
-                      {
-                        label: "已上传待确认",
-                        value: "2",
-                        desc: "司机已经回传回执等待确认",
-                      },
-                      { label: "回执驳回", value: "3", desc: "回执被驳回" },
-                      {
-                        label: "回执重传待确认",
-                        value: "4",
-                        desc: "司机重新上传回执",
-                      },
-                      {
-                        label: "已确认IOD",
-                        value: "8",
-                        desc: "回执已经确认通过",
-                      },
-                    ]}
+                    options={statusOptions}
                     value={wbStatus}
                     onClick={(val) => {
                       //consolelog('status selected:', val);
@@ -183,10 +184,13 @@ export default function Query() {
                       console.log("querywaybills.ret:", ret);
                       if (ret.result === "success" && ret.count > 0) {
                         setWaybills(ret.waybills);
+                      } else {
+                        setWaybills([]);
                       }
                       setQueryed(true);
                     })
-                    .finally(() => {
+                    .catch(() => {
+                      setWaybills([]);
                       setQueryed(true);
                     });
                 }
@@ -217,6 +221,7 @@ export default function Query() {
                   note={item.shiptoCode + "(" + item.shiptoName + ")"}
                   extraText={item.statusCaption}
                   arrow="right"
+                  key={item.wbNum + item.status}
                 />
               ))
             ) : (

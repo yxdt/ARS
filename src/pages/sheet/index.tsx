@@ -13,9 +13,17 @@ import {
 import "./index.scss";
 import Loading from "../../components/loading";
 import { sendArriveMessage } from "../../controllers/rest";
-import { loadWaybill, confirmArrive } from "../../controllers/waybill";
+import {
+  loadWaybill,
+  confirmArrive,
+  confirmComplete,
+} from "../../controllers/waybill";
 
-import { approvePicture, rejectPicture } from "../../controllers/camera";
+import {
+  approvePicture,
+  rejectPicture,
+  deletePicture,
+} from "../../controllers/camera";
 import ShipItems from "../../components/shipitems";
 import { WaybillResult, Waybill } from "../../types/ars";
 import InfoCard from "../../components/infocard";
@@ -26,8 +34,9 @@ export interface SheetState {
   itemCount: number;
   arrived: boolean; //司机确认到达
   confirmed: boolean; //中心已确认到达
-  confirmTime: Date;
+  confirmTime: string;
   confirmedArrive: boolean; //司机到达确认的确认
+  confirmedComplete: boolean; //中心人员完成的确认
   confirming: boolean; //司机到达确认中
   valid: boolean; //是否是有效的运单号
   failed: boolean; //是否操作失败
@@ -40,21 +49,26 @@ export interface SheetState {
   confirmReject: boolean; //确定驳回
   remark: string; //驳回原因
   selCaption: string; //当前照片状态
+  arriveTimeStr: string; //到达时间格式化字符串
+  gridData: Array<{ image: string; value: string; imageId: string }>; //当前照片
+  deleting: boolean;
   //photos: Array<string>; //uploaded photos
 }
 export default class Index extends Component<null, SheetState> {
   constructor() {
     super(...arguments);
+    const today = new Date();
     this.state = {
       loading: true,
       failed: false,
       rdcNum: "",
       cellphone: "",
       isSuper: false,
+      confirmedComplete: false,
       waybill: {
         shiptoCode: "",
         rdcCode: "",
-        arriveTime: new Date(),
+        arriveTime: today,
         totalPages: 1,
         status: "",
         statusCaption: "",
@@ -64,11 +78,17 @@ export default class Index extends Component<null, SheetState> {
         rdcName: "",
         shipItems: [],
         photos: [],
+        arsCode: "",
+        address: "",
+        latitude: "",
+        longitude: "",
+        phone: "",
+        remark: "",
       },
       itemCount: 0,
       arrived: false,
       confirmedArrive: false,
-      confirmTime: new Date(),
+      confirmTime: today,
       confirming: false,
       confirmed: false,
       valid: false,
@@ -78,6 +98,13 @@ export default class Index extends Component<null, SheetState> {
       confirmReject: false,
       remark: "",
       selCaption: "",
+      deleting: false,
+      arriveTimeStr:
+        today.getFullYear() +
+        "-" +
+        String(1 + today.getMonth()).padStart(2, "0") +
+        "-" +
+        String(today.getDate()).padStart(2, "0"),
     };
     //consolelog("sheet:", this.$router.params);
     this.driverConfirmArrive.bind(this);
@@ -86,21 +113,33 @@ export default class Index extends Component<null, SheetState> {
   componentWillMount() {}
 
   componentDidMount() {
-    //consolelog("sheet.index.componentDidMount.props:",this.props,this.$router.params);
-    const wbno = this.$router.params.wbno;
+    let wbno = this.$router.params.wbno;
+    if (this.$router.params.q && this.$router.params.q.length > 0) {
+      const wbnos = this.$router.params.q.split("%2F");
+      wbno = wbnos[wbnos.length - 1];
+      //consolelog("wbno from qrcode:", wbno);
+    }
     //const rdcno = this.$router.params.rdc;
     //const cell = this.$router.params.cell;
     let isSuper = this.$router.params.super === "1";
     if (!isSuper) {
       isSuper = Taro.getStorageSync("roleName").toString().length > 0;
     }
+
     loadWaybill(wbno)
       .then((ret: WaybillResult) => {
-        //consolelog("getWaybill.ret:", ret, ret.waybill);
+        console.log("getWaybill.ret:", ret, ret.waybill);
+        Taro.atMessage({
+          message: "运单信息获取失败，请重试！",
+          type: "error",
+          duration: 8000,
+        });
         if (ret.result === "success") {
           const iCnt = ret.waybill.shipItems.length;
           //ret.waybill.rdcCode = rdcno;
           //todo: update here for dbl-check
+          const arrDate = ret.waybill.arriveTime.split(".")[0];
+          //consolelog("arrDate-arriveTime:", arrDate, ret.waybill.arriveTime);
           this.setState({
             loading: false,
             waybill: ret.waybill,
@@ -108,11 +147,12 @@ export default class Index extends Component<null, SheetState> {
             arrived: ret.waybill.status === "arrived",
             confirmed: ret.waybill.status === "confirmed",
             confirmedArrive: ret.waybill.status === "loaded",
-            confirmTime: ret.waybill.arriveTime,
+            confirmTime: arrDate,
             valid: true,
             isSuper,
             preview: false,
             selPic: "",
+            arriveTimeStr: arrDate,
           });
         } else {
           this.setState({
@@ -180,17 +220,48 @@ export default class Index extends Component<null, SheetState> {
   handleChange(val) {
     //consolelog("something has been changed:", val);
   }
+  superConfirmComplete() {
+    const { wbNum, shiptoCode, remark } = this.state.waybill;
+    const openid = Taro.getStorageSync("userOpenId");
+    confirmComplete(wbNum, shiptoCode, remark, openid)
+      .then((ret) => {
+        console.log("superConfirmComplete,ret:", ret);
+        if (ret.result === "success") {
+          this.setState({
+            arrived: true,
+            confirmed: true,
+            loading: false,
+            confirmedArrive: false,
+            confirming: false,
+            confirmedComplete: false,
+            waybill: {
+              ...this.state.waybill,
+              status: "confirmed",
+              statusCaption: "中心已确认",
+              statusNum: 8,
+            },
+          });
+        } else {
+          Taro.atMessage({
+            message: "IOD到达确认失败，请重试。",
+            type: "error",
+            duration: 8000,
+          });
+          this.setState({ confirmedComplete: false });
+        }
+      })
+      .catch((ret) => {
+        this.setState({ confirmedComplete: false });
+
+        Taro.atMessage({
+          message: "操作失败，错误原因：" + ret.message,
+          type: "error",
+          duration: 8000,
+        });
+      });
+  }
 
   driverConfirmArrive() {
-    //consolelog("driver confirm arrive");
-    //consolelog("sheetNum:", this.state.waybill.wbNum);
-    // consolelog(
-    //   "rdcNum, shipToCode, rdcCode:",
-    //   this.state.rdcNum,
-    //   this.state.waybill.shiptoCode,
-    //   this.state.waybill.rdcCode
-    // );
-    //dirver position address openid
     const openid = Taro.getStorageSync("userOpenId");
     //consolelog("sheet.index.driverConfirmArrive.openid:", openid);
     if (this.state.cellphone) {
@@ -228,6 +299,7 @@ export default class Index extends Component<null, SheetState> {
               type: "error",
               duration: 8000,
             });
+            this.setState({ confirming: false });
           }
         })
         .catch((ret) => {
@@ -236,16 +308,13 @@ export default class Index extends Component<null, SheetState> {
             type: "error",
             duration: 8000,
           });
-        })
-        .finally(() => {
           this.setState({ confirming: false });
-          //consolelog("confirmArrive.finally:", this.state.confirming);
         });
     } else {
       //wrong rdcNumber input
       ////consolelog("wrong rdc code input");
       Taro.atMessage({
-        message: "接收码输入错误，请重试！",
+        message: "验证码输入错误，请重试！",
         type: "error",
       });
     }
@@ -257,16 +326,18 @@ export default class Index extends Component<null, SheetState> {
       waybill,
       confirmedArrive,
       confirmTime,
-      arrived,
+      arriveTimeStr,
       confirmed,
       confirming,
       valid,
       failed,
       isSuper,
+      confirmedComplete,
       preview,
       selPicId,
       selPic,
       selCaption,
+      remark,
     } = this.state;
     //consolelog("loading:", loading);
     if (loading) {
@@ -305,17 +376,19 @@ export default class Index extends Component<null, SheetState> {
     const confirmString2 = "请输入验证码、手机号确认送达";
     const confirmString3 = "请注意，一旦确认将无法修改。";
     //consolelog("waybill:", waybill);
-    const gridData = waybill.photos.map((item, index) => ({
-      image: item.url,
-      value: item.caption,
-      imageId: item.id,
-    }));
+    this.setState({
+      gridData: waybill.photos.map((item) => ({
+        image: item.url,
+        value: item.caption,
+        imageId: item.id,
+      })),
+    });
     //consolelog("sheet.gridData:", gridData);
 
     return (
       <View className="index">
         <AtMessage />
-        {isSuper && preview ? (
+        {preview ? (
           <View className="preview-span">
             <Image
               mode="aspectFit"
@@ -334,8 +407,33 @@ export default class Index extends Component<null, SheetState> {
                 });
               }}
             ></Image>
-            {selCaption !== "已上传" ? (
-              <View style="display:flex; flex-direction:row">
+            <View style="display:flex; flex-direction:row">
+              {(((selCaption === "已上传" && waybill.statusNum === 3) ||
+                waybill.statusNum === 1) &&
+                !isSuper) ||
+              isSuper ? (
+                <Button
+                  className="preview-confirm-button"
+                  onClick={() => {
+                    deletePicture(
+                      waybill.wbNum + waybill.shiptoCode,
+                      this.state.selPicId,
+                      Taro.getStorageSync("userOpenId")
+                    ).then((ret) => {
+                      for (let idx = 0; idx < waybill.photos.length; idx++) {
+                        if (waybill.photos[idx].id === this.state.selPicId) {
+                          waybill.photos.splice(idx, 1);
+                          break;
+                        }
+                      }
+                      this.setState({ preview: false });
+                    });
+                  }}
+                >
+                  删除
+                </Button>
+              ) : null}
+              {selCaption !== "已上传" || !isSuper ? (
                 <Button
                   className="preview-confirm-button"
                   onClick={() => {
@@ -344,66 +442,66 @@ export default class Index extends Component<null, SheetState> {
                 >
                   返回
                 </Button>
-              </View>
-            ) : (
-              <View style="display:flex; flex-direction:row">
-                <Button
-                  className="preview-confirm-button"
-                  disabled={selCaption !== "已上传"}
-                  onClick={() => {
-                    approvePicture(
-                      waybill.wbNum + waybill.shiptoCode,
-                      this.state.selPicId,
-                      Taro.getStorageSync("userOpenId")
-                    )
-                      .then((ret) => {
-                        //consolelog("wb-approve:", ret);
-                        if (ret.result === "success") {
-                          Taro.atMessage({
-                            message: "照片审核通过",
-                            type: "success",
-                          });
-                          this.setState({ preview: false });
-                          for (
-                            let idx = 0;
-                            idx < waybill.photos.length;
-                            idx++
-                          ) {
-                            if (
-                              waybill.photos[idx].id === this.state.selPicId
+              ) : (
+                <View style="display:flex; flex-direction:row;flex:3">
+                  <Button
+                    className="preview-confirm-button"
+                    disabled={selCaption !== "已上传"}
+                    onClick={() => {
+                      approvePicture(
+                        waybill.wbNum + waybill.shiptoCode,
+                        this.state.selPicId,
+                        Taro.getStorageSync("userOpenId")
+                      )
+                        .then((ret) => {
+                          //consolelog("wb-approve:", ret);
+                          if (ret.result === "success") {
+                            Taro.atMessage({
+                              message: "照片审核通过",
+                              type: "success",
+                            });
+                            this.setState({ preview: false });
+                            for (
+                              let idx = 0;
+                              idx < waybill.photos.length;
+                              idx++
                             ) {
-                              waybill.photos[idx].caption = "通过";
+                              if (
+                                waybill.photos[idx].id === this.state.selPicId
+                              ) {
+                                waybill.photos[idx].caption = "通过";
+                              }
                             }
+                          } else {
+                            Taro.atMessage({
+                              message: "照片审核操作失败，请重试",
+                              type: "error",
+                            });
                           }
-                        } else {
+                          //consolelog("approvePicture.result:", ret);
+                        })
+                        .catch(() => {
                           Taro.atMessage({
                             message: "照片审核操作失败，请重试",
                             type: "error",
                           });
-                        }
-                        //consolelog("approvePicture.result:", ret);
-                      })
-                      .catch(() => {
-                        Taro.atMessage({
-                          message: "照片审核操作失败，请重试",
-                          type: "error",
                         });
-                      });
-                  }}
-                >
-                  通过
-                </Button>
-                <Button
-                  disabled={selCaption !== "已上传"}
-                  className="preview-confirm-button"
-                  onClick={() => {
-                    this.setState({ confirmReject: true });
-                  }}
-                >
-                  驳回
-                </Button>
-              </View>
-            )}
+                    }}
+                  >
+                    通过
+                  </Button>
+                  <Button
+                    disabled={selCaption !== "已上传"}
+                    className="preview-confirm-button"
+                    onClick={() => {
+                      this.setState({ confirmReject: true });
+                    }}
+                  >
+                    驳回
+                  </Button>
+                </View>
+              )}
+            </View>
             <AtModal isOpened={this.state.confirmReject}>
               <AtModalHeader>驳回操作</AtModalHeader>
               <AtModalContent>
@@ -414,7 +512,7 @@ export default class Index extends Component<null, SheetState> {
                     type="text"
                     className="modal-input"
                     title="原因："
-                    value={this.state.remark}
+                    value={remark}
                     name="remark"
                     placeholder=""
                     onChange={(theval) => {
@@ -435,7 +533,12 @@ export default class Index extends Component<null, SheetState> {
                   取消
                 </Button>
                 <Button
-                  className="home-input-semi-right"
+                  disabled={!remark || remark.trim().length <= 0}
+                  className={
+                    !remark || remark.trim().length <= 0
+                      ? "disabled-semi-right"
+                      : "home-input-semi-right"
+                  }
                   onClick={() => {
                     rejectPicture(
                       waybill.wbNum + waybill.shiptoCode,
@@ -445,6 +548,8 @@ export default class Index extends Component<null, SheetState> {
                     )
                       .then((ret) => {
                         //consolelog("rejectPicture.result:", ret);
+                        this.setState({ confirmReject: false });
+
                         if (ret.result === "success") {
                           Taro.atMessage({
                             message: "照片审核驳回成功",
@@ -462,6 +567,7 @@ export default class Index extends Component<null, SheetState> {
                             message: "照片审核操作失败，请重试",
                             type: "error",
                           });
+                          this.setState({ preview: false });
                         }
                       })
                       .catch(() => {
@@ -469,14 +575,11 @@ export default class Index extends Component<null, SheetState> {
                           message: "照片审核操作失败，请重试",
                           type: "error",
                         });
-                      })
-                      .finally(() => {
                         this.setState({ preview: false });
-                        //consolelog("rejected!");
                       });
                   }}
                 >
-                  确认驳回
+                  {remark && remark.length > 0 ? "确认驳回" : "请先输入"}
                 </Button>
               </AtModalAction>
             </AtModal>
@@ -487,28 +590,50 @@ export default class Index extends Component<null, SheetState> {
               <Text className="form-title">交货单详细信息</Text>
               <View className="sheet-info-span">
                 <View className="form-caption-split">
-                  单据状态：
+                  <Text className="form-caption">单据状态：</Text>
                   <Text
-                    className={confirmed ? "arrived" : "notarrive"}
-                    style="flex:1"
+                    className={
+                      confirmed ? "arrived form-item" : "notarrive form-item"
+                    }
                   >
                     {confirming ? "更新中..." : waybill.statusCaption}
                   </Text>
                 </View>
-                <Text className="form-caption"> 装 车 号：{waybill.wbNum}</Text>
+                <View className="form-caption-split">
+                  <Text className="form-caption">装车号：</Text>
+                  <Text className="form-item">{waybill.wbNum}</Text>
+                </View>
                 {waybill.statusNum > 0 ? (
-                  <Text className="form-caption">
-                    到达时间：
-                    {new Date(waybill.arriveTime).toLocaleString("zh-CN")}
-                  </Text>
+                  <View className="form-caption-split">
+                    <Text className="form-caption">到达时间：</Text>
+                    <Text className="form-item">{arriveTimeStr}</Text>
+                  </View>
                 ) : null}
-                <Text className="form-caption">
-                  物流中心：{waybill.rdcCode}（{waybill.rdcName}）
-                </Text>
-                <Text className="form-caption">
-                  接 货 处：{waybill.shiptoCode} （{waybill.shiptoName}）
-                </Text>
+                <View className="form-caption-split">
+                  <Text className="form-caption">物流中心：</Text>
+                  <Text className="form-item">
+                    {waybill.rdcCode}（{waybill.rdcName}）
+                  </Text>
+                </View>
+                <View className="form-caption-split">
+                  <Text className="form-caption">接货处：</Text>
+                  <Text className="form-item">
+                    {waybill.arsCode} （{waybill.shiptoName}）
+                  </Text>
+                </View>
 
+                {waybill.statusNum > 0 && isSuper ? (
+                  <View className="form-caption-split">
+                    <Text className="form-caption">司机手机：</Text>
+                    <Text className="form-item">{waybill.phone || ""}</Text>
+                  </View>
+                ) : null}
+                {waybill.statusNum > 0 && isSuper ? (
+                  <View className="form-caption-split">
+                    <Text className="form-caption">确认地址：</Text>
+                    <Text className="form-item">{waybill.address || ""}</Text>
+                  </View>
+                ) : null}
                 {waybill.statusNum > 0 ? (
                   <View className="form-detail-span">
                     <View className="form-detail-header">
@@ -541,21 +666,9 @@ export default class Index extends Component<null, SheetState> {
                             message: "该照片已被中心驳回，请重新拍照上传",
                             type: "error",
                           });
-                        } else {
-                          if (!isSuper) {
-                            Taro.previewImage({
-                              urls: [gridData[index].image],
-                              success: () => {
-                                //consolelog("success");
-                              },
-                              fail: () => {
-                                //consolelog("fail");
-                              },
-                            });
-                          }
                         }
                       }}
-                      data={gridData}
+                      data={this.state.gridData}
                     />
                   </View>
                 ) : null}
@@ -581,6 +694,17 @@ export default class Index extends Component<null, SheetState> {
                     点击确认到达
                   </AtButton>
                 )}
+                {isSuper && waybill.statusNum > 0 && waybill.statusNum < 8 ? (
+                  <AtButton
+                    className="home-button"
+                    formType="submit"
+                    onClick={() => {
+                      this.setState({ confirmedComplete: true });
+                    }}
+                  >
+                    IOD完成
+                  </AtButton>
+                ) : null}
                 <AtButton
                   className="home-button"
                   formType="reset"
@@ -592,58 +716,88 @@ export default class Index extends Component<null, SheetState> {
                 </AtButton>
               </View>
             </View>
-            {waybill.statusNum > 0 ? null : (
-              <AtModal isOpened={confirmedArrive}>
-                <AtModalHeader>{confirmString}</AtModalHeader>
-                <AtModalContent>
-                  <View className="toast-main">
-                    <View className="confirm-info">{confirmString2}</View>
-                    <View className="confirm-info">{confirmString3}</View>
-                    <AtInput
-                      key={"confirm-arrive-ara-code"}
-                      type="text"
-                      className="modal-input"
-                      title="验证码*"
-                      name="arsCode"
-                      placeholder=""
-                      onChange={(val) => {
-                        //consolelog("arscode:", val);
-                        this.setState({ rdcNum: val.toString() });
-                      }}
-                    ></AtInput>
-                    <AtInput
-                      key={"confirm-arrive-cell-phone"}
-                      type="number"
-                      name="cellphone"
-                      className="modal-input"
-                      title="手机号"
-                      placeholder=""
-                      onChange={(val) => {
-                        //consolelog("changed:", val);
-                        this.setState({ cellphone: val.toString() });
-                      }}
-                    ></AtInput>
+
+            <AtModal isOpened={confirmedComplete}>
+              <AtModalHeader>确认运单IOD完成</AtModalHeader>
+              <AtModalContent>
+                <View className="toast-main">
+                  <View className="confirm-info-1">
+                    注意：确认后，该运单将直接标记为“IOD完成状态”。
                   </View>
-                </AtModalContent>
-                <AtModalAction>
-                  <Button
-                    className="home-input-semi-left"
-                    onClick={() => {
-                      //Taro.navigateBack();
-                      this.setState({ confirmedArrive: false });
+                  <View className="confirm-info-1">
+                    当前运单的全部已上传回执将被标记为“通过”。
+                  </View>
+                </View>
+              </AtModalContent>
+              <AtModalAction>
+                <Button
+                  className="home-input-semi-left"
+                  onClick={() => {
+                    //Taro.navigateBack();
+                    this.setState({ confirmedComplete: false });
+                  }}
+                >
+                  取消
+                </Button>
+                <Button
+                  className="home-input-semi-right"
+                  onClick={this.superConfirmComplete}
+                >
+                  确认
+                </Button>
+              </AtModalAction>
+            </AtModal>
+
+            <AtModal isOpened={confirmedArrive}>
+              <AtModalHeader>{confirmString}</AtModalHeader>
+              <AtModalContent>
+                <View className="toast-main">
+                  <View className="confirm-info">{confirmString2}</View>
+                  <View className="confirm-info">{confirmString3}</View>
+                  <AtInput
+                    key={"confirm-arrive-ara-code"}
+                    type="text"
+                    className="modal-input"
+                    title="验证码*"
+                    name="arsCode"
+                    placeholder=""
+                    onChange={(val) => {
+                      //consolelog("arscode:", val);
+                      this.setState({ rdcNum: val.toString() });
                     }}
-                  >
-                    取消
-                  </Button>
-                  <Button
-                    className="home-input-semi-right"
-                    onClick={this.driverConfirmArrive}
-                  >
-                    确认到达
-                  </Button>
-                </AtModalAction>
-              </AtModal>
-            )}
+                  ></AtInput>
+                  <AtInput
+                    key={"confirm-arrive-cell-phone"}
+                    type="number"
+                    name="cellphone"
+                    className="modal-input"
+                    title="手机号"
+                    placeholder=""
+                    onChange={(val) => {
+                      //consolelog("changed:", val);
+                      this.setState({ cellphone: val.toString() });
+                    }}
+                  ></AtInput>
+                </View>
+              </AtModalContent>
+              <AtModalAction>
+                <Button
+                  className="home-input-semi-left"
+                  onClick={() => {
+                    //Taro.navigateBack();
+                    this.setState({ confirmedArrive: false });
+                  }}
+                >
+                  取消
+                </Button>
+                <Button
+                  className="home-input-semi-right"
+                  onClick={this.driverConfirmArrive}
+                >
+                  确认到达
+                </Button>
+              </AtModalAction>
+            </AtModal>
           </View>
         )}
       </View>

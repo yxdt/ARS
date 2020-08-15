@@ -40,15 +40,24 @@ export default function UserInfo() {
   const [roleName] = useState(Taro.getStorageSync("roleName") || "");
   const [openDetail, setOpenDetail] = useState(false);
   const [msgCount, setMsgCount] = useState(0);
+
   const [curMessage, setCurMessage] = useState<message>({
-    msgId: 0,
-    title: "",
-    content: "",
-    ordNo: "",
-    cdc: "",
-    sentTime: "",
+    id: 0,
+    esTitle: "",
+    esContent: "",
+    createBy: "",
+    createTime: "",
+    esParam: "",
+    esReceiver: 0,
+    esResult: "",
+    esSendNum: 0,
+    esSendStatus: "",
+    esSendTime: "",
+    esType: "",
+    remark: "",
     status: 0,
-    toOpenid: "",
+    updateBy: "",
+    updateTime: "",
   });
   const [messages, setMessages] = useState<msgQueryResult>({
     result: "",
@@ -65,17 +74,15 @@ export default function UserInfo() {
   ////consolelog("UserInfo:", this);
   //let msgList: Array<message>;
   const msgQuery: msgQueryParams = {
-    beginDate: new Date(new Date().valueOf() - 7 * 24 * 60 * 60 * 1000),
-    endDate: new Date(),
-    toOpenid: Taro.getStorageSync("userOpenId"),
-    ordNo: "",
-    cdcCode: "",
-    status: 0,
+    openid: Taro.getStorageSync("userOpenId"),
+    //pageNo: 1,
+    //pageSize: 10,
+    //status: null, //0, //0:未读，1:已读
   };
   if (init) {
     setInit(false);
     queryMessages(msgQuery).then((ret) => {
-      //consolelog("userinfo.queryMessages.ret:", ret);
+      console.log("userinfo.queryMessages.ret:", ret);
       if (ret.count > 0) {
         setMessages(ret);
         setMsgCount(ret.count);
@@ -118,59 +125,15 @@ export default function UserInfo() {
 
     Taro.getUserInfo()
       .then((ret) => {
-        //consolelog("getUserInfo.ret:", ret);
-        //if (isWx) {
         Taro.setStorage({ key: "nickName", data: ret.userInfo.nickName });
         Taro.setStorage({ key: "avatar", data: ret.userInfo.avatarUrl });
         setNickName(ret.userInfo.nickName);
         setAvatar(ret.userInfo.avatarUrl);
-        //}T
+
         setUserInfo(ret.userInfo);
-
-        //get open id
-        Taro.login({
-          fail: (err) => {
-            //consolelog("error in login:", err);
-          },
-          success: (res) => {
-            let code = res.code;
-            console.log("code:", code);
-            Taro.request({
-              url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
-              data: {},
-              header: { "content-type": "json" },
-              fail: (err) => {
-                //consolelog("err in get openid:", err);
-              },
-              success: (resp) => {
-                let openId = JSON.parse(resp.data).openid;
-                const snKey = JSON.parse(resp.data).session_key;
-
-                //consolelog("response:", resp);
-                //consolelog("response.data:", ret.encryptedData);
-                //consolelog("openID:", openId);
-                //consolelog("resp:", resp);
-
-                Taro.request({
-                  url: SERVER_URL + "/users/userInfo",
-                  method: "POST",
-                  data: {
-                    session_key: snKey,
-                    iv: ret.iv,
-                    data: ret.encryptedData,
-                  },
-                  header: {
-                    "content-type": "application/x-www-form-urlencoded",
-                  },
-                }).then((ret) => {
-                  //consolelog("client_post_response:", ret);
-                });
-              },
-            });
-          },
-        });
       })
-      .catch((err) => {
+      .catch((error) => {
+        console.warn("error:", error);
         //consolelog("err in getUserInfo:", err);
       });
   }
@@ -250,7 +213,7 @@ export default function UserInfo() {
               case 0:
                 //Taro.navigateTo({url: "/pages/user/Register",});
                 Taro.requestSubscribeMessage({
-                  tmplIds: ["JGqcKfzKMIg7FSPdM5_n0o1q8u3HH9hsr41SDSwgBls"],
+                  tmplIds: ["Cz_RuoYlP5RGsZTtBh_Pp10etGF2py-nqBoJaCpI9yw"],
                   success: (res) => {
                     //consolelog("subscribe message success:", res);
                     if (res.errMsg.indexOf(":ok") > 0) {
@@ -337,53 +300,59 @@ export default function UserInfo() {
             }}
           ></AtSwitch>
         </View>
-        {msgCount <= 0 ? (
+        {msgCount <= 0 ||
+        (ShowAll && messages.messages && messages.messages.length <= 0) ? (
           <Text>没有新消息</Text>
         ) : (
           <AtList className="message-list">
-            {messages.messages
-              .filter((item) => ShowAll || item.status !== 3)
-              .map((item) => {
-                return (
-                  <AtListItem
-                    key={"user-message-" + item.msgId}
-                    className="list-items"
-                    title={item.title}
-                    note={item.content}
-                    extraText={item.status === 3 ? "已读" : ""}
-                    onClick={() => {
-                      setCurMessage(item);
-                      onOpenDetail();
-                      //setMsgCount(0);
-                    }}
-                  />
-                );
-              })}
+            {messages.messages &&
+              messages.messages
+                .filter((item) => ShowAll || item.status + "" !== "1")
+                .map((item) => {
+                  return (
+                    <AtListItem
+                      key={"user-message-" + item.id}
+                      className="list-items"
+                      title={item.esTitle}
+                      note={item.esContent}
+                      extraText={item.status === 1 ? "已读" : ""}
+                      onClick={() => {
+                        setCurMessage(item);
+                        onOpenDetail();
+                        //setMsgCount(0);
+                      }}
+                    />
+                  );
+                })}
           </AtList>
         )}
       </View>
       <AtFloatLayout
         isOpened={openDetail}
-        title={curMessage.title}
+        title={curMessage.esTitle}
         onClose={onOpenDetail}
       >
         <MessageDetail
-          title={curMessage.title}
-          content={curMessage.content}
-          ordNo={curMessage.ordNo}
-          cdc={curMessage.cdc}
-          sentTime={curMessage.sentTime}
-          msgId={curMessage.msgId + ""}
+          title={curMessage.esTitle}
+          content={curMessage.esContent}
+          sentTime={curMessage.esSendTime}
+          msgId={curMessage.id + ""}
+          isRead={curMessage.status + "" === "1"}
+          closeMe={onOpenDetail}
           markFunc={(msgid: number) => {
             //consolelog("mark read:", msgid);
             markRead(msgid).then((res) => {
+              let length = 0;
               if (res.result === "success") {
-                for (var i = 0; i < messages.messages.length; i++) {
-                  if (messages.messages[i].msgId == msgid) {
-                    messages.messages[i].status = 3;
-                    messages.count--;
-                    setMsgCount(messages.count);
-                    break;
+                if (messages.messages && messages.messages.length > 0) {
+                  length = messages.messages.length;
+                  for (var i = 0; i < length; i++) {
+                    if (messages.messages[i].id == msgid) {
+                      messages.messages[i].status = 1;
+                      messages.count--;
+                      setMsgCount(messages.count);
+                      break;
+                    }
                   }
                 }
                 Taro.atMessage({

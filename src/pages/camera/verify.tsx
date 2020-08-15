@@ -48,17 +48,19 @@ export default function Verify() {
     updateBy: "",
     updateTime: "",
   });
+  const isSuper = Taro.getStorageSync("roleName").toString().length > 0;
 
-  if (!loaded) {
+  if (!loaded && isSuper) {
     queryUnVerifiedPhotos(Taro.getStorageSync("userOpenId"))
       .then((res) => {
-        //consolelog("queryUnVerifiedPhotos.res:", res);
+        console.log("queryUnVerifiedPhotos.res:", res);
         if (res.result === "success" && res.photos) {
           setPhotos(res.photos);
           setLoaded(true);
         }
       })
-      .finally(() => {
+      .catch((e) => {
+        console.warn("error unverfiedPhotos:", e);
         setLoaded(true);
       });
   }
@@ -108,24 +110,20 @@ export default function Verify() {
                         message: "照片审核通过",
                         type: "success",
                       });
-                      setPreview(false);
                     } else {
                       Taro.atMessage({
                         message: "照片审核操作失败，请重试",
                         type: "error",
                       });
                     }
-                    //consolelog("approvePicture.result:", ret);
+                    setPreview(false);
                   })
                   .catch(() => {
                     Taro.atMessage({
                       message: "照片审核操作失败，请重试",
                       type: "error",
                     });
-                  })
-                  .finally(() => {
                     setPreview(false);
-                    //consolelog("confirmed!");
                   });
               }}
             >
@@ -187,23 +185,20 @@ export default function Verify() {
                           message: "照片审核驳回成功",
                           type: "success",
                         });
-                        setPreview(false);
                       } else {
                         Taro.atMessage({
                           message: "照片审核操作失败，请重试",
                           type: "error",
                         });
                       }
+                      setPreview(false);
                     })
                     .catch(() => {
                       Taro.atMessage({
                         message: "照片审核操作失败，请重试",
                         type: "error",
                       });
-                    })
-                    .finally(() => {
                       setPreview(false);
-                      //consolelog("rejected!");
                     });
                 }}
               >
@@ -221,9 +216,9 @@ export default function Verify() {
                 .map((item, index) => {
                   return (
                     <AtListItem
-                      title={item.carAllocNo}
-                      note={item.fileName}
-                      extraText={"第" + index + "项"}
+                      title={item.carAllocNo + item.shptoSeq}
+                      note={item.createTime}
+                      extraText={"第" + (1 + index) + "项"}
                       arrow="right"
                       thumb={SERVER_URL + item.filePath}
                       key={SERVER_URL + item.filePath + "_1"}

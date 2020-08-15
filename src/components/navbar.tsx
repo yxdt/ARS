@@ -7,13 +7,15 @@ export default function NavBar(props) {
   let loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
   function doLoginOut() {
     if (loggedIn) {
+      Taro.removeStorage({ key: "userName" });
+      Taro.removeStorage({ key: "token" });
+      Taro.removeStorage({ key: "tokendate" });
       Taro.removeStorage({
         key: "roleName",
         success: () => {
           Taro.redirectTo({ url: "/pages/index/index" });
         },
       });
-      Taro.removeStorage({ key: "userName" });
     } else {
       //not logged in yet
       Taro.redirectTo({ url: "/pages/user/Login" });

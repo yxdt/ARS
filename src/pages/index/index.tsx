@@ -6,7 +6,6 @@ import "./index.scss";
 import NavBar from "../../components/navbar";
 import ArsTabBar from "../../components/tabbar";
 import { scanBarcode } from "../../controllers/camera";
-import { getWxOpenId } from "../../controllers/users";
 
 export default function Index() {
   //const [manual, setManual] = useState(true);
@@ -41,13 +40,14 @@ export default function Index() {
   function gotBarcode(bcVal) {
     //bcVal = waybillNum + rdcNum
     //consolelog("index.index.gotBarcode:", bcVal);
-    Taro.setStorage({ key: "waybill", data: bcVal.result });
+    const vals = bcVal.result.split("/");
+    Taro.setStorage({ key: "waybill", data: vals[vals.length - 1] });
     Taro.setStorage({
       key: "waybilldate",
       data: new Date().valueOf(),
     });
     Taro.navigateTo({
-      url: "/pages/sheet/index?wbno=" + bcVal.result,
+      url: "/pages/sheet/index?wbno=" + vals[vals.length - 1],
     });
   }
 

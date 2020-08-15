@@ -2,7 +2,7 @@ import Taro, { useState } from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import { AtForm, AtInput, AtButton } from "taro-ui";
 import "./index.scss";
-import { getUserInfo, getWxOpenId } from "../../controllers/users";
+import { getUserInfo } from "../../controllers/users";
 import { WxUserInfo } from "src/types/ars";
 import userpng from "../../assets/img/user.png";
 // export const TruckTypes: string[] = [
@@ -41,10 +41,6 @@ export default function Register() {
     //consolelog("userInfo:", userInfo);
     setUserName(userInfo.nickName || "匿名用户");
     setAvatar(userInfo.avatarUrl || userpng);
-  });
-
-  getWxOpenId((openid) => {
-    //consolelog("Register.getWxOpenId.openId:", openid);
   });
 
   function handleChange(target: string, newVal) {

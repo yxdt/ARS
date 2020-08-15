@@ -1,6 +1,6 @@
 import Taro from "@tarojs/taro";
 //import { WxUserInfo, RegUser } from "src/types/ars";
-import { userLogin } from "./rest";
+import { userLogin, openidLogin, SERVER_URL } from "./rest";
 import QQMapWX from "../libs/qqmap-wx-jssdk";
 import { DriverInfo, loginResult } from "../types/ars";
 
@@ -83,6 +83,26 @@ function getDriverLocation(resolve: Function) {
     },
   });
 }
+
+function checkToken() {
+  const loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
+  let ret = 0; //0:没有登陆过，1：登录且token有效，2.登录但token过期
+  if (loggedIn) {
+    const logindate = new Date(Taro.getStorageSync("tokendate"));
+    const today = new Date();
+    if (today.valueOf() - logindate.valueOf() > 12 * 60 * 60 * 1000) {
+      console.info("user token expired...");
+      Taro.removeStorageSync("userName");
+      Taro.removeStorageSync("roleName");
+      Taro.removeStorageSync("token");
+      ret = 2;
+    } else {
+      ret = 1;
+    }
+  }
+  return ret;
+}
+
 function getWxOpenId(cbOpenId: Function) {
   const locOpenId = Taro.getStorageSync("userOpenId");
   if (locOpenId && locOpenId.length > 0) {
@@ -91,17 +111,21 @@ function getWxOpenId(cbOpenId: Function) {
     Taro.login({
       success: (res) => {
         let code = res.code;
-        console.log("the code:", code);
         Taro.request({
-          url: "https://api.hanyukj.cn/tims/getwxopenid/" + code,
-          data: {},
-          header: { "content-type": "json" },
+          url: SERVER_URL + "/wx/openid",
+          data: { code },
+          header: { "content-type": "application/x-www-form-urlencoded" },
+          method: "POST",
           success: (resp) => {
-            let openId = JSON.parse(resp.data).openid;
-            Taro.setStorage({ key: "userOpenId", data: openId });
-            ////consolelog("controllers.users.getWxOpenId.openID:", openId);
-            ////consolelog("resp:", resp);
-            cbOpenId(openId);
+            if (resp.data && resp.data.code === "0000" && resp.data.data) {
+              let openId = resp.data.data.openObj.openid;
+              Taro.setStorage({ key: "userOpenId", data: openId });
+              //consolelog("controllers.users.getWxOpenId.openID:", openId);
+              cbOpenId(openId);
+            }
+          },
+          fail: (res) => {
+            console.warn("login-fail:", res);
           },
         });
       },
@@ -143,24 +167,21 @@ async function getUserInfo() {
 //   return ret;
 // }
 
-async function doLogin(cellphone, password): Promise<loginResult> {
-  //consolelog("controllers.user.doLogin:", cellphone, password);
-  //consolelog("userOpenId:", Taro.getStorageSync("userOpenId"));
-  const locOpenId = Taro.getStorageSync("userOpenId");
-
+async function doOpenidLogin(openId): Promise<loginResult> {
   let success = false;
   let ret: loginResult = {
     result: "success",
     user: { userName: "", roleName: "", token: "" },
+    message: "成功",
   };
   let restRet;
   try {
-    restRet = await userLogin(cellphone, password);
+    restRet = await openidLogin(openId);
   } catch (err) {
     //consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  //consolelog("controllers.users.doLogin.res:", restRet);
+  console.log("controllers.users.doOpenidLogin.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.data && restRet.data.data.username) {
       const roleName =
@@ -174,6 +195,56 @@ async function doLogin(cellphone, password): Promise<loginResult> {
       };
     } else {
       ret.result = "fail";
+      ret.message = restRet.message;
+    }
+    success = true;
+  } else {
+    ret.result = "error";
+    ret.message = restRet.message;
+  }
+  return new Promise((res, rej) => {
+    if (success) {
+      res(ret);
+    } else {
+      ////consolelog('controllers.users.doLogin.res.rej:', restRet);
+      rej(ret);
+    }
+  });
+}
+
+async function doLogin(cellphone, password): Promise<loginResult> {
+  //consolelog("controllers.user.doLogin:", cellphone, password);
+  //consolelog("userOpenId:", Taro.getStorageSync("userOpenId"));
+  const locOpenId = Taro.getStorageSync("userOpenId");
+
+  let success = false;
+  let ret: loginResult = {
+    result: "success",
+    user: { userName: "", roleName: "", token: "" },
+    message: "成功",
+  };
+  let restRet;
+  try {
+    restRet = await userLogin(cellphone, password);
+  } catch (err) {
+    //consolelog("login error:", err);
+    restRet = { code: "0500", data: null };
+  }
+  console.log("controllers.users.doLogin.res:", restRet);
+  if (restRet.code === "0000") {
+    if (restRet.data && restRet.data.data && restRet.data.data.username) {
+      const roleName =
+        restRet.data.departs && restRet.data.departs.length > 0
+          ? restRet.data.departs[0].departName
+          : restRet.data.data.realname;
+      ret.user = {
+        userName: restRet.data.data.username,
+        roleName,
+        token: restRet.data.token,
+      };
+    } else {
+      ret.result = "fail";
+      ret.message = "登录失败";
     }
     success = true;
   } else {
@@ -189,4 +260,12 @@ async function doLogin(cellphone, password): Promise<loginResult> {
   });
 }
 
-export { getDriverLocation, getWxOpenId, getUserInfo, doLogin, getDriverInfo };
+export {
+  checkToken,
+  getDriverLocation,
+  getWxOpenId,
+  getUserInfo,
+  doLogin,
+  doOpenidLogin,
+  getDriverInfo,
+};

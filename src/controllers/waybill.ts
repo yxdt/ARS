@@ -426,7 +426,7 @@ async function queryWaybillStatus(wbno: string): Promise<wbStatusResult> {
     ret.result = "error";
     ret.statusList = [];
   }
-  ////consolelog('controllers.waybill.queryWaybillStatus.ret:', ret);
+  console.log("controllers.waybill.queryWaybillStatus.ret:", ret);
   return new Promise((res, rej) => {
     if (success) {
       res(ret);

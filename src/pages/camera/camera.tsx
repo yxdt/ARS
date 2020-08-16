@@ -35,7 +35,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
     let openid = Taro.getStorageSync("userOpenId");
     const wbnodate: Date = new Date(Taro.getStorageSync("waybilldate"));
     const today = new Date();
-    const wbstatus = parseInt(Taro.getStorageSync("waybillstatus")) || 0;
+    const wbstatus = parseInt(Taro.getStorageSync("waybillStatus")) || 0;
     const isSuper = Taro.getStorageSync("roleName").toString().length > 0;
 
     if (today.valueOf() - wbnodate.valueOf() > 24 * 60 * 60 * 1000) {

@@ -10,6 +10,9 @@ import { scanBarcode } from "../../controllers/camera";
 export default function Index() {
   //const [manual, setManual] = useState(true);
   const [waybillNum, setWaybillNum] = useState("");
+  const [prompt, setPrompt] = useState(
+    "您可以扫描往来表上的二维码，或输入装车序列号及验证码。"
+  );
   //const [rdcNum, setRdcNum] = useState("");
   //const [cellphone, setCellphone] = useState("");
   //const [isScan, setIsScan] = useState(false);
@@ -52,20 +55,13 @@ export default function Index() {
   }
 
   function openSheet() {
-    //if (!manual) {
-    //  setManual(true);
-    //} else {
-    ////consolelog("openSheet.waybillNum:", waybillNum);
-
-    Taro.navigateTo({
-      url: "/pages/sheet/index?wbno=" + waybillNum,
-      //+
-      //"&rdc=" +
-      //rdcNum, //+
-      //"&cell=" +
-      //cellphone,
-    });
-    //}
+    if (waybillNum && waybillNum.length > 0) {
+      Taro.navigateTo({
+        url: "/pages/sheet/index?wbno=" + waybillNum,
+      });
+    } else {
+      setPrompt("请先输入运单号！");
+    }
   }
 
   return (
@@ -126,7 +122,7 @@ export default function Index() {
           </div>
         </Button>
         <View className="home-prompt-span">
-          <Text>您可以扫描往来表上的二维码，或输入装车序列号及验证码。</Text>
+          <Text>{prompt}</Text>
         </View>
       </View>
       <ArsTabBar current={0} />

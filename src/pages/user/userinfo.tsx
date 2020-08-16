@@ -69,6 +69,7 @@ export default function UserInfo() {
   const loggedIn = Taro.getStorageSync("roleName").toString().length > 0;
   const curWb = Taro.getStorageSync("waybill");
   const [wbStatus, setWbStatus] = useState<Item[]>([]);
+  const [curStatus, setCurStatus] = useState(-1);
 
   ////consolelog("UserInfo:", this);
   //let msgList: Array<message>;
@@ -91,7 +92,7 @@ export default function UserInfo() {
       queryWaybillStatus(curWb).then((ret) => {
         if (ret.result === "success") {
           setWbStatus(
-            ret.statusList.map((item) => {
+            ret.statusList.map((item, index) => {
               const ret: Item = {
                 title: item.caption,
                 desc: item.comment,
@@ -103,6 +104,7 @@ export default function UserInfo() {
               return ret;
             })
           );
+          setCurStatus(ret.statusList.findIndex((item) => !item.doneDate));
         }
       });
     }
@@ -199,7 +201,7 @@ export default function UserInfo() {
         {curWb.length <= 0 ? (
           <Text>没有运单</Text>
         ) : (
-          <AtSteps items={wbStatus} current={2} onChange={() => {}} />
+          <AtSteps items={wbStatus} current={curStatus} onChange={() => {}} />
         )}
       </View>
       <View style={{ fontSize: "0.8rem", color: "#ff0000" }}>

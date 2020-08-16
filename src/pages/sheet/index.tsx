@@ -243,6 +243,10 @@ export default class Index extends Component<null, SheetState> {
               statusNum: 8,
             },
           });
+          Taro.setStorage({
+            key: "waybillStatus",
+            data: "8",
+          });
         } else {
           Taro.atMessage({
             message: "IOD到达确认失败，请重试。",
@@ -293,6 +297,10 @@ export default class Index extends Component<null, SheetState> {
                 statusCaption: "司机已确认到达",
                 statusNum: 1,
               },
+            });
+            Taro.setStorage({
+              key: "waybillStatus",
+              data: "1",
             });
             sendArriveMessage(this.state.waybill.wbNum, openid);
           } else {
@@ -618,10 +626,12 @@ export default class Index extends Component<null, SheetState> {
                   </Text>
                 </View>
                 <View className="form-caption-split">
-                  <Text className="form-caption">接货处：</Text>
-                  <Text className="form-item">
-                    {waybill.arsCode} （{waybill.shiptoName}）
-                  </Text>
+                  <Text className="form-caption">接货处码：</Text>
+                  <Text className="form-item">{waybill.shpToCd}</Text>
+                </View>
+                <View className="form-caption-split">
+                  <Text className="form-caption">接货处名：</Text>
+                  <Text className="form-item">{waybill.shiptoName}</Text>
                 </View>
 
                 {waybill.statusNum > 0 && isSuper ? (
@@ -645,7 +655,7 @@ export default class Index extends Component<null, SheetState> {
                           <AtButton
                             className="right-button"
                             onClick={() => {
-                              Taro.redirectTo({ url: "/pages/camera/camera" });
+                              Taro.navigateTo({ url: "/pages/camera/camera" });
                             }}
                           >
                             {isSuper ? "替司机上传回执" : "点击上传回执"}

@@ -31,8 +31,8 @@ export default function Index() {
     if (wbnodate && today.valueOf() - wbnodate > 24 * 60 * 60 * 1000) {
       //本地运单信息超过一天自动清除
       curwbno = "";
-      Taro.removeStorage("waybill");
-      Taro.removeStorage("waybilldate");
+      Taro.removeStorage({ key: "waybill" });
+      Taro.removeStorage({ key: "waybilldate" });
     }
     setWaybillNum(curwbno);
   }

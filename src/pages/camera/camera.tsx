@@ -20,6 +20,8 @@ export interface CameraStates {
   uploading: boolean;
   uploaded: boolean; //是否已上传？
   openid: string;
+  wbstatus: number;
+  isSuper: boolean;
 }
 
 export interface CameraProps {
@@ -33,6 +35,9 @@ export default class Index extends Component<CameraProps, CameraStates> {
     let openid = Taro.getStorageSync("userOpenId");
     const wbnodate: Date = new Date(Taro.getStorageSync("waybilldate"));
     const today = new Date();
+    const wbstatus = parseInt(Taro.getStorageSync("waybillstatus")) || 0;
+    const isSuper = Taro.getStorageSync("roleName").toString().length > 0;
+
     if (today.valueOf() - wbnodate.valueOf() > 24 * 60 * 60 * 1000) {
       curwbno = "";
       Taro.removeStorageSync("waybill");
@@ -56,6 +61,8 @@ export default class Index extends Component<CameraProps, CameraStates> {
       uploading: false,
       uploaded: false,
       openid,
+      wbstatus,
+      isSuper,
     };
     this.takePic.bind(this);
     //this.scanCode.bind(this);
@@ -108,7 +115,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
         if (res.result === "success") {
           isSuccess = true;
           Taro.atMessage({
-            message: "照片上传成功",
+            message: "上传成功",
             type: "success",
           });
           this.setState({ preview: false, uploaded: true });
@@ -116,7 +123,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
         if (!isSuccess) {
           this.setState({ uploading: false });
           Taro.atMessage({
-            message: "照片上传失败，请重试！",
+            message: "上传失败：" + res.message,
             type: "error",
           });
         }
@@ -124,7 +131,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
       .catch((err) => {
         this.setState({ uploading: false });
         Taro.atMessage({
-          message: "回执上传失败，请重试：" + err.errMsg,
+          message: "上传失败，请重试：" + err.message,
           type: "error",
         });
       });
@@ -134,9 +141,10 @@ export default class Index extends Component<CameraProps, CameraStates> {
     //consolelog('props, router:', this.props, this.$router.params);
 
     //const isScan = this.$router.params.isScan;
-    const { curwbno, uploaded, openid } = this.state;
+    const { curwbno, uploaded, openid, wbstatus, isSuper } = this.state;
 
     //consolelog('curwbno:', curwbno, this.state);
+
     if (curwbno.length <= 0) {
       return (
         <InfoCard
@@ -144,7 +152,19 @@ export default class Index extends Component<CameraProps, CameraStates> {
           message="您还没有输入运单信息，不能上传回执扫描，请先扫描运单二维码或手工输入运单号。"
           extMessage="点击“返回”按钮继续。"
           backFunc={() => {
-            Taro.redirectTo({ url: "/pages/index/index" });
+            Taro.reLaunch({ url: "/pages/index/index" });
+          }}
+        />
+      );
+    }
+    if (wbstatus !== 1 && wbstatus !== 3 && !isSuper) {
+      return (
+        <InfoCard
+          title="该运单不能上传回执"
+          message="当前运单不能上传回执，请登录或与中心工作人员联系。"
+          extMessage="点击“返回”按钮继续。"
+          backFunc={() => {
+            Taro.reLaunch({ url: "/pages/index/index" });
           }}
         />
       );
@@ -174,7 +194,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
               this.setState({ preview: false });
               sendUploadMessage(curwbno, openid);
               confirmPhotoComplete(curwbno, openid);
-              Taro.redirectTo({ url: "/pages/index/index" });
+              Taro.reLaunch({ url: "/pages/index/index" });
             }}
           >
             全部回执已上传

@@ -17,6 +17,10 @@ $color-lg-lred: #ffa3b2;
 }
 .at-input__title {
   font-size: 0.8rem !important;
+  color: black;
+}
+.at-input--disabled {
+  opacity: 1;
 }
 .item-content__info-title {
   font-size: 0.8rem !important;
@@ -152,6 +156,7 @@ hr {
   margin: "0 auto";
   padding-top: 10px;
   text-align: center;
+  width: 100%;
 }
 .arrived {
   color: #ffffff;
@@ -163,6 +168,7 @@ hr {
   margin: "0 auto";
   padding-top: 10px;
   text-align: center;
+  width: 100%;
 }
 .sheet-detail-index {
   display: "flex";
@@ -254,4 +260,9 @@ hr {
 .small-ph {
   font-size: 0.8rem !important;
   text-align: right;
+}
+.small-hd-ph {
+  font-size: 0.8rem !important;
+  text-align: right;
+  color: #f0f0f0;
 }

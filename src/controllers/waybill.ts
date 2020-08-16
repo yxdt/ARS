@@ -73,6 +73,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
     longitude: "",
     phone: "",
     remark: "",
+    shpToCd: "",
   };
   if (wbno && wbno.length > 0) {
     try {
@@ -84,7 +85,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
       //restRet = { code: "0500", data: null };
     }
 
-    console.log("controllers.waybill.loadWaybill.res:", restRet);
+    //consolelog("controllers.waybill.loadWaybill.res:", restRet);
 
     if (restRet && restRet.code === "0000" && restRet.data) {
       const retData = <wbData>restRet.data;
@@ -162,6 +163,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
         longitude: retData.longitude,
         phone: retData.phone && retData.phone !== "null" ? retData.phone : "",
         remark: retData.remark,
+        shpToCd: retData.shpToCd,
       };
       for (const pitem of retData.ordDetailList) {
         //consolelog("pitem:", pitem);
@@ -229,7 +231,7 @@ async function confirmComplete(
   let ret: WaybillCompleteResult = { result: "success", wbno: wbno };
   try {
     result = await completeWaybill(ccParam);
-    console.log("confirmComplete.param,result:", ccParam, result);
+    //consolelog("confirmComplete.param,result:", ccParam, result);
     if (result && result.code === "0000") {
       success = true;
       ret.result = "success"; //result.message;
@@ -239,7 +241,7 @@ async function confirmComplete(
       ret.message = result.message;
     }
   } catch (e) {
-    console.log("waybill.confirmComplete.error.e:", e);
+    //consolelog("waybill.confirmComplete.error.e:", e);
     result = e;
     ret.result = "error";
     ret.message = "未知错误";
@@ -274,7 +276,7 @@ async function confirmArrive(
   let ret: Result = { result: "success" };
   try {
     result = await confirmWaybill(wbcParam);
-    console.log("confirmArrive.param,result:", wbcParam, result);
+    //consolelog("confirmArrive.param,result:", wbcParam, result);
     if (result && result.code === "0000" && result.data) {
       success = true;
       ret.result = "success"; //result.message;
@@ -320,7 +322,7 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
     ////consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  console.log("controllers.waybill.queryWaybills.res:", restRet);
+  //consolelog("controllers.waybill.queryWaybills.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.orderList) {
       ret.waybills = restRet.data.orderList.map((item: wbqData) => ({

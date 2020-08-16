@@ -13,29 +13,16 @@ function getDriverInfo(phone: string): Promise<DriverInfo> {
     address: "",
   };
   return new Promise((res) => {
-    //测试号标志
-    if (phone === "1390000") {
-      setTimeout(() => {
-        driverInfo.latitude = "123.45";
-        driverInfo.longitude = "234.56";
-        driverInfo.address = "北京市东城区长安街1号";
-        driverInfo.openid = "123abcdefg9887";
-
+    getWxOpenId((openid) => {
+      driverInfo.openid = openid;
+      getDriverLocation((ret) => {
+        driverInfo.latitude = ret.latitude;
+        driverInfo.longitude = ret.longitude;
+        driverInfo.address = ret.address;
         ////consolelog("getDriverInfo.driverInfo:", driverInfo);
         res(driverInfo);
-      }, 1000);
-    } else {
-      getWxOpenId((openid) => {
-        driverInfo.openid = openid;
-        getDriverLocation((ret) => {
-          driverInfo.latitude = ret.latitude;
-          driverInfo.longitude = ret.longitude;
-          driverInfo.address = ret.address;
-          ////consolelog("getDriverInfo.driverInfo:", driverInfo);
-          res(driverInfo);
-        });
       });
-    }
+    });
   });
 }
 
@@ -181,7 +168,7 @@ async function doOpenidLogin(openId): Promise<loginResult> {
     //consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  console.log("controllers.users.doOpenidLogin.res:", restRet);
+  //consolelog("controllers.users.doOpenidLogin.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.data && restRet.data.data.username) {
       const roleName =
@@ -230,7 +217,7 @@ async function doLogin(cellphone, password): Promise<loginResult> {
     //consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  console.log("controllers.users.doLogin.res:", restRet);
+  //consolelog("controllers.users.doLogin.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.data && restRet.data.data.username) {
       const roleName =

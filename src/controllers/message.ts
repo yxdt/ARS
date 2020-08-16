@@ -7,19 +7,19 @@ import {
 import { queryMessage, markMessage } from "./rest";
 
 async function markRead(msgId: number): Promise<Result> {
-  return markTheMessage(msgId, 1);
+  return markTheMessage(msgId);
 }
-async function markHide(msgId: number): Promise<Result> {
-  return markTheMessage(msgId, 3);
-}
-async function markTheMessage(msgid: number, mark: number): Promise<Result> {
+//async function markHide(msgId: number): Promise<Result> {
+//  return markTheMessage(msgId, 3);
+//}
+async function markTheMessage(msgid: number): Promise<Result> {
   let success = false;
   let ret: Result = {
     result: "success",
   };
   let restRet: TimsResponse<string>;
   try {
-    restRet = await markMessage(msgid, mark);
+    restRet = await markMessage(msgid);
   } catch (e) {
     restRet = e;
   }
@@ -57,7 +57,7 @@ async function queryMessages(query: msgQueryParams): Promise<msgQueryResult> {
     ////consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  console.log("controllers.message.queryMessages.res:", query, restRet);
+  //consolelog("controllers.message.queryMessages.res:", query, restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.sms && restRet.data.sms.records) {
       ret.messages = restRet.data.sms.records;
@@ -83,4 +83,4 @@ async function queryMessages(query: msgQueryParams): Promise<msgQueryResult> {
   });
 }
 
-export { queryMessages, markRead, markHide };
+export { queryMessages, markRead /*, markHide*/ };

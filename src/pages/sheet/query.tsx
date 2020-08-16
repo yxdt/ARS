@@ -110,7 +110,7 @@ export default function Query() {
                   placeholderClass="small-ph"
                   onChange={(val) => {
                     //consolelog('装车号：', val);
-                    setWbNum(val);
+                    setWbNum(val + "");
                   }}
                 />
               </View>
@@ -125,7 +125,7 @@ export default function Query() {
                   placeholderClass="small-ph"
                   onChange={(val) => {
                     //consolelog('接货处代码：', val);
-                    setRdcCode(val);
+                    setRdcCode(val + "");
                   }}
                 />
               </View>
@@ -135,6 +135,7 @@ export default function Query() {
                   name="wbStatus"
                   title="单据状态"
                   type="text"
+                  editable={false}
                   value={
                     (
                       statusOptions.find(
@@ -144,9 +145,10 @@ export default function Query() {
                   }
                   placeholder="请选择单据状态"
                   placeholderClass="small-ph"
-                  onFocus={() => {
+                  onClick={() => {
                     setStsVisble(true);
                   }}
+                  onChange={() => {}}
                 />
                 {stsVisble ? (
                   <AtRadio
@@ -181,7 +183,7 @@ export default function Query() {
                   //consolelog("queryParams:", query);
                   queryWaybills(query)
                     .then((ret) => {
-                      console.log("querywaybills.ret:", ret);
+                      //consolelog("querywaybills.ret:", ret);
                       if (ret.result === "success" && ret.count > 0) {
                         setWaybills(ret.waybills);
                       } else {

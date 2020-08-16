@@ -48,23 +48,21 @@ export default function ShipItems(props: ShipItemProps) {
             index={pageNo}
             key={"item-pane-" + pageNo}
           >
-            <View>
-              <AtList>
-                {pagedItems.map((item) => {
-                  return (
-                    <AtListItem
-                      key={"ship-item-" + item.id}
-                      onClick={() => {
-                        //consolelog('you clicked a list item.', item);
-                      }}
-                      title={item.orderNum}
-                      note={item.model}
-                      extraText={"" + item.qty}
-                    ></AtListItem>
-                  );
-                })}
-              </AtList>
-            </View>
+            <AtList>
+              {pagedItems.map((item) => {
+                return (
+                  <AtListItem
+                    key={"ship-item-" + item.id}
+                    onClick={() => {
+                      //consolelog('you clicked a list item.', item);
+                    }}
+                    title={item.orderNum}
+                    note={item.model}
+                    extraText={"" + item.qty}
+                  ></AtListItem>
+                );
+              })}
+            </AtList>
           </AtTabsPane>
         );
       })}

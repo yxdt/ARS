@@ -53,7 +53,7 @@ export default function Verify() {
   if (!loaded && isSuper) {
     queryUnVerifiedPhotos(Taro.getStorageSync("userOpenId"))
       .then((res) => {
-        console.log("queryUnVerifiedPhotos.res:", res);
+        //consolelog("queryUnVerifiedPhotos.res:", res);
         if (res.result === "success" && res.photos) {
           setPhotos(res.photos);
           setLoaded(true);

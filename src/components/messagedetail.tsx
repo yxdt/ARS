@@ -28,7 +28,7 @@ export default function MessageDetail(props: MessageDetailProps) {
             props.markFunc(props.msgId);
           }}
         >
-          标记已读
+          隐藏本消息
         </AtButton>
       )}
     </View>

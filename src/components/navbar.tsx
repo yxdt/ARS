@@ -13,12 +13,12 @@ export default function NavBar(props) {
       Taro.removeStorage({
         key: "roleName",
         success: () => {
-          Taro.redirectTo({ url: "/pages/index/index" });
+          Taro.reLaunch({ url: "/pages/index/index" });
         },
       });
     } else {
       //not logged in yet
-      Taro.redirectTo({ url: "/pages/user/Login" });
+      Taro.reLaunch({ url: "/pages/user/Login" });
     }
   }
   return (

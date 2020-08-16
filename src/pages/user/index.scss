@@ -87,6 +87,14 @@ $color-bg: #a50034;
     font-weight: bold;
   }
 
+  .login-form-caption {
+    color: #666666;
+    font-size: 1.6rem;
+    font-weight: bolder;
+    padding-top: 1.2rem;
+    line-height: 2rem;
+    display: block;
+  }
   .form-caption {
     color: $color-bg;
     font-size: 1.6rem;

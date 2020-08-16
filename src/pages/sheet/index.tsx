@@ -50,14 +50,20 @@ export interface SheetState {
   remark: string; //驳回原因
   selCaption: string; //当前照片状态
   arriveTimeStr: string; //到达时间格式化字符串
-  gridData: Array<{ image: string; value: string; imageId: string }>; //当前照片
+  //gridData: Array<{ image: string; value: string; imageId: string }>; //当前照片
   deleting: boolean;
   //photos: Array<string>; //uploaded photos
 }
 export default class Index extends Component<null, SheetState> {
   constructor() {
     super(...arguments);
-    const today = new Date();
+    const Today = new Date();
+    const today =
+      Today.getFullYear() +
+      "-" +
+      String(1 + Today.getMonth()).padStart(2, "0") +
+      "-" +
+      String(Today.getDate()).padStart(2, "0");
     this.state = {
       loading: true,
       failed: false,
@@ -99,12 +105,7 @@ export default class Index extends Component<null, SheetState> {
       remark: "",
       selCaption: "",
       deleting: false,
-      arriveTimeStr:
-        today.getFullYear() +
-        "-" +
-        String(1 + today.getMonth()).padStart(2, "0") +
-        "-" +
-        String(today.getDate()).padStart(2, "0"),
+      arriveTimeStr: today,
     };
     //consolelog("sheet:", this.$router.params);
     this.driverConfirmArrive.bind(this);
@@ -140,6 +141,10 @@ export default class Index extends Component<null, SheetState> {
           //todo: update here for dbl-check
           const arrDate = ret.waybill.arriveTime.split(".")[0];
           //consolelog("arrDate-arriveTime:", arrDate, ret.waybill.arriveTime);
+          Taro.setStorage({
+            key: "waybillStatus",
+            data: ret.waybill.statusNum,
+          });
           this.setState({
             loading: false,
             waybill: ret.waybill,
@@ -217,9 +222,6 @@ export default class Index extends Component<null, SheetState> {
     });
   }
 
-  handleChange(val) {
-    //consolelog("something has been changed:", val);
-  }
   superConfirmComplete() {
     const { wbNum, shiptoCode, remark } = this.state.waybill;
     const openid = Taro.getStorageSync("userOpenId");
@@ -376,13 +378,13 @@ export default class Index extends Component<null, SheetState> {
     const confirmString2 = "请输入验证码、手机号确认送达";
     const confirmString3 = "请注意，一旦确认将无法修改。";
     //consolelog("waybill:", waybill);
-    this.setState({
-      gridData: waybill.photos.map((item) => ({
-        image: item.url,
-        value: item.caption,
-        imageId: item.id,
-      })),
-    });
+    //this.setState({
+    const gridData = waybill.photos.map((item) => ({
+      image: item.url,
+      value: item.caption,
+      imageId: item.id,
+    }));
+    //});
     //consolelog("sheet.gridData:", gridData);
 
     return (
@@ -408,10 +410,9 @@ export default class Index extends Component<null, SheetState> {
               }}
             ></Image>
             <View style="display:flex; flex-direction:row">
-              {(((selCaption === "已上传" && waybill.statusNum === 3) ||
-                waybill.statusNum === 1) &&
-                !isSuper) ||
-              isSuper ? (
+              {(selCaption === "已上传" && waybill.statusNum === 3) ||
+              waybill.statusNum === 1 ||
+              (isSuper && waybill.statusNum < 8) ? (
                 <Button
                   className="preview-confirm-button"
                   onClick={() => {
@@ -514,7 +515,8 @@ export default class Index extends Component<null, SheetState> {
                     title="原因："
                     value={remark}
                     name="remark"
-                    placeholder=""
+                    placeholder="驳回理由"
+                    placeholderClass="small-hd-ph"
                     onChange={(theval) => {
                       //consolelog("remark:", theval);
                       this.setState({ remark: theval.toString() });
@@ -639,7 +641,7 @@ export default class Index extends Component<null, SheetState> {
                     <View className="form-detail-header">
                       <Text className="form-detail-title">回执列表</Text>
                       <View className="form-detail-title-right">
-                        {!confirmed ? (
+                        {!confirmed || isSuper ? (
                           <AtButton
                             className="right-button"
                             onClick={() => {
@@ -668,7 +670,7 @@ export default class Index extends Component<null, SheetState> {
                           });
                         }
                       }}
-                      data={this.state.gridData}
+                      data={gridData}
                     />
                   </View>
                 ) : null}
@@ -760,7 +762,8 @@ export default class Index extends Component<null, SheetState> {
                     className="modal-input"
                     title="验证码*"
                     name="arsCode"
-                    placeholder=""
+                    placeholder="4位验证码"
+                    placeholderClass="small-hd-ph"
                     onChange={(val) => {
                       //consolelog("arscode:", val);
                       this.setState({ rdcNum: val.toString() });
@@ -772,7 +775,8 @@ export default class Index extends Component<null, SheetState> {
                     name="cellphone"
                     className="modal-input"
                     title="手机号"
-                    placeholder=""
+                    placeholder="您的手机号"
+                    placeholderClass="small-hd-ph"
                     onChange={(val) => {
                       //consolelog("changed:", val);
                       this.setState({ cellphone: val.toString() });

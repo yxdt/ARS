@@ -22,22 +22,6 @@ import {
   WaybillCompleteParams,
   WaybillCompleteData,
 } from "../types/ars";
-import {
-  loginRequest,
-  waybillRequest,
-  photosRequest,
-  wbcRequest,
-  arriveMsgRequest,
-  uploadMsgRequest,
-  rejectMsgRequest,
-  verifyRequest,
-  queryRequest,
-  queryMsgRequest,
-  markMsgRequest,
-  wbStatusRequest,
-  unVerifiedRequest,
-} from "../mock/api";
-
 const DEBUGGING = false;
 const devUrl = "http://192.168.0.100:8765";
 const prodUrl = "https://tims.lg.com.cn";
@@ -79,8 +63,8 @@ async function sendRejectMessage(wbno: string, openid: string) {
 }
 //标记消息已读
 async function markMessage(
-  msgid: number,
-  mark: number //2: read, 3:hide
+  msgid: number
+  //mark: number //2: read, 3:hide
 ): Promise<TimsResponse<string>> {
   const ret = await taroRequest<TimsResponse<string>>(
     "/message/sysMessage/read?id=" + msgid,
@@ -285,51 +269,20 @@ async function userLogin(
 //虚拟API
 async function taroRequest<T>(url: string, method, data, header) {
   let ret;
-  //consolelog("taroRequest:", url, method, data, header);
-  if (DEBUGGING) {
-    //consolelog("DEBUGGING.taroRequest.SERVER_URL:", url);
-    if (url === "/logistics/login") {
-      ret = await loginRequest(data);
-    } else if (url.startsWith("/order/code/")) {
-      ret = await waybillRequest(url);
-    } else if (url.startsWith("/photos/bywb/")) {
-      ret = await photosRequest(url);
-    } else if (url === "/driver/confirm") {
-      ret = await wbcRequest(data);
-    } else if (url.startsWith("/message/arrive")) {
-      ret = await arriveMsgRequest(url);
-    } else if (url.startsWith("/message/upload")) {
-      ret = await uploadMsgRequest(url);
-    } else if (url.startsWith("/message/reject")) {
-      ret = await rejectMsgRequest(url);
-    } else if (url === "/logistics/confirm") {
-      ret = await verifyRequest(data);
-    } else if (url === "/order/search") {
-      ret = await queryRequest(data);
-    } else if (url === "/message/query") {
-      ret = await queryMsgRequest(data);
-    } else if (url.startsWith("/message/mark")) {
-      ret = await markMsgRequest(url);
-    } else if (url.startsWith("/order/status")) {
-      ret = await wbStatusRequest(url);
-    } else if (url.startsWith("/photos/unverify")) {
-      ret = await unVerifiedRequest(url);
-    }
+  //consolelog("url:", SERVER_URL + url);
+  ret = await Taro.request<T>({
+    url: SERVER_URL + url,
+    method: method || "GET",
+    data: data || {},
+    header: header || { "content-type": "application/json" },
+  });
+  //consolelog("toraRequest.ret:", ret);
+  if (ret && ret.statusCode === 200) {
+    ret = ret.data;
   } else {
-    //consolelog("url:", SERVER_URL + url);
-    ret = await Taro.request<T>({
-      url: SERVER_URL + url,
-      method: method || "GET",
-      data: data || {},
-      header: header || { "content-type": "application/json" },
-    });
-    //consolelog("toraRequest.ret:", ret);
-    if (ret && ret.statusCode === 200) {
-      ret = ret.data;
-    } else {
-      ret = { code: "5000", message: "网络访问错误" };
-    }
+    ret = { code: "5000", message: "网络访问错误" };
   }
+
   return ret;
 }
 

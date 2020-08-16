@@ -37,7 +37,7 @@ export default function ArsTabBar(props) {
             "&avatarUrl=" +
             avatar;
         }
-        Taro.redirectTo({ url });
+        Taro.reLaunch({ url });
       }}
       iconSize={20}
       current={current}

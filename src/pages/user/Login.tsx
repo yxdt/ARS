@@ -40,7 +40,7 @@ export default function Login() {
           }
         })
         .catch((e) => {
-          console.log("openidLogin fail:", e);
+          console.warn("openidLogin fail:", e);
         });
     }
   });
@@ -59,7 +59,7 @@ export default function Login() {
           Taro.setStorageSync("token", ret.user.token);
           Taro.setStorageSync("tokendate", new Date().valueOf());
           Taro.setStorage({ key: "cellphone", data: cellphone });
-          Taro.redirectTo({ url: "/pages/user/userinfo" });
+          Taro.reLaunch({ url: "/pages/user/userinfo" });
           //Taro.navigateBack();
         } else if (ret.result === "error") {
           //网络或服务器错误
@@ -91,7 +91,7 @@ export default function Login() {
   return (
     <View className="user-reg-span">
       <AtMessage />
-      <Text className="form-caption" style="margin-bottom:2rem">
+      <Text className="login-form-caption" style="margin-bottom:2rem">
         欢迎登录到 <Text className="home-title-hilite">TIMS</Text>\n
         <Text className="home-title-sub">配送信息管理系统</Text>
       </Text>
@@ -137,7 +137,7 @@ export default function Login() {
           onClick={() => {
             setLoging(false);
             //Taro.navigateBack();
-            Taro.redirectTo({ url: "/pages/index/index" });
+            Taro.reLaunch({ url: "/pages/index/index" });
           }}
           disabled={loging}
         >

@@ -52,6 +52,7 @@ function uploadPicture(
       filePath: "",
       id: "",
     },
+    message: "成功",
   };
   return new Promise((response, reject) => {
     //consolelog("file_upload:url:", SERVER_URL + "/driver/photo");
@@ -83,6 +84,7 @@ function uploadPicture(
           } else {
             ret.result = "fail";
             ret.upload = upResult;
+            ret.message = upResult.message;
           }
         }
         response(ret);
@@ -91,12 +93,14 @@ function uploadPicture(
         //consolelog("upload fail:", errr);
         //ret = { filePath: "", fileName: "" };
         ret.result = "fail";
+        ret.message = "上传失败";
         response(ret);
       },
     }).catch((err) => {
       //ret = { filePath: "", fileName: "" };
       //consolelog("upload photo fail:", err);
       ret.result = "error";
+      ret.message = "网络错误";
       reject(ret);
     });
   });
@@ -204,6 +208,7 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
     result: "approve",
     remark: vrf.remark,
     imgIds: vrf.imgIds, //.imgid,
+    filename: "",
   };
 
   //consolelog("camera.verifyPicture.vrf:", vrf);

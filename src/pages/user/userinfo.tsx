@@ -20,7 +20,6 @@ import {
   msgQueryResult,
   message,
 } from "../../types/ars";
-import { SERVER_URL } from "../../controllers/rest";
 import { queryMessages, markRead } from "../../controllers/message";
 import { queryWaybillStatus } from "../../controllers/waybill";
 import userpng from "../../assets/img/user.png";
@@ -82,7 +81,7 @@ export default function UserInfo() {
   if (init) {
     setInit(false);
     queryMessages(msgQuery).then((ret) => {
-      console.log("userinfo.queryMessages.ret:", ret);
+      //consolelog("userinfo.queryMessages.ret:", ret);
       if (ret.count > 0) {
         setMessages(ret);
         setMsgCount(ret.count);
@@ -110,9 +109,7 @@ export default function UserInfo() {
   }
 
   function getUserInfo() {
-    let curUserInfo = {};
     let userInfoStr = "scope.userInfo";
-    const userOpenId = Taro.getStorageSync("userOpenId") || "";
     Taro.getSetting()
       .then((res) => {
         if (res.authSetting[userInfoStr]) {
@@ -120,7 +117,7 @@ export default function UserInfo() {
         }
       })
       .catch((err) => {
-        //consolelog("error in getSetting():", err.errMsg);
+        console.warn("error in getSetting():", err);
       });
 
     Taro.getUserInfo()
@@ -291,7 +288,7 @@ export default function UserInfo() {
         <View className="list-head">
           <Text className="list-title">系统消息</Text>
           <AtSwitch
-            title="显示已读"
+            title="显示已隐藏"
             color="#a50034"
             className="list-head-right"
             checked={ShowAll}
@@ -315,7 +312,7 @@ export default function UserInfo() {
                       className="list-items"
                       title={item.esTitle}
                       note={item.esContent}
-                      extraText={item.status === 1 ? "已读" : ""}
+                      extraText={item.status === 1 ? "已隐藏" : ""}
                       onClick={() => {
                         setCurMessage(item);
                         onOpenDetail();

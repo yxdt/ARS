@@ -4,9 +4,6 @@
  * xxxxData：从服务器返回的结果
  * xxxxResult：系统对从服务器返回的结果进行二次处理解耦后的用于业务逻辑的结果
  */
-
-import { waybillRequest } from "src/mock/api";
-
 //司机不要求注册，中心人员需要后台手工确认绑定openid或手机
 export interface RegUser {
   userName: string; //default is wx.nickName
@@ -145,6 +142,7 @@ export interface Waybill {
   longitude: string;
   phone: string;
   remark: string;
+  shpToCd: string;
 }
 //api 订单详情查询返回值
 export interface wbData {
@@ -165,6 +163,7 @@ export interface wbData {
   orderImageList: Array<photoData>;
   status: number;
   arsCode: string;
+  shpToCd: string;
 }
 //api 订单综合查询返回值
 export interface wbqData {
@@ -320,6 +319,7 @@ export interface uploadData {
 }
 export interface uploadResult extends Result {
   upload: uploadData;
+  message: string;
 }
 
 //系统消息
@@ -359,9 +359,9 @@ export interface messages {
 
 export interface msgQueryParams {
   openid: string;
-  pageNo: number | null;
-  pageSize: number | null;
-  status: number | null;
+  pageNo: number | undefined;
+  pageSize: number | undefined;
+  status: number | undefined;
 }
 
 export interface msgQueryData {

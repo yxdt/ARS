@@ -241,6 +241,13 @@ export default class Index extends Component<null, SheetState> {
               status: "confirmed",
               statusCaption: "中心已确认",
               statusNum: 8,
+              photos: this.state.waybill.photos.map((item) => ({
+                url: item.url,
+                caption: "通过",
+                wbNum: item.wbNum,
+                status: 1,
+                id: item.id,
+              })),
             },
           });
           Taro.setStorage({

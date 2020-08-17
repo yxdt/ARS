@@ -82,5 +82,16 @@ button {
     line-height: 3.2rem;
     font-size: 1rem;
     flex: 1;
+    margin: 0.2rem;
+  }
+  .green-btn {
+    background-color: #62a60a;
+  }
+  .purple-btn {
+    background-color: #ce007c;
+  }
+  .brown-btn {
+    background-color: #d15805;
+    color: white;
   }
 }

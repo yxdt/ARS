@@ -61,9 +61,10 @@ export default class Index extends Component<null, SheetState> {
     const today =
       Today.getFullYear() +
       "-" +
-      String(1 + Today.getMonth()).padStart(2, "0") +
-      "-" +
-      String(Today.getDate()).padStart(2, "0");
+      (Today.getMonth() < 9
+        ? "0" + (Today.getMonth() + 1)
+        : Today.getMonth() + 1 + "");
+    "-" + (Today.getDate() < 10 ? "0" + Today.getDate() : Today.getDate() + "");
     this.state = {
       loading: true,
       failed: false,
@@ -114,12 +115,18 @@ export default class Index extends Component<null, SheetState> {
   componentWillMount() {}
 
   componentDidMount() {
+    console.log("sheet.params:", this.$router.params);
     let wbno = this.$router.params.wbno;
     if (this.$router.params.q && this.$router.params.q.length > 0) {
       const wbnos = this.$router.params.q.split("%2F");
       wbno = wbnos[wbnos.length - 1];
       //consolelog("wbno from qrcode:", wbno);
     }
+    Taro.setStorage({ key: "waybill", data: wbno });
+    Taro.setStorage({
+      key: "waybilldate",
+      data: new Date().valueOf(),
+    });
     //const rdcno = this.$router.params.rdc;
     //const cell = this.$router.params.cell;
     let isSuper = this.$router.params.super === "1";
@@ -449,19 +456,20 @@ export default class Index extends Component<null, SheetState> {
                   删除
                 </Button>
               ) : null}
-              {selCaption !== "已上传" || !isSuper ? (
-                <Button
-                  className="preview-confirm-button"
-                  onClick={() => {
-                    this.setState({ preview: false });
-                  }}
-                >
-                  返回
-                </Button>
-              ) : (
-                <View style="display:flex; flex-direction:row;flex:3">
+              <Button
+                className="preview-confirm-button brown-btn"
+                onClick={() => {
+                  this.setState({ preview: false });
+                }}
+              >
+                返回
+              </Button>
+            </View>
+            <View style="display:flex; flex-direction:row">
+              {selCaption !== "已上传" || !isSuper ? null : (
+                <View style="display:flex; flex-direction:row;flex:4">
                   <Button
-                    className="preview-confirm-button"
+                    className="preview-confirm-button green-btn"
                     disabled={selCaption !== "已上传"}
                     onClick={() => {
                       approvePicture(
@@ -508,7 +516,7 @@ export default class Index extends Component<null, SheetState> {
                   </Button>
                   <Button
                     disabled={selCaption !== "已上传"}
-                    className="preview-confirm-button"
+                    className="preview-confirm-button purple-btn"
                     onClick={() => {
                       this.setState({ confirmReject: true });
                     }}
@@ -634,11 +642,17 @@ export default class Index extends Component<null, SheetState> {
                 </View>
                 <View className="form-caption-split">
                   <Text className="form-caption">接货处码：</Text>
-                  <Text className="form-item">{waybill.shpToCd}</Text>
+                  <Text className="form-item">
+                    {waybill.shpToCd}（{waybill.shiptoCode}）
+                  </Text>
                 </View>
                 <View className="form-caption-split">
                   <Text className="form-caption">接货处名：</Text>
                   <Text className="form-item">{waybill.shiptoName}</Text>
+                </View>
+                <View className="form-caption-split">
+                  <Text className="form-caption">总页数：</Text>
+                  <Text className="form-item">{waybill.totalPages}</Text>
                 </View>
 
                 {waybill.statusNum > 0 && isSuper ? (
@@ -698,7 +712,7 @@ export default class Index extends Component<null, SheetState> {
                   </View>
                   <ShipItems
                     current={0}
-                    pageCount={waybill.totalPages}
+                    pageCount={waybill.maxPage}
                     shipItems={waybill.shipItems}
                   />
                 </View>
@@ -766,59 +780,60 @@ export default class Index extends Component<null, SheetState> {
                 </Button>
               </AtModalAction>
             </AtModal>
-
-            <AtModal isOpened={confirmedArrive}>
-              <AtModalHeader>{confirmString}</AtModalHeader>
-              <AtModalContent>
-                <View className="toast-main">
-                  <View className="confirm-info">{confirmString2}</View>
-                  <View className="confirm-info">{confirmString3}</View>
-                  <AtInput
-                    key={"confirm-arrive-ara-code"}
-                    type="text"
-                    className="modal-input"
-                    title="验证码*"
-                    name="arsCode"
-                    placeholder="4位验证码"
-                    placeholderClass="small-hd-ph"
-                    onChange={(val) => {
-                      //consolelog("arscode:", val);
-                      this.setState({ rdcNum: val.toString() });
+            {waybill.statusNum > 0 ? null : (
+              <AtModal isOpened={confirmedArrive}>
+                <AtModalHeader>{confirmString}</AtModalHeader>
+                <AtModalContent>
+                  <View className="toast-main">
+                    <View className="confirm-info">{confirmString2}</View>
+                    <View className="confirm-info">{confirmString3}</View>
+                    <AtInput
+                      key={"confirm-arrive-ara-code"}
+                      type="text"
+                      className="modal-input"
+                      title="验证码*"
+                      name="arsCode"
+                      placeholder="4位验证码"
+                      placeholderClass="small-hd-ph"
+                      onChange={(val) => {
+                        //consolelog("arscode:", val);
+                        this.setState({ rdcNum: val.toString() });
+                      }}
+                    ></AtInput>
+                    <AtInput
+                      key={"confirm-arrive-cell-phone"}
+                      type="number"
+                      name="cellphone"
+                      className="modal-input"
+                      title="手机号"
+                      placeholder="您的手机号"
+                      placeholderClass="small-hd-ph"
+                      onChange={(val) => {
+                        //consolelog("changed:", val);
+                        this.setState({ cellphone: val.toString() });
+                      }}
+                    ></AtInput>
+                  </View>
+                </AtModalContent>
+                <AtModalAction>
+                  <Button
+                    className="home-input-semi-left"
+                    onClick={() => {
+                      //Taro.navigateBack();
+                      this.setState({ confirmedArrive: false });
                     }}
-                  ></AtInput>
-                  <AtInput
-                    key={"confirm-arrive-cell-phone"}
-                    type="number"
-                    name="cellphone"
-                    className="modal-input"
-                    title="手机号"
-                    placeholder="您的手机号"
-                    placeholderClass="small-hd-ph"
-                    onChange={(val) => {
-                      //consolelog("changed:", val);
-                      this.setState({ cellphone: val.toString() });
-                    }}
-                  ></AtInput>
-                </View>
-              </AtModalContent>
-              <AtModalAction>
-                <Button
-                  className="home-input-semi-left"
-                  onClick={() => {
-                    //Taro.navigateBack();
-                    this.setState({ confirmedArrive: false });
-                  }}
-                >
-                  取消
-                </Button>
-                <Button
-                  className="home-input-semi-right"
-                  onClick={this.driverConfirmArrive}
-                >
-                  确认到达
-                </Button>
-              </AtModalAction>
-            </AtModal>
+                  >
+                    取消
+                  </Button>
+                  <Button
+                    className="home-input-semi-right"
+                    onClick={this.driverConfirmArrive}
+                  >
+                    确认到达
+                  </Button>
+                </AtModalAction>
+              </AtModal>
+            )}
           </View>
         )}
       </View>

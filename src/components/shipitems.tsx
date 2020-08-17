@@ -13,22 +13,38 @@ export interface ShipItemProps {
 export default function ShipItems(props: ShipItemProps) {
   // const [pages, setPages] = useState(props.pageCount);
   //const [shipItems, setShipItems] = useState(props.shipItems || []);
+  console.log("shipitems.params:", props);
   const shipItems = props.shipItems || [];
 
   const [current, setCurrent] = useState(props.current);
 
-  const arrPages: Array<number> = new Array(props.pageCount || 1);
-  const pageInds: Array<TabItem> = new Array(props.pageCount || 1);
-
-  for (let i = 0; i < props.pageCount; i++) {
-    arrPages[i] = i;
-    pageInds[i] = { title: "【" + (i + 1) + "】" };
+  const arrPages: Array<number> = new Array();
+  const pageInds: Array<TabItem> = new Array();
+  let pagedItems;
+  let idx = 0;
+  for (let i = 1; i <= props.pageCount; i++) {
+    pagedItems = shipItems.filter((item) => parseInt(item.page) === i);
+    console.log("pagedItems:", pagedItems, pagedItems.length);
+    if (pagedItems && pagedItems.length > 0) {
+      console.log("has item:", i);
+      arrPages.push(idx++);
+      pageInds.push({ title: "【" + i + "】" });
+      let sumVal = 0;
+      for (let j = 0; j < pagedItems.length; j++) {
+        sumVal += pagedItems[j].qty;
+      }
+      pagedItems.push({
+        id: "----total",
+        orderNum: "",
+        model: "小计",
+        seq: "99",
+        page: 1 + current + "",
+        qty: sumVal,
+      });
+    }
   }
-  const pagedItems = shipItems.filter(
-    (item) => parseInt(item.page) === 1 + current
-  );
 
-  //consolelog("arrPages.current:", current, arrPages, pagedItems);
+  console.log("arrPages.current:", current, arrPages, pagedItems, pageInds);
 
   return (
     <AtTabs
@@ -41,7 +57,7 @@ export default function ShipItems(props: ShipItemProps) {
       }}
     >
       {arrPages.map((pageNo) => {
-        //consolelog("tabpanes:", pageNo, shipItems);
+        console.log("arrPages.map.pageNo:", pageNo, pagedItems);
         return (
           <AtTabsPane
             current={current}

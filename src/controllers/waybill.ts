@@ -85,7 +85,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
       //restRet = { code: "0500", data: null };
     }
 
-    //consolelog("controllers.waybill.loadWaybill.res:", restRet);
+    console.log("controllers.waybill.loadWaybill.res:", restRet);
 
     if (restRet && restRet.code === "0000" && restRet.data) {
       const retData = <wbData>restRet.data;
@@ -164,6 +164,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
         phone: retData.phone && retData.phone !== "null" ? retData.phone : "",
         remark: retData.remark,
         shpToCd: retData.shpToCd,
+        maxPage: retData.maxPage,
       };
       for (const pitem of retData.ordDetailList) {
         //consolelog("pitem:", pitem);
@@ -322,7 +323,7 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
     ////consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  //consolelog("controllers.waybill.queryWaybills.res:", restRet);
+  console.log("controllers.waybill.queryWaybills.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.orderList) {
       ret.waybills = restRet.data.orderList.map((item: wbqData) => ({
@@ -337,6 +338,7 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
         statusCaption: getStatusCaption(item.status),
         shipItems: [],
         photos: null,
+        pgYmd: item.pgYmd,
       }));
       ret.count = restRet.data.orderList.length;
     } else {
@@ -443,4 +445,5 @@ export {
   confirmComplete,
   queryWaybills,
   queryWaybillStatus,
+  getStatusCaption,
 };

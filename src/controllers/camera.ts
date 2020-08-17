@@ -18,7 +18,11 @@ import {
   delParams,
   delResult,
   delData,
+  queryData,
+  queryResult,
+  wbqData,
 } from "../types/ars";
+import { getStatusCaption } from "./waybill";
 
 //扫描运单二维码，返回二维码内含字符串
 function scanBarcode(cbBarcode) {
@@ -122,28 +126,57 @@ async function confirmPhotoComplete(
   return ret;
 }
 //查询尚未审核的已上传回执列表
-async function queryUnVerifiedPhotos(openid: string): Promise<uvPhotoResult> {
-  let uvResult: TimsResponse<uvPhotoListData>;
+async function queryUnVerifiedPhotos(openid: string): Promise<queryResult> {
+  let uvResult;
   let success = true;
-  const ret: uvPhotoResult = {
+  const ret: queryResult = {
     result: "success",
-    photos: null,
+    count: 0,
+    waybills: [],
   };
   try {
     uvResult = await queryUnVerified(openid);
   } catch (e) {
-    uvResult = e;
+    uvResult = {
+      code: "0500",
+      data: null,
+      message: "error",
+      messageId: "202022",
+      sentTime: new Date(),
+      responseTime: new Date(),
+    };
     success = false;
   }
-  //consolelog("queryUnVerified:", uvResult);
+  console.log("queryUnVerified:", uvResult);
   if (uvResult.code === "0000") {
-    if (uvResult.data) {
-      ret.photos = uvResult.data.orderImageList;
+    if (uvResult.data && uvResult.data.orderList) {
+      ret.waybills = uvResult.data.orderList.map((item: wbqData) => ({
+        wbNum: item.carAllocNo + item.shpToSeq, //.ordNo,
+        rdcCode: item.dcCd, //.logCd,
+        rdcName: item.dcFullNm, //.logName,
+        totalPages: 1,
+        shiptoCode: item.shpToSeq, //.shpToCd,
+        shiptoName: item.shpToNm,
+        arriveTime: item.insertDate,
+        status: item.status + "",
+        statusCaption: getStatusCaption(item.status),
+        shipItems: [],
+        photos: null,
+        pgYmd: item.pgYmd,
+        dcFullNm: item.dcFullNm,
+        dcIdt: item.dcIdt,
+      }));
+      ret.count = uvResult.data.orderList.length;
+    } else {
+      ret.result = "fail";
+      ret.count = 0;
+      ret.waybills = null;
     }
+    success = true;
   } else {
     ret.result = "error";
-    ret.photos = null;
-    success = false;
+    ret.count = 0;
+    ret.waybills = null;
   }
   return new Promise((res, rej) => {
     if (success) {
@@ -184,6 +217,7 @@ async function deletePicture(
     };
     success = false;
   }
+  console.log("controllers.deletePicture.ret:", delData);
   if (delData.code === "0000" && delData.data) {
     ret.result = "success";
   } else {

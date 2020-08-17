@@ -88,20 +88,7 @@ async function queryMessage(
   //consolelog("queryMessage:", query, ret);
   return ret;
 }
-//查询未审核回执--中心人员功能
-async function queryUnVerified(
-  openid: string
-): Promise<TimsResponse<uvPhotoListData>> {
-  const ret = await taroRequest<TimsResponse<uvPhotoListData>>(
-    "/logistics/check",
-    "GET",
-    { openId: openid },
-    {
-      "X-Access-Token": Taro.getStorageSync("token"),
-    }
-  );
-  return ret;
-}
+
 //删除回执照片
 async function deletePhoto(
   delParam: delParams
@@ -169,6 +156,20 @@ async function getWaybill(wbNum: string) {
     null
   );
   //consolelog("rest.getWaybill.ret:", ret);
+  return ret;
+}
+//查询未审核回执--中心人员功能
+async function queryUnVerified(
+  openid: string
+): Promise<TimsResponse<queryData>> {
+  const ret = await taroRequest<TimsResponse<queryData>>(
+    "/logistics/check?openid=" + openid,
+    "GET",
+    { openid },
+    {
+      "X-Access-Token": Taro.getStorageSync("token"),
+    }
+  );
   return ret;
 }
 //运单查询功能

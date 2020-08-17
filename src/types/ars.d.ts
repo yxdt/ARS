@@ -143,6 +143,8 @@ export interface Waybill {
   phone: string;
   remark: string;
   shpToCd: string;
+  pgYmd: string;
+  maxPage: number;
 }
 //api 订单详情查询返回值
 export interface wbData {
@@ -164,6 +166,7 @@ export interface wbData {
   status: number;
   arsCode: string;
   shpToCd: string;
+  maxPage: number;
 }
 //api 订单综合查询返回值
 export interface wbqData {
@@ -188,6 +191,7 @@ export interface wbqData {
   shpToNm: string;
   shpToSeq: string;
   status: number;
+  pgYmd: string;
 }
 //运单详情项目
 export interface ShipItem {

@@ -20,24 +20,29 @@ export default function Query() {
   const [startDate, setStartDatetime] = useState(
     start.getFullYear() +
       "-" +
-      String(1 + start.getMonth()).padStart(2, "0") +
+      (start.getMonth() < 9
+        ? "0" + (start.getMonth() + 1)
+        : start.getMonth() + 1 + "") +
       "-" +
-      String(start.getDate()).padStart(2, "0")
+      (start.getDate() < 10 ? "0" + start.getDate() : start.getDate() + "")
   );
   const [endDate, setEndDatetime] = useState(
     today.getFullYear() +
       "-" +
-      String(1 + today.getMonth()).padStart(2, "0") +
+      (today.getMonth() < 9
+        ? "0" + (today.getMonth() + 1)
+        : today.getMonth() + 1 + "") +
       "-" +
-      String(today.getDate()).padStart(2, "0")
+      (today.getDate() < 10 ? "0" + today.getDate() : today.getDate() + "")
   );
   const [rdcCode, setRdcCode] = useState("");
-  const [wbStatus, setWbStatus] = useState(0);
+  const [wbStatus, setWbStatus] = useState("");
   const [stsVisble, setStsVisble] = useState(false);
   const [wbNum, setWbNum] = useState("");
   const [waybills, setWaybills] = useState<Array<Waybill> | null>([]);
   const [queryed, setQueryed] = useState(false);
   const statusOptions = [
+    { label: "全部", value: "", desc: "不做状态条件过滤" },
     { label: "未到达", value: "0", desc: "未完成到达时间" },
     { label: "已到达", value: "1", desc: "已完成到达时间" },
     {
@@ -60,10 +65,9 @@ export default function Query() {
   //function doLogin() {}
 
   return (
-    <View className="index">
+    <View className="home-title-span">
       <AtMessage />
       <Text className="form-title">交货单查询</Text>
-
       <View className="sheet-info-span">
         <View className="page-section">
           {queryed ? null : (
@@ -220,7 +224,14 @@ export default function Query() {
                     });
                   }}
                   title={item.wbNum}
-                  note={item.shiptoCode + "(" + item.shiptoName + ")"}
+                  note={
+                    "[" +
+                    item.pgYmd +
+                    "-" +
+                    item.shiptoCode +
+                    "]" +
+                    item.shiptoName
+                  }
                   extraText={item.statusCaption}
                   arrow="right"
                   key={item.wbNum + item.status}

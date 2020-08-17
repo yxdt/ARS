@@ -36,8 +36,8 @@ class App extends Component {
       "pages/user/userinfo",
       "pages/user/Register",
       "pages/user/Login",
-      "pages/sheet/index",
       "pages/sheet/query",
+      "pages/sheet/index",
     ],
     window: {
       backgroundTextStyle: "light",

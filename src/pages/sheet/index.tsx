@@ -140,7 +140,7 @@ export default class Index extends Component<null, SheetState> {
 
     loadWaybill(wbno)
       .then((ret: WaybillResult) => {
-        console.log("getWaybill.ret:", ret, ret.waybill);
+        //consolelog("getWaybill.ret:", ret, ret.waybill);
         if (ret.result === "success") {
           const iCnt = ret.waybill.shipItems.length;
           //ret.waybill.rdcCode = rdcno;
@@ -148,7 +148,7 @@ export default class Index extends Component<null, SheetState> {
           const arrDate = ret.waybill.arriveTime
             ? ret.waybill.arriveTime.split(".")[0]
             : "";
-          console.log("arrDate-arriveTime:", arrDate, ret.waybill.arriveTime);
+          //consolelog("arrDate-arriveTime:", arrDate, ret.waybill.arriveTime);
           Taro.setStorage({
             key: "waybillStatus",
             data: ret.waybill.statusNum,
@@ -258,6 +258,26 @@ export default class Index extends Component<null, SheetState> {
             key: "waybillStatus",
             data: "8",
           });
+
+          const pidx = this.$router.params.pidx || "0";
+          if (pidx === "1") {
+            const wb: Array<Waybill> = Taro.getStorageSync("queryWaybills");
+
+            for (let i = 0; i < wb.length; i++) {
+              if (
+                wb[i].wbNum ===
+                this.state.waybill.wbNum + this.state.waybill.shiptoCode
+              ) {
+                wb[i].statusNum = 8;
+                wb[i].status = "confirmed";
+                wb[i].statusCaption = "中心已确认";
+
+                break;
+              }
+            }
+            Taro.setStorageSync("queryWaybills", wb);
+            Taro.setStorageSync("queryWaybillsUpdated", "1");
+          }
         } else {
           Taro.atMessage({
             message: "IOD到达确认失败，请重试。",
@@ -313,7 +333,27 @@ export default class Index extends Component<null, SheetState> {
               key: "waybillStatus",
               data: "1",
             });
-            sendArriveMessage(this.state.waybill.wbNum, openid);
+
+            const pidx = this.$router.params.pidx || "0";
+            if (pidx === "1") {
+              const wb: Array<Waybill> = Taro.getStorageSync("queryWaybills");
+
+              for (let i = 0; i < wb.length; i++) {
+                if (
+                  wb[i].wbNum ===
+                  this.state.waybill.wbNum + this.state.waybill.shiptoCode
+                ) {
+                  wb[i].statusNum = 1;
+                  wb[i].status = "arrived";
+                  wb[i].statusCaption = "已到达";
+
+                  break;
+                }
+              }
+              Taro.setStorageSync("queryWaybills", wb);
+              Taro.setStorageSync("queryWaybillsUpdated", "1");
+            }
+            //sendArriveMessage(this.state.waybill.wbNum, openid);
           } else {
             Taro.atMessage({
               message: "操作失败：订单信息有误，请重试。",
@@ -501,6 +541,31 @@ export default class Index extends Component<null, SheetState> {
                                 key: "waybillStatus",
                                 data: "8",
                               });
+
+                              const pidx = this.$router.params.pidx || "0";
+                              if (pidx === "1") {
+                                const wb: Array<Waybill> = Taro.getStorageSync(
+                                  "queryWaybills"
+                                );
+                                for (let i = 0; i < wb.length; i++) {
+                                  if (
+                                    wb[i].wbNum ===
+                                    this.state.waybill.wbNum +
+                                      this.state.waybill.shiptoCode
+                                  ) {
+                                    wb[i].statusNum = 8;
+                                    wb[i].status = "confirmed";
+                                    wb[i].statusCaption = "中心已确认";
+
+                                    break;
+                                  }
+                                }
+                                Taro.setStorageSync("queryWaybills", wb);
+                                Taro.setStorageSync(
+                                  "queryWaybillsUpdated",
+                                  "1"
+                                );
+                              }
                             }
                             for (
                               let idx = 0;

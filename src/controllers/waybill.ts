@@ -85,7 +85,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
       //restRet = { code: "0500", data: null };
     }
 
-    console.log("controllers.waybill.loadWaybill.res:", restRet);
+    //consolelog("controllers.waybill.loadWaybill.res:", restRet);
 
     if (restRet && restRet.code === "0000" && restRet.data) {
       const retData = <wbData>restRet.data;

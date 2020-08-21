@@ -28,47 +28,50 @@ function getDriverInfo(phone: string): Promise<DriverInfo> {
 
 function getDriverLocation(resolve: Function) {
   ////consolelog("wbno:", wbno);
-
-  Taro.getLocation({
-    type: "wgs84",
-    success: (res) => {
-      const qqmapsdk = new QQMapWX({
-        key: "HV2BZ-HMTC6-IICS7-ESS5M-BFX2E-V6B5B",
-      });
-      const loc = { latitude: res.latitude, longitude: res.longitude };
-      ////consolelog("cur position:", loc);
-      qqmapsdk.reverseGeocoder({
-        location: loc || "",
-        success: (resLoc) => {
-          ////consolelog("resLoc:", resLoc);
-          resolve({
-            latitude: res.latitude,
-            longitude: res.longitude,
-            address: resLoc.result.address,
-          });
-        },
-        fail: () => {
-          //consolelog("error when find address:", err);
-          resolve({
-            latitude: "",
-            longitude: "",
-            address: "",
-          });
-        },
-      });
-      //成功获取司机位置信息可以做一些服务器端操作，比如存储位置信息。
-      //res:
-      //{
-      //   accuracy: 65
-      //   errMsg: "getLocation:ok"
-      //   horizontalAccuracy: 65
-      //   latitude: 39.92855
-      //   longitude: 116.41637
-      //   speed: -1
-      //   verticalAccuracy: 65
-      //}
-    },
-  });
+  try {
+    Taro.getLocation({
+      type: "wgs84",
+      fail: () => {
+        resolve({
+          latitude: "",
+          longitude: "",
+          address: "",
+        });
+      },
+      success: (res) => {
+        const qqmapsdk = new QQMapWX({
+          key: "HV2BZ-HMTC6-IICS7-ESS5M-BFX2E-V6B5B",
+        });
+        const loc = { latitude: res.latitude, longitude: res.longitude };
+        ////consolelog("cur position:", loc);
+        qqmapsdk.reverseGeocoder({
+          location: loc || "",
+          success: (resLoc) => {
+            ////consolelog("resLoc:", resLoc);
+            resolve({
+              latitude: res.latitude,
+              longitude: res.longitude,
+              address: resLoc.result.address,
+            });
+          },
+          fail: () => {
+            //consolelog("error when find address:", err);
+            resolve({
+              latitude: "",
+              longitude: "",
+              address: "",
+            });
+          },
+        });
+      },
+    });
+  } catch (e) {
+    resolve({
+      latitude: "",
+      longitude: "",
+      address: "",
+    });
+  }
 }
 
 function checkToken() {

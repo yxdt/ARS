@@ -1,4 +1,4 @@
-import Taro, { useState } from "@tarojs/taro";
+import Taro, { useState, useDidShow } from "@tarojs/taro";
 import { View, Text, Picker } from "@tarojs/components";
 import {
   AtInput,
@@ -15,7 +15,17 @@ import { queryParams, Waybill } from "../../types/ars";
 import { queryWaybills } from "../../controllers/waybill";
 
 export default function Query() {
-  const isReturn = this.$router.params.rtn === "1";
+  useDidShow(() => {
+    const isReturn =
+      this.$router.params.rtn === "1" ||
+      Taro.getStorageSync("queryWaybillsUpdated") === "1";
+    //consolelog("useDidShow.isReturn:", isReturn);
+    if (isReturn) {
+      setWaybills(Taro.getStorageSync("queryWaybills"));
+      setWbCount(Taro.getStorageSync("queryWaybillCount"));
+      setQueryed(isReturn);
+    }
+  });
 
   const start = new Date(new Date().valueOf() - 7 * 24 * 60 * 60 * 1000);
   const today = new Date();
@@ -41,13 +51,9 @@ export default function Query() {
   const [wbStatus, setWbStatus] = useState("");
   const [stsVisble, setStsVisble] = useState(false);
   const [wbNum, setWbNum] = useState("");
-  const [waybills, setWaybills] = useState<Array<Waybill> | null>(
-    isReturn ? Taro.getStorageSync("queryWaybills") : []
-  );
-  const [wbCount, setWbCount] = useState(
-    isReturn ? Taro.getStorageSync("queryWaybillCount") : 0
-  );
-  const [queryed, setQueryed] = useState(isReturn);
+  const [waybills, setWaybills] = useState<Array<Waybill> | null>([]);
+  const [wbCount, setWbCount] = useState(0);
+  const [queryed, setQueryed] = useState(false);
   const statusOptions = [
     { label: "全部", value: "", desc: "不做状态条件过滤" },
     { label: "未到达", value: "0", desc: "未完成到达时间" },
@@ -69,6 +75,8 @@ export default function Query() {
       desc: "回执已经确认通过",
     },
   ];
+
+  Taro.removeStorage({ key: "queryWaybillsUpdated" });
 
   return (
     <View className="home-title-span">
@@ -210,6 +218,7 @@ export default function Query() {
                         setWbCount(0);
                         Taro.removeStorage({ key: "queryWaybills" });
                         Taro.removeStorage({ key: "queryWaybillCount" });
+                        Taro.removeStorage({ key: "queryWaybillsUpdated" });
                       }
 
                       setQueryed(true);
@@ -219,6 +228,7 @@ export default function Query() {
                       setWbCount(0);
                       Taro.removeStorage({ key: "queryWaybills" });
                       Taro.removeStorage({ key: "queryWaybillCount" });
+                      Taro.removeStorage({ key: "queryWaybillsUpdated" });
 
                       setQueryed(true);
                     });
@@ -242,6 +252,7 @@ export default function Query() {
               waybills.map((item) => (
                 <AtListItem
                   onClick={() => {
+                    Taro.removeStorage({ key: "queryWaybillsUpdated" });
                     if (item.wbNum && item.wbNum.length > 0) {
                       Taro.navigateTo({
                         url:

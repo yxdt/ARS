@@ -15,6 +15,8 @@ import { queryParams, Waybill } from "../../types/ars";
 import { queryWaybills } from "../../controllers/waybill";
 
 export default function Query() {
+  const isReturn = this.$router.params.rtn === "1";
+
   const start = new Date(new Date().valueOf() - 7 * 24 * 60 * 60 * 1000);
   const today = new Date();
   const [startDate, setStartDatetime] = useState(
@@ -39,8 +41,13 @@ export default function Query() {
   const [wbStatus, setWbStatus] = useState("");
   const [stsVisble, setStsVisble] = useState(false);
   const [wbNum, setWbNum] = useState("");
-  const [waybills, setWaybills] = useState<Array<Waybill> | null>([]);
-  const [queryed, setQueryed] = useState(false);
+  const [waybills, setWaybills] = useState<Array<Waybill> | null>(
+    isReturn ? Taro.getStorageSync("queryWaybills") : []
+  );
+  const [wbCount, setWbCount] = useState(
+    isReturn ? Taro.getStorageSync("queryWaybillCount") : 0
+  );
+  const [queryed, setQueryed] = useState(isReturn);
   const statusOptions = [
     { label: "全部", value: "", desc: "不做状态条件过滤" },
     { label: "未到达", value: "0", desc: "未完成到达时间" },
@@ -57,12 +64,11 @@ export default function Query() {
       desc: "司机重新上传回执",
     },
     {
-      label: "已确认IOD",
+      label: "中心已确认",
       value: "8",
       desc: "回执已经确认通过",
     },
   ];
-  //function doLogin() {}
 
   return (
     <View className="home-title-span">
@@ -190,20 +196,37 @@ export default function Query() {
                       //consolelog("querywaybills.ret:", ret);
                       if (ret.result === "success" && ret.count > 0) {
                         setWaybills(ret.waybills);
+                        setWbCount(ret.count);
+                        Taro.setStorage({
+                          key: "queryWaybills",
+                          data: ret.waybills,
+                        });
+                        Taro.setStorage({
+                          key: "queryWaybillCount",
+                          data: ret.count,
+                        });
                       } else {
                         setWaybills([]);
+                        setWbCount(0);
+                        Taro.removeStorage({ key: "queryWaybills" });
+                        Taro.removeStorage({ key: "queryWaybillCount" });
                       }
+
                       setQueryed(true);
                     })
                     .catch(() => {
                       setWaybills([]);
+                      setWbCount(0);
+                      Taro.removeStorage({ key: "queryWaybills" });
+                      Taro.removeStorage({ key: "queryWaybillCount" });
+
                       setQueryed(true);
                     });
                 }
               }}
               customStyle="margin-top:1rem;margin-bottom:-1rem"
             >
-              {queryed ? "再次查询" : "查询"}
+              {queryed ? "[查询结果：" + wbCount + "条] 再次查询" : "查询"}
             </AtButton>
           </View>
         </View>
@@ -219,21 +242,30 @@ export default function Query() {
               waybills.map((item) => (
                 <AtListItem
                   onClick={() => {
-                    Taro.navigateTo({
-                      url: "/pages/sheet/index?wbno=" + item.wbNum,
-                    });
+                    if (item.wbNum && item.wbNum.length > 0) {
+                      Taro.navigateTo({
+                        url:
+                          "/pages/sheet/index?wbno=" + item.wbNum + "&pidx=1",
+                      });
+                    }
                   }}
                   title={item.wbNum}
                   note={
-                    "[" +
-                    item.pgYmd +
-                    "-" +
-                    item.shiptoCode +
-                    "]" +
-                    item.shiptoName
+                    item.shiptoName === "合计" && item.wbNum === ""
+                      ? item.shiptoName
+                      : "[" +
+                        item.pgYmd +
+                        "-" +
+                        item.shiptoCode +
+                        "]" +
+                        item.shiptoName
                   }
                   extraText={item.statusCaption}
-                  arrow="right"
+                  arrow={
+                    item.shiptoName === "合计" && item.wbNum === ""
+                      ? undefined
+                      : "right"
+                  }
                   key={item.wbNum + item.status}
                 />
               ))

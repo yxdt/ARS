@@ -42,7 +42,7 @@ function getStatusCaption(status: number): string {
       retStr = "回执重传待确认";
       break;
     case 8:
-      retStr = "已确认IOD";
+      retStr = "中心已确认";
       break;
   }
   return retStr;
@@ -168,16 +168,33 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
       };
       for (const pitem of retData.ordDetailList) {
         //consolelog("pitem:", pitem);
-        const items = pitem.ordList.map((witem) => ({
-          id: witem.ordNo,
-          orderNum: witem.ordNo,
-          model: witem.modelCd,
-          seq: witem.ordSeqNo,
-          page: witem.pageNo,
-          qty: witem.ordQty,
-        }));
-        //consolelog(items);
-        ret.shipItems = ret.shipItems.concat(items);
+        ret.shipItems.push({
+          pageNo: pitem.pageNo,
+          shipItems: pitem.ordList.map((witem) => ({
+            id: witem.ordNo,
+            orderNum: witem.ordNo,
+            model: witem.modelCd,
+            seq: witem.ordSeqNo,
+            page: witem.pageNo,
+            qty: witem.ordQty,
+          })),
+        });
+      }
+      for (let i = 0; i < ret.shipItems.length; i++) {
+        let total = 0;
+        for (let j = 0; j < ret.shipItems[i].shipItems.length; j++) {
+          total += ret.shipItems[i].shipItems[j].qty;
+        }
+        if (total > 0) {
+          ret.shipItems[i].shipItems.push({
+            id: "----total",
+            orderNum: "",
+            model: "小计",
+            seq: "99",
+            page: ret.shipItems[i].pageNo,
+            qty: total,
+          });
+        }
       }
 
       success = true;
@@ -323,7 +340,7 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
     ////consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  console.log("controllers.waybill.queryWaybills.res:", restRet);
+  //consolelog("controllers.waybill.queryWaybills.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.orderList) {
       ret.waybills = restRet.data.orderList.map((item: wbqData) => ({
@@ -337,10 +354,26 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
         status: item.status + "",
         statusCaption: getStatusCaption(item.status),
         shipItems: [],
-        photos: null,
+        photos: [],
         pgYmd: item.pgYmd,
       }));
       ret.count = restRet.data.orderList.length;
+      if (ret.waybills) {
+        ret.waybills.push({
+          wbNum: "",
+          rdcCode: "",
+          rdcName: "合计",
+          totalPages: 1,
+          shiptoCode: "",
+          shiptoName: "合计",
+          arriveTime: "",
+          status: "",
+          statusCaption: ret.count + "",
+          shipItems: [],
+          photos: [],
+          pgYmd: "",
+        });
+      }
     } else {
       ret.result = "fail";
       ret.count = 0;
@@ -382,7 +415,7 @@ async function queryWaybillStatus(wbno: string): Promise<wbStatusResult> {
     { status: 0, caption: "未到达", doneCaption: "司机已出发", seq: 0 },
     { status: 1, caption: "已到达", doneCaption: "司机需上传回执", seq: 1 },
     { status: 2, caption: "已上传待确认", doneCaption: "中心核验回执", seq: 2 },
-    { status: 8, caption: "已确认IOD", doneCaption: "运单完成", seq: 5 },
+    { status: 8, caption: "中心已确认", doneCaption: "运单完成", seq: 5 },
   ];
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.status >= 0) {
@@ -428,7 +461,7 @@ async function queryWaybillStatus(wbno: string): Promise<wbStatusResult> {
     ret.result = "error";
     ret.statusList = [];
   }
-  console.log("controllers.waybill.queryWaybillStatus.ret:", ret);
+  //consolelog("controllers.waybill.queryWaybillStatus.ret:", ret);
   return new Promise((res, rej) => {
     if (success) {
       res(ret);

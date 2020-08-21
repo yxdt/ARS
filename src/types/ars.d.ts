@@ -134,7 +134,7 @@ export interface Waybill {
   status: string;
   statusCaption: string;
   statusNum: number;
-  shipItems: ShipItem[];
+  shipItems: PagedShipItem[];
   photos: wbPhoto[];
   arsCode: string;
   address: string;
@@ -400,13 +400,14 @@ export interface verifyParams {
   openId: string;
 }
 export interface verifyData {
-  result: string;
+  closed: number;
 }
 
 export interface verifyResult extends Result {
   filename: string;
   remark: string;
   imgIds: string;
+  closed: number;
 }
 
 //运单查询

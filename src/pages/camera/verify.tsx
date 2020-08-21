@@ -53,7 +53,7 @@ export default function Verify() {
   if (!loaded && isSuper) {
     queryUnVerifiedPhotos(Taro.getStorageSync("userOpenId"))
       .then((res) => {
-        console.log("queryUnVerifiedPhotos.res:", res);
+        //consolelog("queryUnVerifiedPhotos.res:", res);
         if (res.result === "success" && res.waybills) {
           setPhotos(res.waybills);
           setLoaded(true);
@@ -78,7 +78,7 @@ export default function Verify() {
                 <AtListItem
                   onClick={() => {
                     Taro.navigateTo({
-                      url: "/pages/sheet/index?wbno=" + item.wbNum,
+                      url: "/pages/sheet/index?wbno=" + item.wbNum + "&pidx=2",
                     });
                   }}
                   title={item.wbNum}

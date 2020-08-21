@@ -147,7 +147,7 @@ async function queryUnVerifiedPhotos(openid: string): Promise<queryResult> {
     };
     success = false;
   }
-  console.log("queryUnVerified:", uvResult);
+  //consolelog("queryUnVerified:", uvResult);
   if (uvResult.code === "0000") {
     if (uvResult.data && uvResult.data.orderList) {
       ret.waybills = uvResult.data.orderList.map((item: wbqData) => ({
@@ -217,7 +217,7 @@ async function deletePicture(
     };
     success = false;
   }
-  console.log("controllers.deletePicture.ret:", delData);
+  //consolelog("controllers.deletePicture.ret:", delData);
   if (delData.code === "0000" && delData.data) {
     ret.result = "success";
   } else {
@@ -243,6 +243,7 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
     remark: vrf.remark,
     imgIds: vrf.imgIds, //.imgid,
     filename: "",
+    closed: 1,
   };
 
   //consolelog("camera.verifyPicture.vrf:", vrf);
@@ -262,8 +263,10 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
   //consolelog("camera.verifyPicture.verifyPhoto.result:", vrfResult);
   if (vrfResult.code === "0000" && vrfResult.data) {
     ret.result = "success"; //vrfResult.data.result || "";
+    ret.closed = vrfResult.data.closed;
   } else {
     ret.result = "error";
+    ret.closed = 1;
     success = false;
   }
   //consolelog('verifyPicture:', ret);

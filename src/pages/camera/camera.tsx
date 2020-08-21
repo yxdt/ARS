@@ -194,7 +194,11 @@ export default class Index extends Component<CameraProps, CameraStates> {
               this.setState({ preview: false });
               sendUploadMessage(curwbno, openid);
               confirmPhotoComplete(curwbno, openid);
-              Taro.reLaunch({ url: "/pages/sheet/index?wbno=" + curwbno });
+              const pidx = this.$router.params.pidx || "0";
+
+              Taro.reLaunch({
+                url: "/pages/sheet/index?wbno=" + curwbno + "&pidx=" + pidx,
+              });
             }}
           >
             全部回执已上传

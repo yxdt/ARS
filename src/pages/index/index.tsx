@@ -1,66 +1,49 @@
-import Taro, { useState } from "@tarojs/taro";
-import { View, Text, Image, Button } from "@tarojs/components";
-import { AtInput, AtIcon } from "taro-ui";
-import "./index.scss";
+import Taro, { useState } from '@tarojs/taro';
+import { View, Text, Image, Button } from '@tarojs/components';
+import { AtInput, AtIcon } from 'taro-ui';
+import './index.scss';
 
-import NavBar from "../../components/navbar";
-import ArsTabBar from "../../components/tabbar";
-import { scanBarcode } from "../../controllers/camera";
+import NavBar from '../../components/navbar';
+import ArsTabBar from '../../components/tabbar';
+import { scanBarcode } from '../../controllers/camera';
 
 export default function Index() {
-  //const [manual, setManual] = useState(true);
-  const [waybillNum, setWaybillNum] = useState("");
-  const [prompt, setPrompt] = useState(
-    "您可以扫描往来表上的二维码，或输入装车序列号及验证码。"
-  );
-  //const [rdcNum, setRdcNum] = useState("");
-  //const [cellphone, setCellphone] = useState("");
-  //const [isScan, setIsScan] = useState(false);
-  //const [loggedIn, setLoggedIn] = useState(false);
-
-  //consolelog("$router.params:", this.$router.params);
-
+  const [waybillNum, setWaybillNum] = useState('');
+  const [prompt, setPrompt] = useState('您可以扫描往来表上的二维码，或输入装车序列号及验证码。');
   if (this.$router.params.wbno) {
-    //setIsScan(true);
     setWaybillNum(this.$router.params.wbno);
-    //setManual(true);
   } else {
-    let curwbno = Taro.getStorageSync("waybill");
-    const wbnodate: number =
-      Taro.getStorageSync("waybilldate") || new Date().valueOf();
-
+    let curwbno = Taro.getStorageSync('waybill');
+    const wbnodate: number = Taro.getStorageSync('waybilldate') || new Date().valueOf();
     const today = new Date();
-    //consolelog("localcurwbno, wbnodate:", curwbno, wbnodate);
     if (wbnodate && today.valueOf() - wbnodate > 24 * 60 * 60 * 1000) {
       //本地运单信息超过一天自动清除
-      curwbno = "";
-      Taro.removeStorage({ key: "waybill" });
-      Taro.removeStorage({ key: "waybilldate" });
+      curwbno = '';
+      Taro.removeStorage({ key: 'waybill' });
+      Taro.removeStorage({ key: 'waybilldate' });
     }
     setWaybillNum(curwbno);
   }
 
   function gotBarcode(bcVal) {
-    //bcVal = waybillNum + rdcNum
-    //consolelog("index.index.gotBarcode:", bcVal);
-    const vals = bcVal.result.split("/");
-    Taro.setStorage({ key: "waybill", data: vals[vals.length - 1] });
+    const vals = bcVal.result.split('/');
+    Taro.setStorage({ key: 'waybill', data: vals[vals.length - 1] });
     Taro.setStorage({
-      key: "waybilldate",
+      key: 'waybilldate',
       data: new Date().valueOf(),
     });
     Taro.navigateTo({
-      url: "/pages/sheet/index?wbno=" + vals[vals.length - 1],
+      url: '/pages/sheet/index?wbno=' + vals[vals.length - 1],
     });
   }
 
   function openSheet() {
     if (waybillNum && waybillNum.length > 0) {
       Taro.navigateTo({
-        url: "/pages/sheet/index?wbno=" + waybillNum,
+        url: '/pages/sheet/index?wbno=' + waybillNum,
       });
     } else {
-      setPrompt("请先输入运单号！");
+      setPrompt('请先输入运单号！');
     }
   }
 
@@ -75,7 +58,7 @@ export default function Index() {
       </View>
       <View className="home-button-span">
         <View>
-          <View style={{ flexDirection: "row", display: "flex" }}>
+          <View style={{ flexDirection: 'row', display: 'flex' }}>
             <AtInput
               className="home-input"
               name="waybillNum"
@@ -83,11 +66,10 @@ export default function Index() {
               type="text"
               value={waybillNum}
               onChange={(val: string) => {
-                ////consolelog("new wbNum:", val);
                 setWaybillNum(val);
-                Taro.setStorage({ key: "waybill", data: val });
+                Taro.setStorage({ key: 'waybill', data: val });
                 Taro.setStorage({
-                  key: "waybilldate",
+                  key: 'waybilldate',
                   data: new Date().valueOf(),
                 });
               }}
@@ -98,26 +80,14 @@ export default function Index() {
               onClick={() => {
                 scanBarcode(gotBarcode);
               }}
-              className="cam-button"
-            >
-              <AtIcon
-                prefixClass="fa"
-                value="qrcode"
-                size="26"
-                color="#ffffff"
-              ></AtIcon>
+              className="cam-button">
+              <AtIcon prefixClass="fa" value="qrcode" size="26" color="#ffffff"></AtIcon>
             </Button>
           </View>
         </View>
         <Button className="home-button" onClick={openSheet}>
           <div>
-            <AtIcon
-              prefixClass="fa"
-              value="search"
-              size="20"
-              color="#ffffff"
-              customStyle="margin-right:10px;"
-            ></AtIcon>
+            <AtIcon prefixClass="fa" value="search" size="20" color="#ffffff" customStyle="margin-right:10px;"></AtIcon>
             获取交货单信息
           </div>
         </Button>
@@ -130,5 +100,5 @@ export default function Index() {
   );
 }
 Index.config = {
-  navigationBarTitleText: "TIMS-首页",
+  navigationBarTitleText: 'TIMS-首页',
 };

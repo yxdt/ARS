@@ -112,7 +112,6 @@ export interface loginParam {
   openId: string;
 }
 export interface loginData {
-  //result: boolean;
   userName: string;
   roleName: string;
   token: string;
@@ -122,7 +121,7 @@ export interface loginResult extends Result {
   message: string;
 }
 
-//运单相关
+//运单详情
 export interface Waybill {
   wbNum: string;
   rdcCode: string;
@@ -247,17 +246,17 @@ export interface wbStatus {
   seq: number;
 }
 
+//运单状态列表
 export interface wbStatusData {
   statusList: Array<wbStatus>;
 }
 
+//运单状态列表结果
 export interface wbStatusResult extends Result {
   statusList: Array<wbStatus>;
   wbno: string;
 }
-// export interface PhotoUrl {
-//   url: string;
-// }
+
 //回执照片查询返回值
 export interface photoData {
   carAllocNo: string;

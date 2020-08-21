@@ -1,4 +1,4 @@
-import Taro from "@tarojs/taro";
+import Taro from '@tarojs/taro';
 import {
   RegUser,
   WaybillConfirmParams,
@@ -20,10 +20,10 @@ import {
   delData,
   WaybillCompleteParams,
   WaybillCompleteData,
-} from "../types/ars";
+} from '../types/ars';
 const DEBUGGING = false;
-const devUrl = "http://192.168.0.100:8765";
-const prodUrl = "https://tims.lg.com.cn";
+const devUrl = 'http://192.168.0.100:8765';
+const prodUrl = 'https://tims.lg.com.cn';
 
 const SERVER_URL = DEBUGGING ? devUrl : prodUrl;
 
@@ -32,217 +32,136 @@ async function sendArriveMessage(
   wbno: string, //shipCode + rdcCode
   openid: string
 ) {
-  const ret = await taroRequest<TimsResponse<msgSentData>>(
-    "/message/arrive?wbno=" + wbno + "&openid=" + openid,
-    "GET",
-    null,
-    null
-  );
+  const ret = await taroRequest<TimsResponse<msgSentData>>('/message/arrive?wbno=' + wbno + '&openid=' + openid, 'GET', null, null);
   return ret;
 }
 //发送回执已上传消息
 async function sendUploadMessage(wbno: string, openid: string) {
-  const ret = await taroRequest<TimsResponse<msgSentData>>(
-    "/message/upload?wbno=" + wbno + "&openid=" + openid,
-    "GET",
-    null,
-    null
-  );
+  const ret = await taroRequest<TimsResponse<msgSentData>>('/message/upload?wbno=' + wbno + '&openid=' + openid, 'GET', null, null);
   return ret;
 }
 //发送回执已驳回消息
 async function sendRejectMessage(wbno: string, openid: string) {
-  const ret = await taroRequest<TimsResponse<msgSentData>>(
-    "/message/reject?wbno=" + wbno + "&openid=" + openid,
-    "GET",
-    null,
-    null
-  );
+  const ret = await taroRequest<TimsResponse<msgSentData>>('/message/reject?wbno=' + wbno + '&openid=' + openid, 'GET', null, null);
   return ret;
 }
 //标记消息已读
 async function markMessage(msgid: number): Promise<TimsResponse<string>> {
-  const ret = await taroRequest<TimsResponse<string>>(
-    "/message/sysMessage/read?id=" + msgid,
-    "GET",
-    null,
-    null
-  );
+  const ret = await taroRequest<TimsResponse<string>>('/message/sysMessage/read?id=' + msgid, 'GET', null, null);
   return ret;
 }
 //消息列表查询
-async function queryMessage(
-  query: msgQueryParams
-): Promise<TimsResponse<msgQueryData>> {
-  const ret = await taroRequest<TimsResponse<msgQueryData>>(
-    "/message/sysMessage/wx",
-    "GET",
-    query,
-    { "content-type": "application/x-www-form-urlencoded" }
-  );
+async function queryMessage(query: msgQueryParams): Promise<TimsResponse<msgQueryData>> {
+  const ret = await taroRequest<TimsResponse<msgQueryData>>('/message/sysMessage/wx', 'GET', query, { 'content-type': 'application/x-www-form-urlencoded' });
   return ret;
 }
 
 //删除回执照片
-async function deletePhoto(
-  delParam: delParams
-): Promise<TimsResponse<delData>> {
-  const ret = await taroRequest<TimsResponse<delData>>(
-    "/driver/delete",
-    "POST",
-    delParam,
-    {
-      "content-type": "application/x-www-form-urlencoded",
-    }
-  );
+async function deletePhoto(delParam: delParams): Promise<TimsResponse<delData>> {
+  const ret = await taroRequest<TimsResponse<delData>>('/driver/delete', 'POST', delParam, {
+    'content-type': 'application/x-www-form-urlencoded',
+  });
   return ret;
 }
 //审核回执
-async function verifyPhoto(
-  verifydata: verifyParams
-): Promise<TimsResponse<verifyData>> {
-  const ret = await taroRequest<TimsResponse<verifyData>>(
-    "/logistics/confirm",
-    "POST",
-    verifydata,
-    {
-      "content-type": "application/x-www-form-urlencoded",
-      "X-Access-Token": Taro.getStorageSync("token"),
-    }
-  );
+async function verifyPhoto(verifydata: verifyParams): Promise<TimsResponse<verifyData>> {
+  const ret = await taroRequest<TimsResponse<verifyData>>('/logistics/confirm', 'POST', verifydata, {
+    'content-type': 'application/x-www-form-urlencoded',
+    'X-Access-Token': Taro.getStorageSync('token'),
+  });
   return ret;
 }
 
 //运单确认通过
 async function completeWaybill(wbInfo: WaybillCompleteParams) {
-  const ret = await taroRequest<TimsResponse<WaybillCompleteData>>(
-    "/logistics/confirmall",
-    "POST",
-    wbInfo,
-    {
-      "content-type": "application/x-www-form-urlencoded",
-      "X-Access-Token": Taro.getStorageSync("token"),
-    }
-  );
+  const ret = await taroRequest<TimsResponse<WaybillCompleteData>>('/logistics/confirmall', 'POST', wbInfo, {
+    'content-type': 'application/x-www-form-urlencoded',
+    'X-Access-Token': Taro.getStorageSync('token'),
+  });
   return ret;
 }
 //确认运单到达
 async function confirmWaybill(wbInfo: WaybillConfirmParams) {
-  const ret = await taroRequest<TimsResponse<WaybillConfirmData>>(
-    "/driver/confirm",
-    "POST",
-    wbInfo,
-    { "content-type": "application/x-www-form-urlencoded" }
-  );
+  const ret = await taroRequest<TimsResponse<WaybillConfirmData>>('/driver/confirm', 'POST', wbInfo, { 'content-type': 'application/x-www-form-urlencoded' });
   return ret;
 }
 //获取运单详情
 async function getWaybill(wbNum: string) {
-  const ret = await taroRequest<TimsResponse<wbData>>(
-    "/order/code/" + wbNum,
-    "GET",
-    null,
-    null
-  );
+  const ret = await taroRequest<TimsResponse<wbData>>('/order/code/' + wbNum, 'GET', null, null);
   return ret;
 }
 //查询未审核回执--中心人员功能
-async function queryUnVerified(
-  openid: string
-): Promise<TimsResponse<queryData>> {
+async function queryUnVerified(openid: string): Promise<TimsResponse<queryData>> {
   const ret = await taroRequest<TimsResponse<queryData>>(
-    "/logistics/check?openid=" + openid,
-    "GET",
+    '/logistics/check?openid=' + openid,
+    'GET',
     { openid },
     {
-      "X-Access-Token": Taro.getStorageSync("token"),
+      'X-Access-Token': Taro.getStorageSync('token'),
     }
   );
   return ret;
 }
 //运单查询功能
 async function queryWaybill(query: queryParams) {
-  const ret = await taroRequest<TimsResponse<queryData>>(
-    "/logistics/search",
-    "GET",
-    query,
-    {
-      "X-Access-Token": Taro.getStorageSync("token"),
-    }
-  );
+  const ret = await taroRequest<TimsResponse<queryData>>('/logistics/search', 'GET', query, {
+    'X-Access-Token': Taro.getStorageSync('token'),
+  });
   return ret;
 }
 //查询运单状态进度
 async function queryWbStatus(wbNum: string) {
-  const ret = await taroRequest<TimsResponse<wbStatusData>>(
-    "/order/code/" + wbNum,
-    "GET",
-    null,
-    null
-  );
+  const ret = await taroRequest<TimsResponse<wbStatusData>>('/order/code/' + wbNum, 'GET', null, null);
   return ret;
 }
 
 //标记当前运单回执已上传完成
 async function photoComplete(wbInfo: photoDoneParam) {
-  const ret = await taroRequest<TimsResponse<any>>(
-    "/driver/complete",
-    "POST",
-    wbInfo,
-    { "content-type": "application/x-www-form-urlencoded" }
-  );
+  const ret = await taroRequest<TimsResponse<any>>('/driver/complete', 'POST', wbInfo, { 'content-type': 'application/x-www-form-urlencoded' });
   return ret;
 }
 
 //获取运单已上传回执列表
 async function getWbPhotos(wbNum: string) {
   if (DEBUGGING) {
-    const photos = await taroRequest<TimsResponse<photoListData>>(
-      "/photos/bywb/" + wbNum,
-      "GET",
-      {},
-      null
-    );
+    const photos = await taroRequest<TimsResponse<photoListData>>('/photos/bywb/' + wbNum, 'GET', {}, null);
     return photos;
   }
 }
 //保存用户信息
 async function saveUserInfo(userInfo: RegUser) {
-  const url = "/users/save";
+  const url = '/users/save';
   const ret = await Taro.request({
     url: SERVER_URL + url,
-    method: "POST",
+    method: 'POST',
     data: userInfo,
-    header: { "content-type": "application/x-www-form-urlencoded" },
+    header: { 'content-type': 'application/x-www-form-urlencoded' },
   });
   return ret;
 }
 //openId登录
 async function openidLogin(openid: string): Promise<TimsResponse<loginData>> {
   const ret = await taroRequest<TimsResponse<loginData>>(
-    "/logistics/openIdLogin",
-    "POST",
+    '/logistics/openIdLogin',
+    'POST',
     {
       openId: openid,
     },
-    { "content-type": "application/x-www-form-urlencoded" }
+    { 'content-type': 'application/x-www-form-urlencoded' }
   );
   return ret;
 }
 //用户登录
-async function userLogin(
-  cellphone: string,
-  password: string
-): Promise<TimsResponse<loginData>> {
+async function userLogin(cellphone: string, password: string): Promise<TimsResponse<loginData>> {
   const ret = await taroRequest<TimsResponse<loginData>>(
-    "/logistics/phoneLogin",
-    "POST",
+    '/logistics/phoneLogin',
+    'POST',
     {
       pwd: password,
       phone: cellphone,
-      openId: Taro.getStorageSync("userOpenId"),
+      openId: Taro.getStorageSync('userOpenId'),
     },
-    { "content-type": "application/x-www-form-urlencoded" }
+    { 'content-type': 'application/x-www-form-urlencoded' }
   );
 
   return ret;
@@ -252,14 +171,14 @@ async function taroRequest<T>(url: string, method, data, header) {
   let ret;
   ret = await Taro.request<T>({
     url: SERVER_URL + url,
-    method: method || "GET",
+    method: method || 'GET',
     data: data || {},
-    header: header || { "content-type": "application/json" },
+    header: header || { 'content-type': 'application/json' },
   });
   if (ret && ret.statusCode === 200) {
     ret = ret.data;
   } else {
-    ret = { code: "5000", message: "网络访问错误" };
+    ret = { code: '5000', message: '网络访问错误' };
   }
 
   return ret;

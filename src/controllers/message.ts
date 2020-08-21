@@ -23,7 +23,7 @@ async function markTheMessage(msgid: number): Promise<Result> {
   } catch (e) {
     restRet = e;
   }
-  //consolelog("controllers.message.restRet:", restRet);
+
   if (restRet.code === "0000") {
     ret.result = "success";
     success = true;
@@ -35,15 +35,12 @@ async function markTheMessage(msgid: number): Promise<Result> {
     if (success) {
       res(ret);
     } else {
-      ////consolelog('controllers.waybill.queryWaybills.res.rej:', restRet);
       rej(ret);
     }
   });
 }
 
 async function queryMessages(query: msgQueryParams): Promise<msgQueryResult> {
-  ////consolelog('controllers.message.queryMessages.param:', query);
-
   let success = false;
   let ret: msgQueryResult = {
     result: "success",
@@ -54,10 +51,8 @@ async function queryMessages(query: msgQueryParams): Promise<msgQueryResult> {
   try {
     restRet = await queryMessage(query);
   } catch (err) {
-    ////consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  //consolelog("controllers.message.queryMessages.res:", query, restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.sms && restRet.data.sms.records) {
       ret.messages = restRet.data.sms.records;
@@ -77,7 +72,6 @@ async function queryMessages(query: msgQueryParams): Promise<msgQueryResult> {
     if (success) {
       res(ret);
     } else {
-      ////consolelog('controllers.waybill.queryWaybills.res.rej:', restRet);
       rej(ret);
     }
   });

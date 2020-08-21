@@ -1,5 +1,4 @@
 import Taro from "@tarojs/taro";
-//import { WxUserInfo, RegUser } from "src/types/ars";
 import { userLogin, openidLogin, SERVER_URL } from "./rest";
 import QQMapWX from "../libs/qqmap-wx-jssdk";
 import { DriverInfo, loginResult } from "../types/ars";
@@ -19,7 +18,6 @@ function getDriverInfo(phone: string): Promise<DriverInfo> {
         driverInfo.latitude = ret.latitude;
         driverInfo.longitude = ret.longitude;
         driverInfo.address = ret.address;
-        ////consolelog("getDriverInfo.driverInfo:", driverInfo);
         res(driverInfo);
       });
     });
@@ -27,7 +25,6 @@ function getDriverInfo(phone: string): Promise<DriverInfo> {
 }
 
 function getDriverLocation(resolve: Function) {
-  ////consolelog("wbno:", wbno);
   try {
     Taro.getLocation({
       type: "wgs84",
@@ -43,11 +40,9 @@ function getDriverLocation(resolve: Function) {
           key: "HV2BZ-HMTC6-IICS7-ESS5M-BFX2E-V6B5B",
         });
         const loc = { latitude: res.latitude, longitude: res.longitude };
-        ////consolelog("cur position:", loc);
         qqmapsdk.reverseGeocoder({
           location: loc || "",
           success: (resLoc) => {
-            ////consolelog("resLoc:", resLoc);
             resolve({
               latitude: res.latitude,
               longitude: res.longitude,
@@ -55,7 +50,6 @@ function getDriverLocation(resolve: Function) {
             });
           },
           fail: () => {
-            //consolelog("error when find address:", err);
             resolve({
               latitude: "",
               longitude: "",
@@ -110,7 +104,6 @@ function getWxOpenId(cbOpenId: Function) {
             if (resp.data && resp.data.code === "0000" && resp.data.data) {
               let openId = resp.data.data.openObj.openid;
               Taro.setStorage({ key: "userOpenId", data: openId });
-              //consolelog("controllers.users.getWxOpenId.openID:", openId);
               cbOpenId(openId);
             }
           },
@@ -126,36 +119,9 @@ function getWxOpenId(cbOpenId: Function) {
 async function getUserInfo() {
   try {
     const ui = await Taro.getUserInfo();
-    ////consolelog("Taro.getUserInfo:", ui);
     return ui.userInfo;
-  } catch (err) {
-    ////consolelog("err in controllers/users/getUserInfo:", err);
-  }
+  } catch (err) {}
 }
-
-// async function uploadWxUserInfo(
-//   openId: string,
-//   cell: string,
-//   userType: string,
-//   area: string,
-//   userInfo: WxUserInfo
-// ) {
-//   const regUserInfo: RegUser = {
-//     userName: userInfo.nickName,
-//     openId,
-//     cellphone: cell,
-//     password: "",
-//     userType: userType,
-//     area: area,
-//     avatarUrl: userInfo.avatarUrl,
-//     country: userInfo.country,
-//     province: userInfo.province,
-//     city: userInfo.city,
-//     gender: userInfo.gender === 1 ? "男" : "女",
-//   };
-//   const ret = await saveUserInfo(regUserInfo);
-//   return ret;
-// }
 
 async function doOpenidLogin(openId): Promise<loginResult> {
   let success = false;
@@ -168,10 +134,8 @@ async function doOpenidLogin(openId): Promise<loginResult> {
   try {
     restRet = await openidLogin(openId);
   } catch (err) {
-    //consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  //consolelog("controllers.users.doOpenidLogin.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.data && restRet.data.data.username) {
       const roleName =
@@ -196,17 +160,13 @@ async function doOpenidLogin(openId): Promise<loginResult> {
     if (success) {
       res(ret);
     } else {
-      ////consolelog('controllers.users.doLogin.res.rej:', restRet);
       rej(ret);
     }
   });
 }
 
 async function doLogin(cellphone, password): Promise<loginResult> {
-  //consolelog("controllers.user.doLogin:", cellphone, password);
-  //consolelog("userOpenId:", Taro.getStorageSync("userOpenId"));
   const locOpenId = Taro.getStorageSync("userOpenId");
-
   let success = false;
   let ret: loginResult = {
     result: "success",
@@ -217,10 +177,8 @@ async function doLogin(cellphone, password): Promise<loginResult> {
   try {
     restRet = await userLogin(cellphone, password);
   } catch (err) {
-    //consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  //consolelog("controllers.users.doLogin.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.data && restRet.data.data.username) {
       const roleName =
@@ -244,7 +202,6 @@ async function doLogin(cellphone, password): Promise<loginResult> {
     if (success) {
       res(ret);
     } else {
-      ////consolelog('controllers.users.doLogin.res.rej:', restRet);
       rej(ret);
     }
   });

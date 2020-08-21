@@ -49,8 +49,6 @@ function getStatusCaption(status: number): string {
 }
 
 async function loadWaybill(wbno: string): Promise<WaybillResult> {
-  ////consolelog('controllers.user.doLogin:', cellphone, password);
-
   let success = false;
   let restRet: TimsResponse<wbData> | null = null;
   let photoRet: TimsResponse<photoListData> | null = null;
@@ -74,18 +72,15 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
     phone: "",
     remark: "",
     shpToCd: "",
+    pgYmd: "",
+    maxPage: 0,
   };
   if (wbno && wbno.length > 0) {
     try {
       restRet = await getWaybill(wbno);
     } catch (err) {
-      //consolelog("get waybill error:", err);
-      //err = null;
       restRet = err;
-      //restRet = { code: "0500", data: null };
     }
-
-    //consolelog("controllers.waybill.loadWaybill.res:", restRet);
 
     if (restRet && restRet.code === "0000" && restRet.data) {
       const retData = <wbData>restRet.data;
@@ -95,7 +90,6 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
         restRet.data.orderImageList &&
         restRet.data.orderImageList.length > 0
       ) {
-        //consolelog("restRet.data:", restRet.data.orderImageList);
         photoRet = {
           data: { photos: restRet.data.orderImageList },
           code: "0000",
@@ -114,7 +108,6 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
           responseTime: new Date(),
         };
       }
-      //consolelog("。。。。photoRet:", photoRet);
       switch (retData.status) {
         case 1:
           status = "arrived";
@@ -167,7 +160,6 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
         maxPage: retData.maxPage,
       };
       for (const pitem of retData.ordDetailList) {
-        //consolelog("pitem:", pitem);
         ret.shipItems.push({
           pageNo: pitem.pageNo,
           shipItems: pitem.ordList.map((witem) => ({
@@ -196,9 +188,7 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
           });
         }
       }
-
       success = true;
-      //consolelog("....wb loaded....", ret);
     }
     if (photoRet && photoRet.code === "0000" && photoRet.data) {
       ret.photos = (<photoListData>photoRet.data).photos.map((item) => ({
@@ -213,15 +203,12 @@ async function loadWaybill(wbno: string): Promise<WaybillResult> {
             : "已上传",
         wbNum: wbno,
       }));
-      //consolelog("....photos loaded....", ret);
     }
   }
   return new Promise((res, rej) => {
     if (success) {
       res({ result: "success", waybill: ret });
     } else {
-      //consolelog("controllers.users.doLogin.res.rej:", restRet);
-
       rej({
         result: "fail",
         waybill: null,
@@ -249,17 +236,15 @@ async function confirmComplete(
   let ret: WaybillCompleteResult = { result: "success", wbno: wbno };
   try {
     result = await completeWaybill(ccParam);
-    //consolelog("confirmComplete.param,result:", ccParam, result);
     if (result && result.code === "0000") {
       success = true;
-      ret.result = "success"; //result.message;
+      ret.result = "success";
     } else {
       success = false;
       ret.result = "error";
       ret.message = result.message;
     }
   } catch (e) {
-    //consolelog("waybill.confirmComplete.error.e:", e);
     result = e;
     ret.result = "error";
     ret.message = "未知错误";
@@ -281,12 +266,11 @@ async function confirmArrive(
   arriveTime: string
 ): Promise<Result> {
   const driverInfo = await getDriverInfo(cellphone);
-  //consolelog("confirmArrive.wbno,ordNo,shpToCd:", wbno);
   const wbcParam: WaybillConfirmParams = {
     ...driverInfo,
-    sysTime: arriveTime, //arrTimeStr,
-    carAllocNo: wbno, //ordNo: wbno,
-    shpToSeq: shiptoCode, //shpToCd: shiptoCode,
+    sysTime: arriveTime,
+    carAllocNo: wbno,
+    shpToSeq: shiptoCode,
     openId: driverInfo.openid,
   };
   let result: TimsResponse<Result>;
@@ -294,39 +278,25 @@ async function confirmArrive(
   let ret: Result = { result: "success" };
   try {
     result = await confirmWaybill(wbcParam);
-    //consolelog("confirmArrive.param,result:", wbcParam, result);
     if (result && result.code === "0000" && result.data) {
       success = true;
-      ret.result = "success"; //result.message;
+      ret.result = "success";
     }
   } catch (e) {
-    //consolelog("waybill.confirmArrive.error.e:", e);
     result = e;
-    //{
-    //  messageId: 'abcd1234asdfasdfas9876',
-    //  code: '0400',
-    //  message: 'error',
-    //  sentTime: 2020-07-03T08:20:14.748Z,
-    //  responseTime: 2020-07-03T08:20:19.748Z,
-    //  data: null
-    //}
-
     ret.result = "error";
-    //result = { result: "error" };
   }
 
   return new Promise((res, rej) => {
     if (success) {
       res(ret);
     } else {
-      //consolelog("controllers.waybill.confirm.rej:", result);
       rej(ret);
     }
   });
 }
 
 async function queryWaybills(query: queryParams): Promise<queryResult> {
-  ////consolelog('controllers.user.doLogin:', cellphone, password);
   let success = false;
   let ret: queryResult = {
     result: "success",
@@ -337,18 +307,16 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
   try {
     restRet = await queryWaybill(query);
   } catch (err) {
-    ////consolelog("login error:", err);
     restRet = { code: "0500", data: null };
   }
-  //consolelog("controllers.waybill.queryWaybills.res:", restRet);
   if (restRet.code === "0000") {
     if (restRet.data && restRet.data.orderList) {
       ret.waybills = restRet.data.orderList.map((item: wbqData) => ({
-        wbNum: item.carAllocNo + item.shpToSeq, //.ordNo,
-        rdcCode: item.dcCd, //.logCd,
-        rdcName: item.dcFullNm, //.logName,
+        wbNum: item.carAllocNo + item.shpToSeq,
+        rdcCode: item.dcCd,
+        rdcName: item.dcFullNm,
         totalPages: 1,
-        shiptoCode: item.shpToSeq, //.shpToCd,
+        shiptoCode: item.shpToSeq,
         shiptoName: item.shpToNm,
         arriveTime: item.insertDate,
         status: item.status + "",
@@ -389,7 +357,6 @@ async function queryWaybills(query: queryParams): Promise<queryResult> {
     if (success) {
       res(ret);
     } else {
-      ////consolelog('controllers.waybill.queryWaybills.res.rej:', restRet);
       rej(ret);
     }
   });
@@ -406,11 +373,9 @@ async function queryWaybillStatus(wbno: string): Promise<wbStatusResult> {
   try {
     restRet = await queryWbStatus(wbno);
   } catch (err) {
-    ////consolelog("login error:", err);
     restRet = { code: "0500", data: null };
     success = false;
   }
-  //consolelog("controllers.waybill.queryWaybillStatus.res:", restRet);
   const statuses = [
     { status: 0, caption: "未到达", doneCaption: "司机已出发", seq: 0 },
     { status: 1, caption: "已到达", doneCaption: "司机需上传回执", seq: 1 },
@@ -451,7 +416,6 @@ async function queryWaybillStatus(wbno: string): Promise<wbStatusResult> {
         }
       });
       ret.result = "success";
-      //consolelog("waybill.queryWaybillStatus.ret:", ret);
     } else {
       ret.result = "fail";
       ret.statusList = [];
@@ -461,12 +425,10 @@ async function queryWaybillStatus(wbno: string): Promise<wbStatusResult> {
     ret.result = "error";
     ret.statusList = [];
   }
-  //consolelog("controllers.waybill.queryWaybillStatus.ret:", ret);
   return new Promise((res, rej) => {
     if (success) {
       res(ret);
     } else {
-      ////consolelog('controllers.waybill.queryWaybills.res.rej:', restRet);
       rej(ret);
     }
   });

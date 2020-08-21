@@ -12,13 +12,10 @@ import {
   verifyParams,
   verifyResult,
   verifyData,
-  uvPhotoResult,
-  uvPhotoListData,
   photoDoneParam,
   delParams,
   delResult,
   delData,
-  queryData,
   queryResult,
   wbqData,
 } from "../types/ars";
@@ -46,7 +43,6 @@ function uploadPicture(
   filePath: string,
   openid: string
 ): Promise<uploadResult> {
-  //consolelog("uploadPicture.wbno, filePath:", wbno, filePath);
   const ordNo = wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno;
   const shpToCd = wbno.length > 4 ? wbno.substr(wbno.length - 4) : "";
   let ret: uploadResult = {
@@ -59,9 +55,8 @@ function uploadPicture(
     message: "成功",
   };
   return new Promise((response, reject) => {
-    //consolelog("file_upload:url:", SERVER_URL + "/driver/photo");
     Taro.uploadFile({
-      url: SERVER_URL + "/driver/photo", //"/photos/upload",
+      url: SERVER_URL + "/driver/photo",
       filePath,
       name: "multipartFile",
       formData: {
@@ -71,15 +66,6 @@ function uploadPicture(
       },
       timeout: 15000, //for testing purpose
       success: (res) => {
-        //result: "success"
-        //upload:
-        //code: "0000"
-        //data: {fileName: "tmp_3de83ae4651de55995413adbdf0c6f68_1597062731841.jpg", filePath: "/BJZI20010100033788/tmp_3de83ae4651de55995413adbdf0c6f68_1597062731841.jpg", id: "e679f7d4feaeccfd4f54f61ec998c65e"}
-        //message: "操作成功！"
-        //messageId: "4b14c0e373d824190173d85b584f0012"
-        //responseTime: "2020-08-10 20:32:11.855"
-        //sentTime: "2020-08-10 20:32:11.836"
-        //consolelog("success.res:", res);
         if (res.statusCode === 200 && res.data) {
           const upResult = JSON.parse(res.data);
           if (upResult.code === "0000" && upResult.data) {
@@ -94,15 +80,11 @@ function uploadPicture(
         response(ret);
       },
       fail: (errr) => {
-        //consolelog("upload fail:", errr);
-        //ret = { filePath: "", fileName: "" };
         ret.result = "fail";
         ret.message = "上传失败";
         response(ret);
       },
     }).catch((err) => {
-      //ret = { filePath: "", fileName: "" };
-      //consolelog("upload photo fail:", err);
       ret.result = "error";
       ret.message = "网络错误";
       reject(ret);
@@ -114,7 +96,6 @@ async function confirmPhotoComplete(
   wbno: string,
   openid: string
 ): Promise<any> {
-  //consolelog("uploadPicture.wbno, filePath:", wbno, filePath);
   const comParam: photoDoneParam = {
     openId: openid,
     carAllocNo: wbno.length > 4 ? wbno.substr(0, wbno.length - 4) : wbno,
@@ -122,7 +103,6 @@ async function confirmPhotoComplete(
   };
 
   const ret = await photoComplete(comParam);
-  //consolelog(ret);
   return ret;
 }
 //查询尚未审核的已上传回执列表
@@ -147,15 +127,14 @@ async function queryUnVerifiedPhotos(openid: string): Promise<queryResult> {
     };
     success = false;
   }
-  //consolelog("queryUnVerified:", uvResult);
   if (uvResult.code === "0000") {
     if (uvResult.data && uvResult.data.orderList) {
       ret.waybills = uvResult.data.orderList.map((item: wbqData) => ({
-        wbNum: item.carAllocNo + item.shpToSeq, //.ordNo,
-        rdcCode: item.dcCd, //.logCd,
-        rdcName: item.dcFullNm, //.logName,
+        wbNum: item.carAllocNo + item.shpToSeq,
+        rdcCode: item.dcCd,
+        rdcName: item.dcFullNm,
         totalPages: 1,
-        shiptoCode: item.shpToSeq, //.shpToCd,
+        shiptoCode: item.shpToSeq,
         shiptoName: item.shpToNm,
         arriveTime: item.insertDate,
         status: item.status + "",
@@ -217,14 +196,12 @@ async function deletePicture(
     };
     success = false;
   }
-  //consolelog("controllers.deletePicture.ret:", delData);
   if (delData.code === "0000" && delData.data) {
     ret.result = "success";
   } else {
     ret.result = "error";
     success = false;
   }
-  //consolelog("deletePicture:", delData, ret);
   return new Promise((res, rej) => {
     if (success) {
       res(ret);
@@ -241,12 +218,11 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
   const ret: verifyResult = {
     result: "approve",
     remark: vrf.remark,
-    imgIds: vrf.imgIds, //.imgid,
+    imgIds: vrf.imgIds,
     filename: "",
     closed: 1,
   };
 
-  //consolelog("camera.verifyPicture.vrf:", vrf);
   try {
     vrfResult = await verifyPhoto(vrf);
   } catch (e) {
@@ -260,16 +236,15 @@ async function verifyPicture(vrf: verifyParams): Promise<verifyResult> {
     };
     success = false;
   }
-  //consolelog("camera.verifyPicture.verifyPhoto.result:", vrfResult);
   if (vrfResult.code === "0000" && vrfResult.data) {
-    ret.result = "success"; //vrfResult.data.result || "";
+    ret.result = "success";
     ret.closed = vrfResult.data.closed;
   } else {
     ret.result = "error";
     ret.closed = 1;
     success = false;
   }
-  //consolelog('verifyPicture:', ret);
+
   return new Promise((res, rej) => {
     if (success) {
       res(ret);

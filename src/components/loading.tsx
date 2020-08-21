@@ -1,9 +1,7 @@
 import Taro from "@tarojs/taro";
-
 import { AtActivityIndicator } from "taro-ui";
 
 export default function Loading() {
-  //return <div />;
   return (
     <AtActivityIndicator
       mode="center"

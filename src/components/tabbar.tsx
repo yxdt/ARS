@@ -23,7 +23,6 @@ export default function ArsTabBar(props) {
         },
       ]}
       onClick={(val) => {
-        //consolelog("click Menu:", val);
         setCurrent(val);
         let url = "/pages/index/index";
         if (val === 1) {

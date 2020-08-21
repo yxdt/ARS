@@ -15,7 +15,6 @@ import {
   msgQueryParams,
   msgQueryData,
   wbStatusData,
-  uvPhotoListData,
   photoDoneParam,
   delParams,
   delData,
@@ -62,13 +61,9 @@ async function sendRejectMessage(wbno: string, openid: string) {
   return ret;
 }
 //标记消息已读
-async function markMessage(
-  msgid: number
-  //mark: number //2: read, 3:hide
-): Promise<TimsResponse<string>> {
+async function markMessage(msgid: number): Promise<TimsResponse<string>> {
   const ret = await taroRequest<TimsResponse<string>>(
     "/message/sysMessage/read?id=" + msgid,
-    //"/message/mark?msgid=" + msgid + "&mark=" + mark,
     "GET",
     null,
     null
@@ -85,7 +80,6 @@ async function queryMessage(
     query,
     { "content-type": "application/x-www-form-urlencoded" }
   );
-  //consolelog("queryMessage:", query, ret);
   return ret;
 }
 
@@ -101,7 +95,6 @@ async function deletePhoto(
       "content-type": "application/x-www-form-urlencoded",
     }
   );
-  //consolelog("rest.deletePhoto.ret:", ret);
   return ret;
 }
 //审核回执
@@ -117,10 +110,6 @@ async function verifyPhoto(
       "X-Access-Token": Taro.getStorageSync("token"),
     }
   );
-  //consolelog("rest.verifyPhoto.ret", ret);
-  //if (ret.data) {
-  //  return ret.data;
-  //}
   return ret;
 }
 
@@ -155,7 +144,6 @@ async function getWaybill(wbNum: string) {
     null,
     null
   );
-  //consolelog("rest.getWaybill.ret:", ret);
   return ret;
 }
 //查询未审核回执--中心人员功能
@@ -174,7 +162,6 @@ async function queryUnVerified(
 }
 //运单查询功能
 async function queryWaybill(query: queryParams) {
-  //consolelog("queryWaybill:", query);
   const ret = await taroRequest<TimsResponse<queryData>>(
     "/logistics/search",
     "GET",
@@ -187,7 +174,6 @@ async function queryWaybill(query: queryParams) {
 }
 //查询运单状态进度
 async function queryWbStatus(wbNum: string) {
-  //consolelog("rest.queryWbStatus:", wbNum);
   const ret = await taroRequest<TimsResponse<wbStatusData>>(
     "/order/code/" + wbNum,
     "GET",
@@ -205,11 +191,9 @@ async function photoComplete(wbInfo: photoDoneParam) {
     wbInfo,
     { "content-type": "application/x-www-form-urlencoded" }
   );
-  //consolelog("rest.photoComplete.ret:", ret);
   return ret;
 }
 
-//async function uploadPhoto() {}
 //获取运单已上传回执列表
 async function getWbPhotos(wbNum: string) {
   if (DEBUGGING) {
@@ -219,7 +203,6 @@ async function getWbPhotos(wbNum: string) {
       {},
       null
     );
-    //consolelog("getWbPhotos:", photos);
     return photos;
   }
 }
@@ -261,23 +244,18 @@ async function userLogin(
     },
     { "content-type": "application/x-www-form-urlencoded" }
   );
-  //consolelog("rest.userLogin.ret:", ret);
-  //Taro.setStorage({ key: "roleName", data: roleName });
-  //Taro.setStorage({ key: "userName", data: userName });
 
   return ret;
 }
 //虚拟API
 async function taroRequest<T>(url: string, method, data, header) {
   let ret;
-  //consolelog("url:", SERVER_URL + url);
   ret = await Taro.request<T>({
     url: SERVER_URL + url,
     method: method || "GET",
     data: data || {},
     header: header || { "content-type": "application/json" },
   });
-  //consolelog("toraRequest.ret:", ret);
   if (ret && ret.statusCode === 200) {
     ret = ret.data;
   } else {

@@ -1,18 +1,27 @@
-import Taro, { useState, useDidShow } from '@tarojs/taro';
-import { View, Text, Picker } from '@tarojs/components';
-import { AtInput, AtMessage, AtList, AtListItem, AtRadio, AtButton } from 'taro-ui';
-import './index.scss';
+import Taro, { useState, useDidShow } from "@tarojs/taro";
+import { View, Text, Picker } from "@tarojs/components";
+import {
+  AtInput,
+  AtMessage,
+  AtList,
+  AtListItem,
+  AtRadio,
+  AtButton,
+} from "taro-ui";
+import "./index.scss";
 
-import ArsTabBar from '../../components/tabbar';
-import { queryParams, Waybill } from '../../types/ars';
-import { queryWaybills } from '../../controllers/waybill';
+import ArsTabBar from "../../components/tabbar";
+import { queryParams, Waybill } from "../../types/ars";
+import { queryWaybills } from "../../controllers/waybill";
 
 export default function Query() {
   useDidShow(() => {
-    const isReturn = this.$router.params.rtn === '1' || Taro.getStorageSync('queryWaybillsUpdated') === '1';
+    const isReturn =
+      this.$router.params.rtn === "1" ||
+      Taro.getStorageSync("queryWaybillsUpdated") === "1";
     if (isReturn) {
-      setWaybills(Taro.getStorageSync('queryWaybills'));
-      setWbCount(Taro.getStorageSync('queryWaybillCount'));
+      setWaybills(Taro.getStorageSync("queryWaybills"));
+      setWbCount(Taro.getStorageSync("queryWaybillCount"));
       setQueryed(isReturn);
     }
   });
@@ -20,47 +29,51 @@ export default function Query() {
   const today = new Date();
   const [startDate, setStartDatetime] = useState(
     start.getFullYear() +
-      '-' +
-      (start.getMonth() < 9 ? '0' + (start.getMonth() + 1) : start.getMonth() + 1 + '') +
-      '-' +
-      (start.getDate() < 10 ? '0' + start.getDate() : start.getDate() + '')
+      "-" +
+      (start.getMonth() < 9
+        ? "0" + (start.getMonth() + 1)
+        : start.getMonth() + 1 + "") +
+      "-" +
+      (start.getDate() < 10 ? "0" + start.getDate() : start.getDate() + "")
   );
   const [endDate, setEndDatetime] = useState(
     today.getFullYear() +
-      '-' +
-      (today.getMonth() < 9 ? '0' + (today.getMonth() + 1) : today.getMonth() + 1 + '') +
-      '-' +
-      (today.getDate() < 10 ? '0' + today.getDate() : today.getDate() + '')
+      "-" +
+      (today.getMonth() < 9
+        ? "0" + (today.getMonth() + 1)
+        : today.getMonth() + 1 + "") +
+      "-" +
+      (today.getDate() < 10 ? "0" + today.getDate() : today.getDate() + "")
   );
-  const [rdcCode, setRdcCode] = useState('');
-  const [wbStatus, setWbStatus] = useState('');
+  const [rdcCode, setRdcCode] = useState("");
+  const [wbStatus, setWbStatus] = useState("");
   const [stsVisble, setStsVisble] = useState(false);
-  const [wbNum, setWbNum] = useState('');
+  const [wbNum, setWbNum] = useState("");
   const [waybills, setWaybills] = useState<Array<Waybill> | null>([]);
   const [wbCount, setWbCount] = useState(0);
   const [queryed, setQueryed] = useState(false);
   const statusOptions = [
-    { label: '全部', value: '', desc: '不做状态条件过滤' },
-    { label: '未到达', value: '0', desc: '未完成到达时间' },
-    { label: '已到达', value: '1', desc: '已完成到达时间' },
+    { label: "全部", value: "", desc: "不做状态条件过滤" },
+    { label: "未到达", value: "0", desc: "未完成到达时间" },
+    { label: "已到达", value: "1", desc: "已完成到达时间" },
     {
-      label: '已上传待确认',
-      value: '2',
-      desc: '司机已经回传回执等待确认',
+      label: "已上传待确认",
+      value: "2",
+      desc: "司机已经回传回执等待确认",
     },
-    { label: '回执驳回', value: '3', desc: '回执被驳回' },
+    { label: "回执驳回", value: "3", desc: "回执被驳回" },
     {
-      label: '回执重传待确认',
-      value: '4',
-      desc: '司机重新上传回执',
+      label: "回执重传待确认",
+      value: "4",
+      desc: "司机重新上传回执",
     },
     {
-      label: '中心已确认',
-      value: '8',
-      desc: '回执已经确认通过',
+      label: "中心已确认",
+      value: "8",
+      desc: "回执已经确认通过",
     },
   ];
-  Taro.removeStorage({ key: 'queryWaybillsUpdated' });
+  Taro.removeStorage({ key: "queryWaybillsUpdated" });
   return (
     <View className="home-title-span">
       <AtMessage />
@@ -75,9 +88,14 @@ export default function Query() {
                   onChange={(dateVal) => {
                     setStartDatetime(dateVal.detail.value);
                   }}
-                  value={startDate}>
+                  value={startDate}
+                >
                   <AtList>
-                    <AtListItem title="起始出门时间" extraText={startDate} customStyle="font-size:1rem" />
+                    <AtListItem
+                      title="起始出门时间"
+                      extraText={startDate}
+                      customStyle="font-size:1rem"
+                    />
                   </AtList>
                 </Picker>
               </View>
@@ -87,7 +105,8 @@ export default function Query() {
                   onChange={(dateVal) => {
                     setEndDatetime(dateVal.detail.value);
                   }}
-                  value={endDate}>
+                  value={endDate}
+                >
                   <AtList>
                     <AtListItem title="截止出门时间" extraText={endDate} />
                   </AtList>
@@ -103,7 +122,7 @@ export default function Query() {
                   placeholder="请输入装车号"
                   placeholderClass="small-ph"
                   onChange={(val) => {
-                    setWbNum(val + '');
+                    setWbNum(val + "");
                   }}
                 />
               </View>
@@ -117,7 +136,7 @@ export default function Query() {
                   placeholder="请输入接货处代码"
                   placeholderClass="small-ph"
                   onChange={(val) => {
-                    setRdcCode(val + '');
+                    setRdcCode(val + "");
                   }}
                 />
               </View>
@@ -128,7 +147,13 @@ export default function Query() {
                   title="单据状态"
                   type="text"
                   editable={false}
-                  value={(statusOptions.find((item) => item.value === wbStatus + '') || { label: '未知' }).label}
+                  value={
+                    (
+                      statusOptions.find(
+                        (item) => item.value === wbStatus + ""
+                      ) || { label: "未知" }
+                    ).label
+                  }
                   placeholder="请选择单据状态"
                   placeholderClass="small-ph"
                   onClick={() => {
@@ -143,7 +168,8 @@ export default function Query() {
                     onClick={(val) => {
                       setStsVisble(false);
                       setWbStatus(val);
-                    }}></AtRadio>
+                    }}
+                  ></AtRadio>
                 ) : null}
               </View>
             </View>
@@ -161,65 +187,83 @@ export default function Query() {
                     shpToCd: rdcCode,
                     status: wbStatus,
                     carAllocNo: wbNum,
-                    openId: Taro.getStorageSync('userOpenId'),
+                    openId: Taro.getStorageSync("userOpenId"),
                   };
                   queryWaybills(query)
                     .then((ret) => {
-                      if (ret.result === 'success' && ret.count > 0) {
+                      if (ret.result === "success" && ret.count > 0) {
                         setWaybills(ret.waybills);
                         setWbCount(ret.count);
                         Taro.setStorage({
-                          key: 'queryWaybills',
+                          key: "queryWaybills",
                           data: ret.waybills,
                         });
                         Taro.setStorage({
-                          key: 'queryWaybillCount',
+                          key: "queryWaybillCount",
                           data: ret.count,
                         });
                       } else {
                         setWaybills([]);
                         setWbCount(0);
-                        Taro.removeStorage({ key: 'queryWaybills' });
-                        Taro.removeStorage({ key: 'queryWaybillCount' });
-                        Taro.removeStorage({ key: 'queryWaybillsUpdated' });
+                        Taro.removeStorage({ key: "queryWaybills" });
+                        Taro.removeStorage({ key: "queryWaybillCount" });
+                        Taro.removeStorage({ key: "queryWaybillsUpdated" });
                       }
                       setQueryed(true);
                     })
                     .catch(() => {
                       setWaybills([]);
                       setWbCount(0);
-                      Taro.removeStorage({ key: 'queryWaybills' });
-                      Taro.removeStorage({ key: 'queryWaybillCount' });
-                      Taro.removeStorage({ key: 'queryWaybillsUpdated' });
+                      Taro.removeStorage({ key: "queryWaybills" });
+                      Taro.removeStorage({ key: "queryWaybillCount" });
+                      Taro.removeStorage({ key: "queryWaybillsUpdated" });
                       setQueryed(true);
                     });
                 }
               }}
-              customStyle="margin-top:1rem;margin-bottom:-1rem">
-              {queryed ? '[查询结果：' + wbCount + '条] 再次查询' : '查询'}
+              customStyle="margin-top:1rem;margin-bottom:-1rem"
+            >
+              {queryed ? "[查询结果：" + wbCount + "条] 再次查询" : "查询"}
             </AtButton>
           </View>
         </View>
       </View>
       {queryed ? (
-        <View className="user-reg-span" style="margin-top:-2rem;margin-bottom:5rem;">
+        <View
+          className="user-reg-span"
+          style="margin-top:-2rem;margin-bottom:5rem;"
+        >
           查询结果：
           <AtList>
             {waybills && waybills.length > 0 ? (
               waybills.map((item) => (
                 <AtListItem
                   onClick={() => {
-                    Taro.removeStorage({ key: 'queryWaybillsUpdated' });
+                    Taro.removeStorage({ key: "queryWaybillsUpdated" });
                     if (item.wbNum && item.wbNum.length > 0) {
                       Taro.navigateTo({
-                        url: '/pages/sheet/index?wbno=' + item.wbNum + '&pidx=1',
+                        url:
+                          "/pages/sheet/index?wbno=" + item.wbNum + "&pidx=1",
                       });
                     }
                   }}
                   title={item.wbNum}
-                  note={item.shiptoName === '合计' && item.wbNum === '' ? item.shiptoName : '[' + item.pgYmd + '-' + item.shiptoCode + ']' + item.shiptoName}
+                  note={
+                    item.shiptoName === "合计" && item.wbNum === ""
+                      ? item.shiptoName
+                      : "[" +
+                        item.pgYmd +
+                        "-" +
+                        item.shiptoCode +
+                        "]" +
+                        item.shiptoName
+                  }
                   extraText={item.statusCaption}
-                  arrow={item.shiptoName === '合计' && item.wbNum === '' ? undefined : 'right'}
+                  arrow={
+                    item.shiptoName === "合计" && item.wbNum === ""
+                      ? undefined
+                      : "right"
+                  }
                   key={item.wbNum + item.status}
                 />
               ))

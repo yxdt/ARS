@@ -22,6 +22,7 @@ export interface CameraStates {
   openid: string;
   wbstatus: number;
   isSuper: boolean;
+  isAlbum: boolean;
 }
 
 export interface CameraProps {
@@ -37,6 +38,7 @@ export default class Index extends Component<CameraProps, CameraStates> {
     const today = new Date();
     const wbstatus = parseInt(Taro.getStorageSync("waybillStatus")) || 0;
     const isSuper = Taro.getStorageSync("roleName").toString().length > 0;
+    const picSrc = this.$router.params.psrc || "";
 
     if (today.valueOf() - wbnodate.valueOf() > 24 * 60 * 60 * 1000) {
       curwbno = "";
@@ -55,8 +57,9 @@ export default class Index extends Component<CameraProps, CameraStates> {
     }
 
     this.state = {
-      src: "",
-      preview: false,
+      src: picSrc,
+      preview: picSrc.length > 0,
+      isAlbum: picSrc.length > 0,
       curwbno,
       uploading: false,
       uploaded: false,
@@ -128,7 +131,14 @@ export default class Index extends Component<CameraProps, CameraStates> {
   }
 
   render() {
-    const { curwbno, uploaded, openid, wbstatus, isSuper } = this.state;
+    const {
+      curwbno,
+      uploaded,
+      openid,
+      wbstatus,
+      isSuper,
+      isAlbum,
+    } = this.state;
 
     if (curwbno.length <= 0) {
       return (
@@ -168,6 +178,9 @@ export default class Index extends Component<CameraProps, CameraStates> {
           <Button
             className="preview-confirm-button"
             onClick={() => {
+              if (isAlbum) {
+                Taro.navigateBack();
+              }
               this.setState({ uploaded: false });
             }}
           >
@@ -235,6 +248,9 @@ export default class Index extends Component<CameraProps, CameraStates> {
             <Button
               className="preview-confirm-button"
               onClick={() => {
+                if (isAlbum) {
+                  Taro.navigateBack();
+                }
                 this.setState({ preview: false });
               }}
               disabled={this.state.uploading}

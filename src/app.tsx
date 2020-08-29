@@ -34,7 +34,6 @@ class App extends Component {
       "pages/camera/camera",
       "pages/camera/verify",
       "pages/user/userinfo",
-      "pages/user/Register",
       "pages/user/Login",
       "pages/sheet/query",
       "pages/sheet/index",

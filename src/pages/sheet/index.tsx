@@ -733,7 +733,29 @@ export default class Index extends Component<null, SheetState> {
                               });
                             }}
                           >
-                            {isSuper ? "替司机上传回执" : "点击上传回执"}
+                            {isSuper ? "替司机上传" : "点击上传回执"}
+                          </AtButton>
+                        ) : null}
+                        {isSuper &&
+                        (waybill.statusNum < 8 || arriveTimeStr.length > 0) ? (
+                          <AtButton
+                            className="right-button-2"
+                            onClick={() => {
+                              Taro.chooseImage({
+                                count: 1,
+                                sizeType: ["original", "compressed"],
+                                sourceType: ["album"],
+                                success: function(res) {
+                                  Taro.navigateTo({
+                                    url:
+                                      "/pages/camera/camera?psrc=" +
+                                      res.tempFilePaths[0],
+                                  });
+                                },
+                              });
+                            }}
+                          >
+                            从相册上传
                           </AtButton>
                         ) : null}
                       </View>
